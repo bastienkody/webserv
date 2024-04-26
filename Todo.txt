@@ -2,18 +2,24 @@
 | Webserv |
 ###########
 
+----------
 Research : 
+----------
 	- rfc 9112
 	- rfc 9110
+	- https://beeceptor.com/docs/concepts/http-headers/
 	- socket (bouquin jm rifflet)
 	- multiplexing (epoll ou select)
 	- desgin oop for the project
 	- configuration file : what is accepted? cf. nginx.conf
 
+-----------------------
 Drafts implementations:
+-----------------------
 	- server nginx on a good/portable environnement for testing (at home + 42dump)
 	- creation and simple communication via sockets
 	- trying to multiplex sockets via poll, select etc
 	- parsing from the server : 
+		- request line (method+uri+version ; seems out of the header part)
 		- header : where to send(cgi?, solo?), detect errors
 		- whole message parsing from the server (ie. reject)
