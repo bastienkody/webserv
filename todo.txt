@@ -8,6 +8,7 @@ Research :
 	- rfc 9112
 	- rfc 9110
 	- https://beeceptor.com/docs/concepts/http-headers/
+	- webdocs mozzila : https://developer.mozilla.org/en-US/docs/Web/HTTP
 	- socket (bouquin jm rifflet)
 	- multiplexing (epoll ou select)
 	- desgin oop for the project
