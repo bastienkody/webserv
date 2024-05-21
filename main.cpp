@@ -6,42 +6,214 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/19 17:17:01 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/21 19:07:14 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/socket.h> /*socket, listen, bind, accept...*/
-#include <arpa/inet.h> /*inet_pton et inet_ntop*/
+#include <arpa/inet.h> /*inet_pton et inet_ntop  (transforme ip en chaine de caracteres et inversement)*/
 #include <string.h> /*memset*/
 #include <netdb.h> /*struc addrinfo*/
 #include <iostream> /*std::*/
+#include <unistd.h> /*fcntl*/
+#include <fcntl.h> /*fcntl*/
+#include <stdio.h> /*perror*/
+
+#define PORT "8080"
 
 /*dans un premier temps creer socket
-  pour ca je dois utiliser getaddrinfo pour obtenir info pour creer socket et pour utiliser bind and co*/
+  pour ca je dois utiliser getaddrinfo pour obtenir info pour creer socket 
+  et pour utiliser bind and co grace au resultat de getaddrinfo
+  utiliser shutdown pour socket ?*/
 
-int	main(void)
+
+/*---------TO DO---------
+	- finir mise en place serv test
+	- commencer parsing une fois serv fait*/
+
+
+int create_socket_server(void)
 {
 	struct addrinfo hints;
 	struct addrinfo *res;
-	int socket_fd; /*fd du socket bind sur mon serveur*/
-	int client_fd; /*fd du client qui se connect au serv via socket_fd*/
-	int status; /*check retour diff fonctions*/
+	int server_fd;
+	int client_fd;
+	int status;
 
-	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
-	
-	status = getaddrinfo(NULL, "8080", &hints, &res);
-	socket_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	//socket_fd = socket(PF_INET, SOCK_STREAM, TCP);
 
-	status = bind(socket_fd, res->ai_addr, res->ai_addrlen);
+	status = getaddrinfo(NULL, PORT, &hints, &res);
+	if (status < 0)
+		return (perror("getaddrinfo"), -1);
+	server_fd = socket(res->ai_socktype, res->ai_socktype, res->ai_protocol);
+	if (server_fd < 0)
+		return (perror("socket"), freeaddrinfo(res), -1);
+	status = bind(server_fd, res->ai_addr, res->ai_addrlen);
+	if (status < 0)
+		return (perror("socket"), freeaddrinfo(res), close(server_fd), -1);
+	freeaddrinfo(res)
+	std::cout<< "[Server] New server socket created and bound to port " << PORT<<std::endl;
+	return (server_fd);
+}
 
-	status = listen(socket_fd, 20);
-	
-	client_fd = accept(socket_fd, NULL, 0);
-	
-	std::cout<< "Nouvelle connection recue !"<<std::endl;
+int	add_to_poll(int client_fd, struct poll **poll_fds, int *poll_count, int poll_size)
+{
+	if (*poll_count == poll_size)
+		return (std::cout<<"Error: Not enough space in \"poll_fds\""<<std::endl, -1);
+	(*poll_fds[*poll_count]).fd = client_fd;
+	(*poll_fds[*poll_count]).events = POLLIN;
+	*poll_count++;
 	return (0);
 }
+
+int	read_recv_data(struct poll **poll_fds, int *poll_count, int poll_size)
+{
+	int nb_bytes
+	char buff[10000];
+
+	nb_bytes = recv(poll_fds[*poll_count - 1].fd, &buff, 10000, 0);
+	if (nb_bytes < 0)
+		return (perror("recv"), -1);
+	else if (nb_bytes == 0)
+		return (std::cout<< "[Server] Connexion with " << poll_fds[i].fd << "is closed."<<std::endl);
+	std::cout<< "[Client] " << buff<<std::endl;
+	return (0);
+}
+
+void	accept_new_connection(int server_fd, struct poll **poll_fds, int *poll_count, int poll_size)
+{
+	int client_fd;
+	int status;
+	char buff[100];
+
+	client_fd = accept(server_fd, NULL, NULL);
+	if (client_fd < 0)
+		return (perror("accept"), close(server_fd), free(*poll_fds), exit(1));
+	status = add_to_poll(client_fd, poll_fds, poll_count, poll_size);
+	if (status < 0)
+		return (close(server_fd), close(client_fd), free(*poll_fds), exit(1));
+	std::cout<< "[Server] New connexion with client fd : " << poll_fds[i].fd<<std::endl;
+	status = read_recv_data(poll_fds, poll_count, poll_size);
+	if (status < 0);
+		return (close(server_fd), close(client_fd), free(*poll_fds), exit(1));
+}
+
+int main(void)
+{
+	int server_fd;
+	int status;
+	struct pollfd poll_fds[20];
+	int poll_size = 20;
+	int poll_count = 0;
+
+	server_fd = create_socket_server();
+	if (server_fd == -1)
+		return (0);
+	
+	status = listen(server_fd, 20);
+	if (status < 0)
+		return (perror("listen"), close(server_fd), 0);
+	
+	// poll_fds = calloc(poll_size + 1, sizeof(struct pollfd));
+	// if (!poll_fds)
+	// 	return (std::cout<< "Malloc Error"<<std::endl, close(server_fd), 0);
+	
+	poll_fds[0].fd = server_fd;
+	poll_fds[0].events = POLLIN;
+	poll_count++;
+
+	while (1)
+	{
+		status = poll(poll_fds, poll_count, 2000);
+		if (status < 0)
+			return (perror("poll"), close(server_fd), free(poll_fds), 0);
+		else if (status == 0)
+		{
+			std::cout<< "[Server] Server is waiting..."<<std::endl;
+			continue;
+		}
+
+		for(int i = 0; i < poll_count; i++)
+		{
+			if ((poll_fds[i].revents && POLLIN) != 1)
+				continue ;
+
+			if (poll_fds[i].fd == server_fd)
+				accept_new_connection(server_fd, &poll_fds, &poll_count, poll_size);
+		}
+
+	}
+
+
+}
+
+
+
+
+// int	main(void)
+// {
+// 	struct addrinfo hints;
+// 	struct addrinfo *res;
+// 	int server_fd; /*fd du socket bind sur mon serveur*/
+// 	int client_fd; /*fd du client qui se connect au serv via server_fd*/
+// 	int status; /*check retour diff fonctions*/
+
+// 	memset(&hints, 0, sizeof hints);
+// 	hints.ai_family = AF_INET;
+// 	hints.ai_socktype = SOCK_STREAM;
+// 	hints.ai_flags = AI_PASSIVE;
+	
+// 	status = getaddrinfo(NULL, PORT, &hints, &res);
+// 	if (status != 0)
+// 	{
+// 		perror("getaddrinfo");
+// 		return (std::cout<< "Error getaddrinfo"<<std::endl, 0);
+// 	}
+// 	server_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+// 	if (server_fd == -1)
+// 		return (freeaddrinfo(res), std::cout<< "Error socket"<<std::endl, 0);
+// 	//server_fd = socket(PF_INET, SOCK_STREAM, TCP);
+
+// 	status = bind(server_fd, res->ai_addr, res->ai_addrlen);
+// 	if (status == -1)
+// 	{
+// 		perror("bind");
+// 		return (freeaddrinfo(res), close(server_fd), std::cout<< "Error bind"<<std::endl, 0);
+// 	}
+
+// 	status = listen(server_fd, 20);
+// 	if (status == -1)
+// 	{
+// 		perror("listen");
+// 		return (freeaddrinfo(res), close(server_fd), std::cout<< "Error listen"<<std::endl, 0);
+// 	}
+// 	std::cout<< "[Server] Server is listening on port " << PORT <<std::endl;
+	
+// 	client_fd = accept(server_fd, NULL, 0);
+// 	if (client_fd == -1)
+// 	{
+// 		perror("accept");
+// 		return (freeaddrinfo(res), close(server_fd), std::cout<< "Error accept"<<std::endl, 0);
+// 	}
+// 	std::cout<< "[Server] New client socket : " << client_fd <<std::endl;
+	
+// 	ssize_t nb_bytes;
+// 	char buff[10000];
+// 	while (1)
+// 	{
+// 		memset(&buff, 0, 10000);
+// 		nb_bytes = recv(client_fd, &buff, 10000, 0);
+// 		if (nb_bytes == 0)
+// 			break ;
+// 		else if (nb_bytes == -1)
+// 			return (freeaddrinfo(res), close(client_fd), close(server_fd), std::cout<< "Error recv"<<std::endl, 0);
+// 		std::cout<< "[Client] " << buff;
+// 	}
+// 	std::cout<< "[Server] Connexion is closed."<<std::endl;
+// 	freeaddrinfo(res);
+// 	close(server_fd);
+// 	close(client_fd);
+// 	return (0);
+// }
