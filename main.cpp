@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/21 19:07:14 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/22 16:36:28 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <unistd.h> /*fcntl*/
 #include <fcntl.h> /*fcntl*/
 #include <stdio.h> /*perror*/
+#include <poll.h> /*poll*/
+#include <stdlib.h> /*exit*/
 
 #define PORT "8080"
 
@@ -29,6 +31,9 @@
 
 /*---------TO DO---------
 	- finir mise en place serv test
+		- creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation
+		- creer class socket (je sais pas encore comment je vais m'en servir)
+		- passer socket en non bloquant
 	- commencer parsing une fois serv fait*/
 
 
@@ -37,7 +42,6 @@ int create_socket_server(void)
 	struct addrinfo hints;
 	struct addrinfo *res;
 	int server_fd;
-	int client_fd;
 	int status;
 
 	hints.ai_family = AF_INET;
@@ -53,52 +57,62 @@ int create_socket_server(void)
 	status = bind(server_fd, res->ai_addr, res->ai_addrlen);
 	if (status < 0)
 		return (perror("socket"), freeaddrinfo(res), close(server_fd), -1);
-	freeaddrinfo(res)
+	freeaddrinfo(res);
 	std::cout<< "[Server] New server socket created and bound to port " << PORT<<std::endl;
 	return (server_fd);
 }
 
-int	add_to_poll(int client_fd, struct poll **poll_fds, int *poll_count, int poll_size)
+int	add_to_poll(int client_fd, struct pollfd *poll_fds, int *poll_count, int poll_size)
 {
-	if (*poll_count == poll_size)
+	if (*poll_count >= poll_size)
 		return (std::cout<<"Error: Not enough space in \"poll_fds\""<<std::endl, -1);
-	(*poll_fds[*poll_count]).fd = client_fd;
-	(*poll_fds[*poll_count]).events = POLLIN;
-	*poll_count++;
+	(void) poll_size;
+	// int i = -1;
+	// while (++i < poll_size)
+	// {
+	// 	if ((*pol_fds)[i].fd == 0)
+	// 		break ;
+	// }
+	// poll_fds[0]->fd = 10;
+	poll_fds[*poll_count - 1].fd = client_fd;
+	poll_fds[*poll_count - 1].events = POLLIN;
+	*poll_count += 1;
 	return (0);
 }
 
-int	read_recv_data(struct poll **poll_fds, int *poll_count, int poll_size)
+void remove_to_poll(int i, struct pollfd *poll_fds, int *poll_count)
 {
-	int nb_bytes
+	poll_fds[i] = poll_fds[*poll_count - 1];
+	*poll_count -= 1;
+}
+
+void	read_recv_data(int i, struct pollfd *poll_fds, int *poll_count)
+{
+	int nb_bytes;
 	char buff[10000];
 
-	nb_bytes = recv(poll_fds[*poll_count - 1].fd, &buff, 10000, 0);
+	nb_bytes = recv(poll_fds[i].fd, &buff, 10000, 0);
 	if (nb_bytes < 0)
-		return (perror("recv"), -1);
+		return (perror("recv"), exit(1));
 	else if (nb_bytes == 0)
-		return (std::cout<< "[Server] Connexion with " << poll_fds[i].fd << "is closed."<<std::endl);
+		return (remove_to_poll(i, poll_fds, poll_count), std::cout<< "[Server] Connexion with " << poll_fds[i].fd << "is closed."<<std::endl, exit(1));
 	std::cout<< "[Client] " << buff<<std::endl;
-	return (0);
 }
 
-void	accept_new_connection(int server_fd, struct poll **poll_fds, int *poll_count, int poll_size)
+void	accept_new_connection(int server_fd, struct pollfd *poll_fds, int *poll_count, int poll_size)
 {
 	int client_fd;
 	int status;
-	char buff[100];
 
 	client_fd = accept(server_fd, NULL, NULL);
 	if (client_fd < 0)
-		return (perror("accept"), close(server_fd), free(*poll_fds), exit(1));
+		return (perror("accept"), close(server_fd), exit(1));
 	status = add_to_poll(client_fd, poll_fds, poll_count, poll_size);
 	if (status < 0)
-		return (close(server_fd), close(client_fd), free(*poll_fds), exit(1));
-	std::cout<< "[Server] New connexion with client fd : " << poll_fds[i].fd<<std::endl;
-	status = read_recv_data(poll_fds, poll_count, poll_size);
-	if (status < 0);
-		return (close(server_fd), close(client_fd), free(*poll_fds), exit(1));
+		return (close(server_fd), close(client_fd), exit(1));
+	std::cout<< "[Server] New connexion with client fd : " << poll_fds[*poll_count - 1].fd<<std::endl;
 }
+
 
 int main(void)
 {
@@ -128,7 +142,7 @@ int main(void)
 	{
 		status = poll(poll_fds, poll_count, 2000);
 		if (status < 0)
-			return (perror("poll"), close(server_fd), free(poll_fds), 0);
+			return (perror("poll"), close(server_fd), 0);
 		else if (status == 0)
 		{
 			std::cout<< "[Server] Server is waiting..."<<std::endl;
@@ -142,11 +156,13 @@ int main(void)
 
 			if (poll_fds[i].fd == server_fd)
 				accept_new_connection(server_fd, &poll_fds, &poll_count, poll_size);
+			else
+				read_recv_data(i, &poll_fds, &poll_count);
 		}
 
 	}
-
-
+	
+	return (0);
 }
 
 
