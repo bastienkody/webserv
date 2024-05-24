@@ -6,19 +6,28 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 16:37:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/22 17:01:46 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/24 17:09:01 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <poll.h>
-
+#include <iostream>
 
 class	Poll
 {
 	public :
-		
+		Poll(void);
+		~Poll(void);
+		struct pollfd	getFds(int i) const;
+		// struct pollfd	getAllFds(void) const;
+		int				getCount(void) const;
+		void			setFds(int i, int new_fd, short event);
+		void			setCount(int count);
+		int 			add_to_poll(int new_fd);
+		void			remove_to_poll(int i);
+		int				wait(void);
 
 	private :
-		struct pollfd	fds[256];
-		int				poll_count;
+		struct pollfd	_fds[256];
+		int				_count;
 };
