@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/25 15:45:03 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/25 16:58:16 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,13 @@
 
 /*---------TO DO---------
 	- finir mise en place serv test
-		- creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation
+		~ creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation (globalement fini ?)
 		- creer class socket (je sais pas encore comment je vais m'en servir)
-		- passer socket en non bloquant (fait ?)
-	- commencer parsing une fois serv fait
-	- utiliser "signal" pour catch ctrl c et terminer le programme*/
+		~ passer socket en non bloquant (fait ?)
+	- commencer parsing une fois serv fait (Bastien ou moi qui fait ?)
+	- utiliser "signal" pour catch ctrl c et terminer le programme
+	- gerer leaks et fds
+-------------------------*/
 
 
 int create_socket_server(void)
@@ -75,7 +77,7 @@ int	read_recv_data(int i, Poll *poll_fds)
 	int nb_bytes;
 	char buff[10000];
 
-	memset(&buff, 0, sizeof buff);
+	memset(&buff, 0, sizeof buff); /*vide le buffer a chaque fois (pas sur de le garder mais utile pour l'instant)*/
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
 	if (nb_bytes < 0)
 		return (perror("recv"), -1);
@@ -99,7 +101,6 @@ void	accept_new_connection(int server_fd, Poll *poll_fds)
 	std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;
 }
 
-
 int main(void)
 {
 	int server_fd;
@@ -111,9 +112,10 @@ int main(void)
 		return (0);
 	status = poll_fds.add_to_poll(server_fd);
 
+	/*boucle principale du serv qui passe par poll a chaque tour pour les potentiels ecritures/lectures*/
 	while (1)
 	{
-		status = poll_fds.wait();
+		status = poll_fds.wait(); /*appel a poll*/
 		if (status < 0)
 			return (perror("poll"), close(server_fd), 0);
 		else if (status == 0)
@@ -128,23 +130,21 @@ int main(void)
 
 			if (poll_fds.getFds(i).fd == server_fd)
 			{
-				accept_new_connection(server_fd, &poll_fds);
+				accept_new_connection(server_fd, &poll_fds); /*si c'est une nouvelle connexion*/
 			}
 			else
 			{
-				status = read_recv_data(i, &poll_fds);
+				status = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
 				if (status == -1)
 					return (0);
-
 			}
 		}
 	}
-	
 	return (0);
 }
 
 
-
+/*Probablement bientot supp*/
 
 // int	main(void)
 // {

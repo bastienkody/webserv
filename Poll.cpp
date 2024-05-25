@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/24 15:04:51 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/25 15:39:03 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/25 16:56:58 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,6 @@ struct pollfd	Poll::getFds(int i) const
 {
 	return (_fds[i]);
 }
-
-// struct pollfd Poll::getAllFds(void) const
-// {
-// 	return (this->_fds);
-// }
 
 int	Poll::getCount(void) const
 {
