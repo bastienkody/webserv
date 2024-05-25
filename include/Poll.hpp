@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 16:37:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/25 14:47:11 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/25 17:02:13 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class	Poll
 		void			setCount(int count);
 		int 			add_to_poll(int new_fd);
 		void			remove_to_poll(int i);
-		int				wait(void);
+		int				wait(void); /*trouver meilleur nom ?*/
 
 	private :
 		struct pollfd	_fds[256];
