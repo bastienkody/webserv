@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/24 15:04:51 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/24 17:37:32 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/25 15:39:03 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ int	Poll::add_to_poll(int new_fd)
 {
 	if (this->_count >= 256)
 		return (std::cout<<"Error: Not enough space in \"poll_fds\""<<std::endl, -1);
-	this->setFds(getCount(), new_fd, POLLIN);
+	_fds[_count].fd = new_fd;
+	_fds[_count].events = POLLIN;
 	this->_count++;
-	// std::cout<< "fd[0] : " << _fds[_count - 1].fd<<std::endl;
 	return (0);
 }
 
@@ -38,8 +38,8 @@ void	Poll::remove_to_poll(int i)
 
 int	Poll::wait()
 {
-	// std::cout<< "test 2"<<std::endl;
-	return (poll(_fds, _count, 2000));
+	int status = poll(_fds, _count, -1);
+	return (status);
 }
 
 struct pollfd	Poll::getFds(int i) const
@@ -61,6 +61,7 @@ void	Poll::setFds(int i, int new_fd, short event)
 {
 	this->_fds[i].fd = new_fd;
 	this->_fds[i].fd = event;
+	_count++;
 }
 
 void	Poll::setCount(int count)

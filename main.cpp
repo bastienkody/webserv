@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/24 17:50:02 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/25 15:45:03 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 #include <arpa/inet.h> /*inet_pton et inet_ntop  (transforme ip en chaine de caracteres et inversement)*/
 #include <string.h> /*memset*/
 #include <netdb.h> /*struc addrinfo*/
-#include <iostream> /*std::*/
 #include <unistd.h> /*fcntl*/
 #include <fcntl.h> /*fcntl*/
 #include <stdio.h> /*perror*/
+// #include <iostream> /*std::*/
 // #include <poll.h> /*poll*/
 #include "include/Poll.hpp"
 #include <stdlib.h> /*exit*/
@@ -34,8 +34,9 @@
 	- finir mise en place serv test
 		- creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation
 		- creer class socket (je sais pas encore comment je vais m'en servir)
-		- passer socket en non bloquant
-	- commencer parsing une fois serv fait*/
+		- passer socket en non bloquant (fait ?)
+	- commencer parsing une fois serv fait
+	- utiliser "signal" pour catch ctrl c et terminer le programme*/
 
 
 int create_socket_server(void)
@@ -50,55 +51,38 @@ int create_socket_server(void)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
+	/*recup les infos necessaires pour creer puis bind socket*/
 	status = getaddrinfo(NULL, PORT, &hints, &res);
 	if (status < 0)
 		return (perror("getaddrinfo"), -1);
 	server_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (server_fd < 0)
 		return (perror("socket"), freeaddrinfo(res), -1);
+	fcntl(server_fd, F_SETFL, O_NONBLOCK); /*je vois pas encore de diff avec et sans*/
 	status = bind(server_fd, res->ai_addr, res->ai_addrlen);
 	if (status < 0)
-		return (perror("socket"), freeaddrinfo(res), close(server_fd), -1);
+		return (perror("bind"), freeaddrinfo(res), close(server_fd), -1);
 	freeaddrinfo(res);
-	std::cout<< "[Server] New server socket created and bound to port " << PORT<<std::endl;
+	status = listen(server_fd, 20);
+	if (status < 0)
+		return (perror("listen"), close(server_fd), -1);
+	std::cout<< "[Server] New server socket created and listening to port " << PORT<<std::endl;
 	return (server_fd);
 }
 
-// int	add_to_poll(int client_fd, struct pollfd *poll_fds, int *poll_count, int poll_size)
-// {
-// 	if (*poll_count >= poll_size)
-// 		return (std::cout<<"Error: Not enough space in \"poll_fds\""<<std::endl, -1);
-// 	(void) poll_size;
-// 	// int i = -1;
-// 	// while (++i < poll_size)
-// 	// {
-// 	// 	if ((*pol_fds)[i].fd == 0)
-// 	// 		break ;
-// 	// }
-// 	// poll_fds[0]->fd = 10;
-// 	poll_fds[*poll_count - 1].fd = client_fd;
-// 	poll_fds[*poll_count - 1].events = POLLIN;
-// 	*poll_count += 1;
-// 	return (0);
-// }
-
-// void remove_to_poll(int i, struct pollfd *poll_fds, int *poll_count)
-// {
-// 	poll_fds[i] = poll_fds[*poll_count - 1];
-// 	*poll_count -= 1;
-// }
-
-void	read_recv_data(int i, Poll *poll_fds)
+int	read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
 	char buff[10000];
 
+	memset(&buff, 0, sizeof buff);
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
 	if (nb_bytes < 0)
-		return (perror("recv"), exit(1));
+		return (perror("recv"), -1);
 	else if (nb_bytes == 0)
-		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << "is closed."<<std::endl, exit(1));
-	std::cout<< "[Client] " << buff<<std::endl;
+		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, 0);
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
+	return (0);
 }
 
 void	accept_new_connection(int server_fd, Poll *poll_fds)
@@ -125,16 +109,11 @@ int main(void)
 	server_fd = create_socket_server();
 	if (server_fd == -1)
 		return (0);
-	
-	status = listen(server_fd, 20);
-	if (status < 0)
-		return (perror("listen"), close(server_fd), 0);
 	status = poll_fds.add_to_poll(server_fd);
 
 	while (1)
 	{
 		status = poll_fds.wait();
-		std::cout<< "status : " << status<<std::endl;
 		if (status < 0)
 			return (perror("poll"), close(server_fd), 0);
 		else if (status == 0)
@@ -142,7 +121,6 @@ int main(void)
 			std::cout<< "[Server] Server is waiting..."<<std::endl;
 			continue;
 		}
-		// std::cout<< "count : " << poll_fds.getCount()<<std::endl;
 		for(int i = 0; i < poll_fds.getCount(); i++)
 		{
 			if ((poll_fds.getFds(i).revents && POLLIN) != 1)
@@ -150,11 +128,15 @@ int main(void)
 
 			if (poll_fds.getFds(i).fd == server_fd)
 			{
-				std::cout<< "test 1"<<std::endl;
 				accept_new_connection(server_fd, &poll_fds);
 			}
-			// else
-			// 	read_recv_data(i, &poll_fds);
+			else
+			{
+				status = read_recv_data(i, &poll_fds);
+				if (status == -1)
+					return (0);
+
+			}
 		}
 	}
 	
