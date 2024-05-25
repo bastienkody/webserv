@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/25 16:58:16 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/25 17:33:37 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 		~ creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation (globalement fini ?)
 		- creer class socket (je sais pas encore comment je vais m'en servir)
 		~ passer socket en non bloquant (fait ?)
+		- POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour chaque port ? Mais existe plus que 256 ports donc pas viable pour bcp de ports possible)
 	- commencer parsing une fois serv fait (Bastien ou moi qui fait ?)
 	- utiliser "signal" pour catch ctrl c et terminer le programme
 	- gerer leaks et fds
