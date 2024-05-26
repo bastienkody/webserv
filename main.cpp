@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/26 15:24:45 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/26 15:28:47 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 			socketpair pas utilise parce qu'utile pour 2 ports mais a partir de 3 revient au meme que utiliser socket
 	- commencer parsing une fois serv fait (Bastien ou moi qui fait ?)
 	- utiliser "signal" pour catch ctrl c et terminer le programme
+	- mettre a la norme du projet (check fonction autorise et alternative pour fonctions C)
 	- gerer leaks et fds
 -------------------------*/
 
