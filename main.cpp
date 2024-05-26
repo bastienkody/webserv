@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/25 17:33:37 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/26 15:18:54 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,27 +22,24 @@
 #include "include/Poll.hpp"
 #include <stdlib.h> /*exit*/
 
-#define PORT "8080"
-
-/*dans un premier temps creer socket
-  pour ca je dois utiliser getaddrinfo pour obtenir info pour creer socket 
-  et pour utiliser bind and co grace au resultat de getaddrinfo
-  utiliser shutdown pour socket ?*/
-
-
 /*---------TO DO---------
-	- finir mise en place serv test
-		~ creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation (globalement fini ?)
+- : pas encore fait/en cours
+~ : fait mais pas sur que ce soit bien
++ : fait
+
+	~ finir mise en place serv test
+		~ creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation
 		- creer class socket (je sais pas encore comment je vais m'en servir)
-		~ passer socket en non bloquant (fait ?)
-		- POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour chaque port ? Mais existe plus que 256 ports donc pas viable pour bcp de ports possible)
+		~ passer socket en non bloquant
+		+ POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour chaque port ? Mais existe plus que 256 ports donc pas viable pour bcp de ports possible)
+			socketpair pas utilise parce qu'utile pour 2 ports mais a partir de 3 revient au meme que utiliser socket
 	- commencer parsing une fois serv fait (Bastien ou moi qui fait ?)
 	- utiliser "signal" pour catch ctrl c et terminer le programme
 	- gerer leaks et fds
 -------------------------*/
 
 
-int create_socket_server(void)
+int create_socket_server(const char *port)
 {
 	struct addrinfo hints;
 	struct addrinfo *res;
@@ -55,7 +52,7 @@ int create_socket_server(void)
 	hints.ai_flags = AI_PASSIVE;
 
 	/*recup les infos necessaires pour creer puis bind socket*/
-	status = getaddrinfo(NULL, PORT, &hints, &res);
+	status = getaddrinfo(NULL, port, &hints, &res);
 	if (status < 0)
 		return (perror("getaddrinfo"), -1);
 	server_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -69,7 +66,7 @@ int create_socket_server(void)
 	status = listen(server_fd, 20);
 	if (status < 0)
 		return (perror("listen"), close(server_fd), -1);
-	std::cout<< "[Server] New server socket created and listening to port " << PORT<<std::endl;
+	std::cout<< "[Server] New server socket created and listening to port " << port<<std::endl;
 	return (server_fd);
 }
 
@@ -102,36 +99,55 @@ void	accept_new_connection(int server_fd, Poll *poll_fds)
 	std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;
 }
 
+/*verifie quel socket server a recu une nouvelle connexion*/
+int	check_serv_socket(int fd, int *serv_fds)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (fd == serv_fds[i])
+			return (i);
+	}
+	return (-1);
+}
+
 int main(void)
 {
-	int server_fd;
+	/*bcp de hard code mais je le changerai quand le parsing du fichier de config sera fait 
+	et qu'on aura les ports + leur nombre*/
+	int server_fd[3];
 	int status;
-	Poll poll_fds;
+	Poll poll_fds; /*contient la liste des fds que poll va surveiller*/
+	std::string ports[3] = {"8080", "8081", "8082"};
 
-	server_fd = create_socket_server();
-	if (server_fd == -1)
-		return (0);
-	status = poll_fds.add_to_poll(server_fd);
+	for (int i = 0; i < 3; i++)
+	{
+		server_fd[i] = create_socket_server(ports[i].c_str());
+		if (server_fd[i] == -1)
+			return (0);
+		status = poll_fds.add_to_poll(server_fd[i]);
+		if (status < 0)
+			return (0);
+	}
 
 	/*boucle principale du serv qui passe par poll a chaque tour pour les potentiels ecritures/lectures*/
 	while (1)
 	{
 		status = poll_fds.wait(); /*appel a poll*/
 		if (status < 0)
-			return (perror("poll"), close(server_fd), 0);
+			return (perror("poll"), 0);
 		else if (status == 0)
 		{
-			std::cout<< "[Server] Server is waiting..."<<std::endl;
+			// std::cout<< "[Server] Server is waiting..."<<std::endl;
 			continue;
 		}
 		for(int i = 0; i < poll_fds.getCount(); i++)
 		{
-			if ((poll_fds.getFds(i).revents && POLLIN) != 1)
+			if ((poll_fds.getFds(i).revents && POLLIN) != 1) /*revents = event attendu pour la socket et POLLIN = event pour signal entrant*/
 				continue ;
 
-			if (poll_fds.getFds(i).fd == server_fd)
+			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1)
 			{
-				accept_new_connection(server_fd, &poll_fds); /*si c'est une nouvelle connexion*/
+				accept_new_connection(server_fd[status], &poll_fds); /*si c'est une nouvelle connexion*/
 			}
 			else
 			{
