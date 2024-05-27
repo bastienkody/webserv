@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/05/26 15:28:47 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/05/27 18:55:49 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@
 #include <unistd.h> /*fcntl*/
 #include <fcntl.h> /*fcntl*/
 #include <stdio.h> /*perror*/
+#include <stdlib.h> /*exit*/
 // #include <iostream> /*std::*/
 // #include <poll.h> /*poll*/
 #include "include/Poll.hpp"
-#include <stdlib.h> /*exit*/
 
 /*---------TO DO---------
 - : pas encore fait/en cours
@@ -31,8 +31,8 @@
 		~ creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation
 		- creer class socket (je sais pas encore comment je vais m'en servir)
 		~ passer socket en non bloquant
-		+ POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour chaque port ?
-			socketpair pas utilise parce qu'utile pour 2 ports mais a partir de 3 revient au meme que utiliser socket
+		+ POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour chaque port ?)
+	- gerer requete chunk
 	- commencer parsing une fois serv fait (Bastien ou moi qui fait ?)
 	- utiliser "signal" pour catch ctrl c et terminer le programme
 	- mettre a la norme du projet (check fonction autorise et alternative pour fonctions C)
@@ -52,7 +52,7 @@ int create_socket_server(const char *port)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	/*recup les infos necessaires pour creer puis bind socket*/
+	/*recup les infos necessaires dans res pour creer puis bind socket*/
 	status = getaddrinfo(NULL, port, &hints, &res);
 	if (status < 0)
 		return (perror("getaddrinfo"), -1);
@@ -83,8 +83,43 @@ int	read_recv_data(int i, Poll *poll_fds)
 	else if (nb_bytes == 0)
 		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, 0);
 	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
+	/*
+		1	parsing build objet grace a buff
+		2	appel a cgi (pas forcement directement mais en tout cas sans repasser par read_recv)
+		3	si cgi a eu tout ce dont il avait besoin parsing modifie nb_bytes en x qui signifie qu'on peut quitter read_recv
+			sinon parsing modifie nb_bytes en y et return objet
+		4	nouvel appel a recv pour lire suite body
+		5	appel a parsing avec objet != NULL donc pas besoin de rebuild juste append
+		6	repeter a partir 2 autant de fois que necessaires
+	*/
 	return (0);
 }
+
+/*int	function(char *buff, int *nb_bytes, bool)
+{
+	parse buff et cree obj
+	envoie a cgi
+	cgi renvoie erreur manque info
+	appel a read_recv
+	append a obj
+	envoie a cgi etc...
+}*/
+
+/*int	read_recv_data(int i, Poll *poll_fds)
+{
+	int nb_bytes;
+	char buff[10000];
+	int status;
+
+	memset(&buff, 0, sizeof buff);
+	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
+	if (nb_bytes < 0)
+		return (perror("recv"), -1);
+	else if (nb_bytes == 0)
+		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, 0);
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;	
+	return (0);
+}*/
 
 void	accept_new_connection(int server_fd, Poll *poll_fds)
 {
@@ -100,7 +135,7 @@ void	accept_new_connection(int server_fd, Poll *poll_fds)
 	std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;
 }
 
-/*verifie quel socket server a recu une nouvelle connexion*/
+/*verifie quelle socket server a recu une nouvelle connexion*/
 int	check_serv_socket(int fd, int *serv_fds)
 {
 	for (int i = 0; i < 3; i++)
@@ -155,77 +190,9 @@ int main(void)
 				status = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
 				if (status == -1)
 					return (0);
+				/*function*/
 			}
 		}
 	}
 	return (0);
 }
-
-
-/*Probablement bientot supp*/
-
-// int	main(void)
-// {
-// 	struct addrinfo hints;
-// 	struct addrinfo *res;
-// 	int server_fd; /*fd du socket bind sur mon serveur*/
-// 	int client_fd; /*fd du client qui se connect au serv via server_fd*/
-// 	int status; /*check retour diff fonctions*/
-
-// 	memset(&hints, 0, sizeof hints);
-// 	hints.ai_family = AF_INET;
-// 	hints.ai_socktype = SOCK_STREAM;
-// 	hints.ai_flags = AI_PASSIVE;
-	
-// 	status = getaddrinfo(NULL, PORT, &hints, &res);
-// 	if (status != 0)
-// 	{
-// 		perror("getaddrinfo");
-// 		return (std::cout<< "Error getaddrinfo"<<std::endl, 0);
-// 	}
-// 	server_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-// 	if (server_fd == -1)
-// 		return (freeaddrinfo(res), std::cout<< "Error socket"<<std::endl, 0);
-// 	//server_fd = socket(PF_INET, SOCK_STREAM, TCP);
-
-// 	status = bind(server_fd, res->ai_addr, res->ai_addrlen);
-// 	if (status == -1)
-// 	{
-// 		perror("bind");
-// 		return (freeaddrinfo(res), close(server_fd), std::cout<< "Error bind"<<std::endl, 0);
-// 	}
-
-// 	status = listen(server_fd, 20);
-// 	if (status == -1)
-// 	{
-// 		perror("listen");
-// 		return (freeaddrinfo(res), close(server_fd), std::cout<< "Error listen"<<std::endl, 0);
-// 	}
-// 	std::cout<< "[Server] Server is listening on port " << PORT <<std::endl;
-	
-// 	client_fd = accept(server_fd, NULL, 0);
-// 	if (client_fd == -1)
-// 	{
-// 		perror("accept");
-// 		return (freeaddrinfo(res), close(server_fd), std::cout<< "Error accept"<<std::endl, 0);
-// 	}
-// 	std::cout<< "[Server] New client socket : " << client_fd <<std::endl;
-	
-// 	ssize_t nb_bytes;
-// 	char buff[10000];
-// 	while (1)
-// 	{
-// 		memset(&buff, 0, 10000);
-// 		nb_bytes = recv(client_fd, &buff, 10000, 0);
-// 		if (nb_bytes == 0)
-// 			break ;
-// 		else if (nb_bytes == -1)
-// 			return (freeaddrinfo(res), close(client_fd), close(server_fd), std::cout<< "Error recv"<<std::endl, 0);
-// 		std::cout<< "[Client] " << buff;
-// 	}
-// 	std::cout<< "[Server] Connexion is closed."<<std::endl;
-// 	freeaddrinfo(res);
-// 	close(server_fd);
-// 	close(client_fd);
-// 	return (0);
-// }
