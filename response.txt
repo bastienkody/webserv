@@ -1,0 +1,14 @@
+############
+| RESPONSE |
+############
+Always be 3 compoments, separated by whitespace(s):
+METHOD	WS	CODE	WS	HUMAN_TEXT	CRLF
+ie :	GET / HTTP/1.1
+		POST http://exampleform.com/home/login/form HTTP/1.1
+		DELETE /thatfile.html HTTP/1.1
+
+Class	StatusLine;
+	string	version; (static? =="HTTP/1.1")
+	uint	code; (clean: csv file with status code==text? or static map?)
+	Class	header; (or just map?)
+	string	data; (what if chunked response?)
