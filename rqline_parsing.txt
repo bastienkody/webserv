@@ -91,8 +91,9 @@ Class	Request
 	string	body; (waht if chunked?)
 
 Class Requestline
-	uint	method;
-	class	url;
+	std::string	fullRequest;
+	uint		method;
+	class		url;
 
 Class URL
 	string	protocol;
@@ -106,6 +107,7 @@ Most work in constructor
 Use of exception for error? argh je sais pas en vrai il faudrait avoir créé
 la classe pour pouvoir creer la reponse d'erreur ; genre ici on note tout naivement
 et dans la partie reponse on check si error ou cgi (lequel checkerait d'autres erreurs)
+OUI!
 
 What about "syntax" problem? are they even possible?
 ie. for rqline: bad sep, query with no "=", no path at all 
