@@ -14,12 +14,11 @@ URL::~URL()
 //	Param constructor
 URL::URL(const std::string str)
 {
-	if (std::string(str.begin(), str.begin() + 8).compare("https://"))
-		// bad protocol
-	if (std::string(str.begin(), str.begin() + 7).compare("http://"))
-		absoluteFromParser();
+	_fullURL = str;
+	if (str.find("https://") == std::string::npos && str.find("http://") == 0)
+		absoluteFormParser();
 	else
-		_path = str;
+		originFormParser(str); // on laisse les https ici (nsp si necessaire)
 }
 
 //	Copy constructor (via copy operator)
@@ -44,11 +43,61 @@ URL & URL::operator=(const URL & rhs)
 }
 
 /*	ie.  http://www.example.com:80/path/to/myfile.html?key1=value1&key2=value2#SomewhereInTheDocument	
-	port can be ommited
+	port can be ommited, query and anchor too
 */
-void	URL::absoluteFromParser()
+void	URL::absoluteFormParser()
 {
-	std::string delim[] = {"://", ":", "?", "#"};
+	std::string			url(_fullURL), delimProto = "://", delimPort = ":", delimEndDomain;
+	std::stringstream	sstmp;
+
+	// "https://" remove
+	url.erase(0, url.find(delimProto) + delimProto.size());
+	//	domain (until port or path)
+	url.find(delimPort) == std::string::npos ? delimEndDomain = "/" : ":";
+	_authority = url.substr(0, url.find(delimEndDomain));
+	url.erase(0, url.find(delimEndDomain));
+	// port?
+	if (delimEndDomain == delimPort)
+	{
+		sstmp << url.substr(url.find(delimPort) + 1, url.find("/"));
+		url.erase(url.find(delimPort) + 1, url.find("/"));
+		sstmp >> _port;
+		if (sstmp.fail() || !sstmp.eof())
+			throw std::invalid_argument("bad port in aboslute url form?");
+	}
+	originFormParser(url);
+}
+
+/*	ie.  /path/to/myfile.html?key1=value1&key2=value2#SomewhereInTheDocument
+	query and anchor can be ommited
+	split query here (or in cgi???)
+	it takes an url argument here to also work with the absolute already treated
+*/
+void	URL::originFormParser(std::string url)
+{
+	std::string	delimPath="/", delimQuery="?", interQ="&", delimAnchor="#";
+	std::string	endPath;
+
+	// anchor fragment
+	if (url.find(delimAnchor) != std::string::npos)
+	{
+		_anchor = url.substr(url.find(delimAnchor) + 1, url.size() - 1);
+		url.erase(url.find(delimAnchor), url.size() - 1);
+	}
+	// queries into map
+	if (url.find(delimQuery) != std::string::npos)
+	{
+		std::string	query = url.substr(url.find(delimQuery) + 1, url.size() - 1);
+		url.erase(url.find(delimQuery), url.find(delimQuery) + 1);
+		// key1=value1&key2=value2 etc
+		do	{
+			std::string	key(query.substr(0, query.find("=") - 1));
+			std::string	value(query.substr(query.find("=") + 1), query.find("&") == std::string::npos ? query.size() -1 : query.find("&"));
+			_queries[key] = value;
+			query.erase(0, query.find("&") == std::string::npos ? query.size() -1 : query.find("&") - 1);
+		}	while (query.find("&") != std::string::npos);
+	}
+	_path = url;
 }
 
 /*	getters	*/

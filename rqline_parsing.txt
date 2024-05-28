@@ -35,6 +35,8 @@ if any other, return:
 used example : http://www.example.com:80/path/to/myfile.html?key1=value1&key2=value2#SomewhereInTheDocument
 (1-2-3 as a group is optional [absolute form], 4 is always mandatory [absolute path (if not with 1-2 or 1-2-3)])
 
+quid des charatcere encoded : "%1A" -> hexa 1A ... 
+
 1 - protocol | mandatory
 ------------------------
 "http"

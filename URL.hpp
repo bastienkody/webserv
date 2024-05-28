@@ -3,6 +3,7 @@
 
 #include<iostream>
 #include<string>
+#include<sstream>
 #include<map>
 #include <vector>
 #include<algorithm>
@@ -40,7 +41,8 @@ class URL
 		std::map<std::string, std::string>	_queries;
 		std::string							_anchor;
 
-		void	absoluteFromParser();
+		void	absoluteFormParser();
+		void	originFormParser(std::string url);
 };
 
 std::ostream& operator<<(std::ostream& os, const URL &rhs);
