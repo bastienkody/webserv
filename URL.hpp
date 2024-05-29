@@ -5,7 +5,7 @@
 #include<string>
 #include<sstream>
 #include<map>
-#include <vector>
+#include<vector>
 #include<algorithm>
 
 /*
@@ -22,24 +22,26 @@ class URL
 		URL(const URL & src);
 		URL & operator=(const URL & rhs);
 
-		std::string							getFull() const;
-		std::string							getProtocol() const;
-		std::string							getAuthority() const;
-		unsigned int						getPort() const;
-		std::string							getPath() const;
-		std::map<std::string, std::string>	getQueries() const;
-		std::string							getAnchor() const;
+		std::string		getFull() const;
+		std::string		getProtocol() const;
+		std::string		getAuthority() const;
+		std::string		getPort() const;
+		std::string		getPath() const;
+		std::string		getQuery() const;
+		std::string		getAnchor() const;
+
+		void			printDebug() const;
 
 	private:
 		URL();
 
-		std::string							_fullURL;
-		std::string							_protocol;
-		std::string							_authority;
-		unsigned int						_port; //(conv via sstrean for ovlf/neg etc)
-		std::string							_path;
-		std::map<std::string, std::string>	_queries;
-		std::string							_anchor;
+		std::string		_fullURL;
+		std::string		_protocol;
+		std::string		_authority;
+		std::string		_port; //(conv via sstream for ovlf/neg later!)
+		std::string		_path;
+		std::string		_query;
+		std::string		_anchor;
 
 		void	absoluteFormParser();
 		void	originFormParser(std::string url);
