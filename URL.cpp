@@ -60,7 +60,6 @@ URL::URL(const std::string str)
 void	URL::absoluteFormParser()
 {
 	std::string			url(_fullURL), dProto = "://", dPort = ":", dEndDomain;
-	std::stringstream	sstmp;
 
 	// protocol
 	if (url.find(dProto) != std::string::npos)
@@ -77,7 +76,6 @@ void	URL::absoluteFormParser()
 	{
 		_port = url.substr(url.find(dPort) + 1, url.find("/") - 1);
 		url.erase(url.find(dPort), url.find("/"));
-		sstmp >> _port;
 	}
 	originFormParser(url);
 }
