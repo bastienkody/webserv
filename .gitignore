@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+#nique bien ta race vscode
+*vscode
+
 # Compiled Object files
 *.slo
 *.lo
