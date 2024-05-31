@@ -23,8 +23,10 @@ class Request
 		std::string							getBody() const;
 
 		void	appendBody(std::string data);
+		void	print() const;
 
 	private:
+		
 		RequestLine							_rql;
 		std::map<std::string, std::string>	_header;
 		std::string							_body;

@@ -34,9 +34,10 @@ std::ostream & operator<<(std::ostream& os, const RequestLine &rhs)
 RequestLine::RequestLine(std::string rql)
 {
 	_fullRequestLine = rql;
-	_version = rql.substr(rql.rfind(" "), rql.find("\r\n"));
-	rql.erase(rql.rfind(" "), rql.find("\r\n"));
 	_verb = rql.substr(0, rql.find(" "));
-	rql.erase(0, rql.find(" "));
+	rql.erase(0, rql.find(" ") + 1);
+	_version = rql.substr(rql.rfind(" "), rql.find("\r\n") - 2);
+	std::cout << "version:" << _version << std::endl;
+	rql.erase(rql.rfind(" "), rql.find("\r\n"));
 	_Url = URL(rql);
 }

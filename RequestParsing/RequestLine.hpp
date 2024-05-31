@@ -11,6 +11,7 @@ class RequestLine
 {
 	public:
 		RequestLine();
+
 		~RequestLine();
 		RequestLine(const std::string name);
 		RequestLine(const RequestLine & src);
@@ -22,6 +23,7 @@ class RequestLine
 		URL			getUrl() const;
 
 	private:
+		
 		std::string		_fullRequestLine;
 		std::string		_verb;
 		std::string		_version;

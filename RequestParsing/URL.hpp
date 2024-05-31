@@ -17,6 +17,7 @@ most prob no absolute form but in case ... we parse it
 class URL
 {
 	public:
+		URL();
 		~URL();
 		URL(const std::string name);
 		URL(const URL & src);
@@ -33,7 +34,6 @@ class URL
 		void			printDebug() const;
 
 	private:
-		URL();
 
 		std::string		_fullURL;
 		std::string		_protocol;

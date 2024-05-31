@@ -1,5 +1,20 @@
-#include "URL.hpp"
+#include "Request.hpp"
 
+int	main(void)
+{
+	std::string	data[] = {
+		"GET /home.html HTTP/1.1\r\nHost: localhost:8080\ntruc: value\n\nthis is the body\n"
+	};
+
+	Request	rq(data[0]);
+	rq.print();
+}
+
+
+
+
+/*
+MAIN URl SOLO
 int	main(void)
 {
 	std::string urls[] = {
@@ -18,3 +33,4 @@ int	main(void)
 		std::cout << "#########################################################" << std::endl;
 	}
 }
+*/
