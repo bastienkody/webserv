@@ -29,6 +29,7 @@ class URL
 		std::string		getPort() const;
 		std::string		getPath() const;
 		std::string		getQuery() const;
+		std::multimap<std::string, std::string>	getQueries() const;
 		std::string		getAnchor() const;
 
 		void			printDebug() const;
@@ -41,6 +42,7 @@ class URL
 		std::string		_port; //(conv via sstream for ovlf/neg later!)
 		std::string		_path;
 		std::string		_query;
+		std::multimap<std::string, std::string>	_queries;
 		std::string		_anchor;
 
 		void	absoluteFormParser();

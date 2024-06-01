@@ -13,6 +13,7 @@ URL & URL::operator=(const URL & rhs)
 		this->_port = rhs.getPort();
 		this->_path = rhs.getPath();
 		this->_query = rhs.getQuery();
+		this->_queries = rhs.getQueries();
 		this->_anchor = rhs.getAnchor();
 	}
 	return (*this);
@@ -24,18 +25,21 @@ std::string	URL::getAuthority() const {return _authority;}
 std::string	URL::getPort() const {return _port;}
 std::string	URL::getPath() const {return _path;}
 std::string	URL::getQuery() const {return _query;}
+std::multimap<std::string, std::string>	URL::getQueries() const {return _queries;}
 std::string	URL::getAnchor() const {return _anchor;}
 //	printers
 void	URL::printDebug() const
 {
-	std::cout << "full URL\t:\t"<< this->getFull() << std::endl;
-	std::cout << "---------------------------------------------"<<  std::endl;
-	std::cout << "protocol\t:\t"<< this->getProtocol() << std::endl;
-	std::cout << "authority\t:\t"<< this->getAuthority() << std::endl;
-	std::cout << "port\t\t:\t"<< this->getPort() << std::endl;
-	std::cout << "path\t\t:\t"<< this->getPath() << std::endl;
-	std::cout << "query\t\t:\t" << this->getQuery() << std::endl;
-	std::cout << "anchor\t\t:\t"<< this->getAnchor() << std::endl;
+	std::cout << "url_full:\t"<< this->getFull() << std::endl;
+	std::cout << "url_proto:\t"<< this->getProtocol() << std::endl;
+	std::cout << "url_authority:\t"<< this->getAuthority() << std::endl;
+	std::cout << "url_port:\t"<< this->getPort() << std::endl;
+	std::cout << "url_path:\t"<< this->getPath() << std::endl;
+	std::cout << "url_query(str):\t" << this->getQuery() << std::endl;
+	std::cout << "url_query(mmap):" << std::endl;
+	for (std::multimap<std::string, std::string>::const_iterator it = _queries.begin(); it!=_queries.end(); ++it)
+		std::cout << "\tentry=> " << it->first << ":" << it->second << std::endl;
+	std::cout << "url_anchor:\t"<< this->getAnchor() << std::endl;
 }
 //	os stream << redefinition
 std::ostream & operator<<(std::ostream& os, const URL &rhs) 
@@ -95,11 +99,23 @@ void	URL::originFormParser(std::string url)
 		_anchor = url.substr(url.find(delimAnchor) + 1, url.size() - 1);
 		url.erase(url.find(delimAnchor), url.size() - 1);
 	}
-	// queries into map
+	// queries into str
 	if (url.find(delimQuery) != std::string::npos)
 	{
 		_query = url.substr(url.find(delimQuery) + 1, url.size() - 1);
 		url.erase(url.find(delimQuery), url.size() - 1);
+		std::string qTmp(_query);
+		// queries into multimap (pb if '=' in key or value )
+		// on rate le dernier mais il est 5h10 letsee demain !
+		do
+		{
+			std::string	key(qTmp.substr(0, qTmp.find('=')));
+			std::string	value(qTmp.substr(qTmp.find('=') + 1, (qTmp.find('&') != std::string::npos ? qTmp.find('&') - 2:qTmp.size())));
+			//std::cout << key << "===>" << value << std::endl;
+			_queries.insert(std::pair<std::string, std::string>(key, value));
+			qTmp.erase(0, qTmp.find('&') != std::string::npos ? qTmp.find('&') +1 :qTmp.size());
+
+		} while (qTmp.find('&') != std::string::npos);
 	}
 	_path = url;
 }

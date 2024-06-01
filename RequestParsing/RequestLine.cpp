@@ -10,6 +10,8 @@ RequestLine & RequestLine::operator=(const RequestLine & rhs)
 	{
 		this->_fullRequestLine = rhs.getFull();
 		this->_verb = rhs.getVerb();
+		this->_version = rhs.getVersion();
+		this->_isVersionGood = rhs.getIsVersionGood();
 		this->_Url = rhs.getUrl();
 	}
 	return (*this);
@@ -18,6 +20,7 @@ RequestLine & RequestLine::operator=(const RequestLine & rhs)
 std::string		RequestLine::getFull() const {return _fullRequestLine;}
 std::string		RequestLine::getVerb() const {return _verb;}
 std::string		RequestLine::getVersion() const {return _version;}
+bool			RequestLine::getIsVersionGood() const {return _isVersionGood;}
 URL				RequestLine::getUrl() const {return _Url;}
 //	os stream << redefinition
 std::ostream & operator<<(std::ostream& os, const RequestLine &rhs)
@@ -30,14 +33,14 @@ std::ostream & operator<<(std::ostream& os, const RequestLine &rhs)
 	GET / HTTP/1.1
 	POST http://exampleform.com/home/login/form HTTP/1.1
 	DELETE /thatfile.html HTTP/1.1
-	*/
+*/
 RequestLine::RequestLine(std::string rql)
 {
 	_fullRequestLine = rql;
 	_verb = rql.substr(0, rql.find(" "));
 	rql.erase(0, rql.find(" ") + 1);
-	_version = rql.substr(rql.rfind(" "), rql.find("\r\n") - 2);
-	std::cout << "version:" << _version << std::endl;
-	rql.erase(rql.rfind(" "), rql.find("\r\n"));
-	_Url = URL(rql);
+	_Url = URL(rql.substr(0, rql.find(" ")));
+	rql.erase(0, rql.find(" ") + 1);
+	_version = rql.substr(0, rql.size());
+	_isVersionGood = _version.compare(EXPECTED_VERSION) == 0 ? true:false;
 }

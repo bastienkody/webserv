@@ -3,7 +3,7 @@
 int	main(void)
 {
 	std::string	data[] = {
-		"GET /home.html HTTP/1.1\r\nHost: localhost:8080\ntruc: value\n\nthis is the body\n"
+		"GET /home.html?a=1&b=2&c=3 HTTP/1.1\r\nHost: localhost:8080\ntruc: value\n\nthis is the body\n"
 	};
 
 	Request	rq(data[0]);
@@ -11,10 +11,20 @@ int	main(void)
 }
 
 
+/*	main request line
+int	main()
+{
+	RequestLine	rql("GET /home.html HTTP/1.1\r\n");
+
+	std::cout << rql.getFull() << std::endl;
+	std::cout << rql.getVerb() << std::endl;
+	std::cout << rql.getUrl() << std::endl;
+	std::cout << rql.getVersion() << std::endl;
+
+}*/
 
 
-/*
-MAIN URl SOLO
+/*	main url
 int	main(void)
 {
 	std::string urls[] = {

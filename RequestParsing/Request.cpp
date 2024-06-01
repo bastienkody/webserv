@@ -8,7 +8,11 @@ Request::Request(const Request & src) {*this = src;}
 Request & Request::operator=(const Request & rhs)
 {
 	if(this != &rhs)
-	{}
+	{
+		this->_rql = rhs.getRql();
+		this->_header = rhs.getHeader();
+		this->_body = rhs.getBody();
+	}
 	return (*this);
 }
 //	getters
@@ -19,25 +23,20 @@ std::string							Request::getBody() const	{return _body;}
 void	Request::print() const
 {
 	std::cout << "verb:\t\t" << getRql().getVerb() << std::endl;
-	std::cout << "version:\t" << getRql().getVersion() << std::endl;
-	std::cout << "url_full:\t" << getRql().getUrl().getFull() << std::endl;
-	std::cout << "url_proto:\t" << getRql().getUrl().getProtocol() << std::endl;
-	std::cout << "url_autho:\t" << getRql().getUrl().getAuthority() << std::endl;
-	std::cout << "url_port:\t" << getRql().getUrl().getPort() << std::endl;
-	std::cout << "url_path:\t" << getRql().getUrl().getPath() << std::endl;
-	std::cout << "url_query:\t" << getRql().getUrl().getQuery() << std::endl;
-	std::cout << "url_anchor:\t" << getRql().getUrl().getAnchor() << std::endl;
+	std::cout << "version:\t" << getRql().getVersion() << " (bool:" << (getRql().getIsVersionGood() == 1 ? "true" : "false")  << ")" << std::endl;
+	getRql().getUrl().printDebug();
 	std::cout << "body:\t" << getBody() << std::endl;
 }
 
 //	Param constructor
 Request::Request(std::string rq)
 {
-	_rql = RequestLine(rq.substr(0, rq.find("\n")));
-	rq.erase(0, rq.find("\n"));
+	_rql = RequestLine(rq.substr(0, rq.find("\r\n")));
+	rq.erase(0, rq.find("\r\n"));
 	std::string	headerTmp(rq.substr(0, rq.find("\n\n")));
 	rq.erase(0, rq.find("\n\n"));
-	// store header field with some particular ordred checks?
+	// store header field with some particular ordred checks? not for now : multimap
+
 	_body = rq;
 }
 

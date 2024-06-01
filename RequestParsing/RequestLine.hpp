@@ -5,6 +5,8 @@
 #include<string>
 #include "URL.hpp"
 
+#define	EXPECTED_VERSION "HTTP/1.1"
+
 class URL;
 
 class RequestLine
@@ -20,6 +22,7 @@ class RequestLine
 		std::string	getFull() const;
 		std::string	getVerb() const;
 		std::string	getVersion() const;
+		bool		getIsVersionGood() const;
 		URL			getUrl() const;
 
 	private:
@@ -27,6 +30,7 @@ class RequestLine
 		std::string		_fullRequestLine;
 		std::string		_verb;
 		std::string		_version;
+		bool			_isVersionGood;
 		URL				_Url;
 		
 };
