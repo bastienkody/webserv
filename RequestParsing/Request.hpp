@@ -18,9 +18,9 @@ class Request
 		Request(const Request & src);
 		Request & operator=(const Request & rhs);
 
-		RequestLine							getRql() const;
-		std::map<std::string, std::string>	getHeader() const;
-		std::string							getBody() const;
+		RequestLine							const & getRql() const;
+		std::map<std::string, std::string>	const & getHeader() const;
+		std::string							const & getBody() const;
 
 		void	appendBody(std::string data);
 		void	print() const;

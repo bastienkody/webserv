@@ -6,6 +6,9 @@
 #include "URL.hpp"
 
 #define	EXPECTED_VERSION "HTTP/1.1"
+#define GET "GET"
+#define POST "POST"
+#define DELETE "DELETE"
 
 class URL;
 
@@ -19,22 +22,22 @@ class RequestLine
 		RequestLine(const RequestLine & src);
 		RequestLine & operator=(const RequestLine & rhs);
 
-		std::string	getFull() const;
-		std::string	getVerb() const;
-		std::string	getVersion() const;
-		bool		getIsVersionGood() const;
-		URL			getUrl() const;
+		std::string	const & getFull() const;
+		std::string	const & getVerb() const;
+		std::string	const & getVersion() const;
+		bool		const & getIsVersionGood() const;
+		bool		const & getIsVerbGood() const;
+		URL			const & getUrl() const;
 
 	private:
 		
 		std::string		_fullRequestLine;
 		std::string		_verb;
+		bool			_isVerbGood;
 		std::string		_version;
 		bool			_isVersionGood;
 		URL				_Url;
 		
 };
-
-std::ostream& operator<<(std::ostream& os, const RequestLine &rhs);
 
 #endif

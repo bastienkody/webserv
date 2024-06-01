@@ -6,10 +6,12 @@ URL::~URL(){}
 URL::URL(const URL & src) {*this = src;}
 URL & URL::operator=(const URL & rhs)
 {
+	std::cout << "why is URL copy op called????" << std::endl;
 	if(this != &rhs)
 	{
 		this->_fullURL = rhs.getFull();
 		this->_protocol = rhs.getProtocol();
+		this->_authority = rhs.getAuthority();
 		this->_port = rhs.getPort();
 		this->_path = rhs.getPath();
 		this->_query = rhs.getQuery();
@@ -19,14 +21,14 @@ URL & URL::operator=(const URL & rhs)
 	return (*this);
 }
 /*	getters	*/
-std::string	URL::getFull() const {return _fullURL;}
-std::string	URL::getProtocol() const {return _protocol;}
-std::string	URL::getAuthority() const {return _authority;}
-std::string	URL::getPort() const {return _port;}
-std::string	URL::getPath() const {return _path;}
-std::string	URL::getQuery() const {return _query;}
-std::multimap<std::string, std::string>	URL::getQueries() const {return _queries;}
-std::string	URL::getAnchor() const {return _anchor;}
+std::string	const & URL::getFull() const {return _fullURL;}
+std::string	const & URL::getProtocol() const {return _protocol;}
+std::string	const & URL::getAuthority() const {return _authority;}
+std::string const & URL::getPort() const {return _port;}
+std::string	const & URL::getPath() const {return _path;}
+std::string	const & URL::getQuery() const {return _query;}
+std::multimap<std::string, std::string>	const & URL::getQueries() const {return _queries;}
+std::string	const & URL::getAnchor() const {return _anchor;}
 //	printers
 void	URL::printDebug() const
 {
@@ -86,7 +88,6 @@ void	URL::absoluteFormParser()
 
 /*	ie.  /path/to/myfile.html?key1=value1&key2=value2#SomewhereInTheDocument
 	query and anchor can be ommited
-	split query here (or in cgi???)
 */
 void	URL::originFormParser(std::string url)
 {
@@ -112,7 +113,6 @@ void	URL::originFormParser(std::string url)
 				qTmp.erase(0, 1);
 			std::string	key(qTmp.substr(0, qTmp.find('=')));
 			std::string	value(qTmp.substr(qTmp.find('=') + 1, (qTmp.find('&') != std::string::npos ? qTmp.find('&') - 2:qTmp.size())));
-			std::cout << key << "===>" << value <<  std::endl;
 			_queries.insert(std::pair<std::string, std::string>(key, value));
 			qTmp.erase(0, qTmp.find('&') != std::string::npos ? qTmp.find('&') : qTmp.size());
 

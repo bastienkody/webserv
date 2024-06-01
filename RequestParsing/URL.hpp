@@ -23,14 +23,14 @@ class URL
 		URL(const URL & src);
 		URL & operator=(const URL & rhs);
 
-		std::string		getFull() const;
-		std::string		getProtocol() const;
-		std::string		getAuthority() const;
-		std::string		getPort() const;
-		std::string		getPath() const;
-		std::string		getQuery() const;
-		std::multimap<std::string, std::string>	getQueries() const;
-		std::string		getAnchor() const;
+		std::string		const & getFull() const;
+		std::string		const & getProtocol() const;
+		std::string		const & getAuthority() const;
+		std::string		const & getPort() const;
+		std::string		const & getPath() const;
+		std::string		const & getQuery() const;
+		std::multimap<std::string, std::string>	const & getQueries() const;
+		std::string		const & getAnchor() const;
 
 		void			printDebug() const;
 
