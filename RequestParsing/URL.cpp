@@ -106,14 +106,15 @@ void	URL::originFormParser(std::string url)
 		url.erase(url.find(delimQuery), url.size() - 1);
 		std::string qTmp(_query);
 		// queries into multimap (pb if '=' in key or value )
-		// on rate le dernier mais il est 5h10 letsee demain !
 		do
 		{
+			if (qTmp[0] == '&')
+				qTmp.erase(0, 1);
 			std::string	key(qTmp.substr(0, qTmp.find('=')));
 			std::string	value(qTmp.substr(qTmp.find('=') + 1, (qTmp.find('&') != std::string::npos ? qTmp.find('&') - 2:qTmp.size())));
-			//std::cout << key << "===>" << value << std::endl;
+			std::cout << key << "===>" << value <<  std::endl;
 			_queries.insert(std::pair<std::string, std::string>(key, value));
-			qTmp.erase(0, qTmp.find('&') != std::string::npos ? qTmp.find('&') +1 :qTmp.size());
+			qTmp.erase(0, qTmp.find('&') != std::string::npos ? qTmp.find('&') : qTmp.size());
 
 		} while (qTmp.find('&') != std::string::npos);
 	}
