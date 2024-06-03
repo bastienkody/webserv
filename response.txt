@@ -12,3 +12,7 @@ Class	StatusLine;
 	uint	code; (clean: csv file with status code==text? or static map?)
 	Class	header; (or just map?)
 	string	data; (what if chunked response?)
+
+BAD SYNTAX of the REQUEST  (ie. using telnet) --> 400 Bad request
+BAD METHOD: 
+	if known : 405 Method Not Allowed

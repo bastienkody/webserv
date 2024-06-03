@@ -1,0 +1,45 @@
+
+sources: 
+https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms-fr
+https://docs.nginx.com/nginx/admin-guide/web-server/web-server/
+
+##########
+| Server |
+##########
+
+Multiple servers : on va utiliser les accolades pour delimiter
+Pas de niveau superieur (http etc)
+On utilise aussi accolades pour a minima location : il faudra compter (ie les
+guillemets dans minishell) pour retrouver la bonne accolade fermante de server
+
+Par défaut, tout bloc de serveur qui n’inclut pas une directive listen se voit 
+attribuer les paramètres d’écoute de 0.0.0.0:80 (ou 0.0.0.0:8080)
+La directive listen peut être configurée sur :
+	- Un combo adresse IP/port.
+	- Une adresse IP unique qui écoutera ensuite le port 80 par défaut.
+	- Un port unique qui écoutera chaque interface sur ce port.
+	- Le chemin vers une socket Unix.
+
+
+############
+| Location |
+############
+On va utilsier les accolades aussi pour delimiter. 
+On ne gere pas le REGEX !
+On va gerer les deux suivants :
+	location /site { } -> sert /site, /site/index.html ect
+	location = /site { } -> ne sert que /site
+ordre : 
+	- cherche d'abord une localisation exacte (avec le '=')
+	- ensuite cherche les prefixes inexactes avec les plus long en premier : 
+		uri: /site/repo/sousrepo/file.html
+		location /site (non selectionne)
+		location /site/repo (non selectionne)
+		location /site/repo/sousrepo (selectionne!!)
+
+a voir :
+	index
+	try_files
+	rewrite
+	error_page
+
