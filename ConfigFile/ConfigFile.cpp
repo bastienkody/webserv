@@ -26,7 +26,7 @@ void	ConfigFile::openReadFileData()
 {
 	_fs.open(_filename.c_str(), std::fstream::in);
 	if (_fs.fail())
-		throw std::invalid_argument("Filename: " + _filename + " failed to open.");
+		throw std::invalid_argument("Confgfile: " + _filename + " failed to open.");
 
 	// test size vs string.max (cf. cpp01/04)
 	_fs.seekg(0, std::ios_base::end);
@@ -41,13 +41,9 @@ void	ConfigFile::openReadFileData()
 	char *buf = new char [dataSize];
 	_fs.read(buf, dataSize);
 	if (_fs)
-	{
 		_rawData = buf;
-		std::cout << "read ok:" << std::endl;
-		std::cout << _rawData<< std::endl;
-	}
 	else
-		std::cout << "read not ok" << std::endl;
+		throw std::invalid_argument("Problem with read on configfile");
 }
 
 
