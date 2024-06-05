@@ -6,13 +6,10 @@
 #    By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/04 18:11:54 by mmuesser          #+#    #+#              #
-#    Updated: 2024/06/04 18:17:02 by mmuesser         ###   ########.fr        #
+#    Updated: 2024/06/05 18:08:30 by mmuesser         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+#!usr/bin/python3
+
 import cgi
-
-'''
-prends en arg conf file, recup majorite info avec variables d'environnement
-
-'''
