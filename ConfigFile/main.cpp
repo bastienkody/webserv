@@ -2,7 +2,7 @@
 
 int	main(void)
 {
-	ConfigFile	config("configfile");
+	ConfigFile	config("testlucas.config");
 
 	try{
 		config.openReadFileData();
