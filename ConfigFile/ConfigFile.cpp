@@ -38,12 +38,14 @@ void	ConfigFile::openReadFileData()
 		throw std::invalid_argument("Data from " + _filename + " is too big or empty");
 
 	//	read into _rawData
-	char *buf = new char [dataSize];
+	char *buf = new char [dataSize + 1];
+	buf[dataSize] = '\0';
 	_fs.read(buf, dataSize);
 	if (_fs)
 		_rawData = buf;
 	else
 		throw std::invalid_argument("Problem with read on configfile");
+	delete [] buf;
 }
 
 

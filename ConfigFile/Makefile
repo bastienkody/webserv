@@ -10,7 +10,7 @@ OBJS		=	${SRCS_NAME:%.cpp=$(BUILD_DIR)/%.o}
 ###		DEFINITIONS		###
 NAME		=	configFile
 CXX			=	c++
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98
+CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 -g3
 
 ###		RULES		###
 $(BUILD_DIR)/%.o: %.cpp ${HEADERS}
