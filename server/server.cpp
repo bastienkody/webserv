@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/04 16:34:47 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/06 16:40:57 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,24 +21,6 @@
 // #include <iostream> /*std::*/
 // #include <poll.h> /*poll*/
 #include "../include/Poll.hpp"
-
-/*---------TO DO---------
-- : pas encore fait/en cours
-~ : fait mais pas sur que ce soit bien
-+ : fait
-
-	~ finir mise en place serv test
-		~ creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation
-		- creer class socket (je sais pas encore comment je vais m'en servir)
-		~ passer socket en non bloquant
-		+ POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour chaque port ?)
-	~ gerer requete chunk
-	- METTRE EN PLACE CGI
-	- utiliser "signal" pour catch ctrl c et terminer le programme
-	- mettre a la norme du projet (check fonction autorise et alternative pour fonctions C)
-	- gerer leaks et fds
--------------------------*/
-
 
 int create_socket_server(const char *port)
 {

@@ -6,9 +6,26 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/04 15:03:22 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/06 16:41:16 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+/*---------TO DO---------
+- : pas encore fait/en cours
+~ : fait mais pas sur que ce soit bien
++ : fait
+
+	~ finir mise en place serv test
+		~ creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation
+		- creer class socket (je sais pas encore comment je vais m'en servir)
+		~ passer socket en non bloquant
+		+ POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour chaque port ?)
+	~ gerer requete chunk
+	- METTRE EN PLACE CGI
+	- utiliser "signal" pour catch ctrl c et terminer le programme
+	- mettre a la norme du projet (check fonction autorise et alternative pour fonctions C)
+	- gerer leaks et fds
+-------------------------*/
 
 #include "include/Poll.hpp"
 
