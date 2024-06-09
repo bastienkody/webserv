@@ -14,6 +14,10 @@ https://www.solo.io/topics/nginx/nginx-configuration/
 - Only the server part (and locations whitin)
 - Locations : no nested locations
 
+Locations data seems to always override server's ones.
+Plus the subject mostly ask routes (=locations?) to have some precisions (autoindex, accepted methods etc)
+--> maybe we can only accept those precisions insie locations, but not in server?
+
 Server:
 	- host and port --> "listen 10.33.3.5:8080" 
 		all optional ? (nginx oui, sujet non?), ip opt and port opt too (set some default)
@@ -42,13 +46,33 @@ Location: (also accepted in server? nginx tests needed)
 	- cgi exec --> "cgi /usr/bin/php-cgi,/usr/bin/python3,/usr/bin/bash"
 
 
+##############
+| TEST NGINX |
+##############
+
+@@@@@@@@@@@@@@@
+| root + path |
+@@@@@@@@@@@@@@@
+Can be present in server and in location. location override server !
+Can't yet really understand what happens if no root -> 404
+if present : give the path to look for when any request comes to the port
+if the root is given in the request path : 404 because it seems to try to concatenate it ?
+	ie root /var + request url /var ==> /var/var
 
 
-example:
-server {
-	listen 127.0.0.1:8080;
+@@@@@@@@@@@@@@@@@@@@
+| autoindex on/off |
+@@@@@@@@@@@@@@@@@@@@
+for request ending with '/'
+Can be present in server and in location. location override server !
+if request a dir with a off and no index.html -> 403 Forbidden
+if request a dir with a off and index.html present -> 200 + return index.html
+if no autoindex line : same behaviour than OFF
+if request a dir with a on and no index.html -> 200 + indexation stuff
+if request a dir with a on and index.html present -> 200 + return index.html
+when requesting the ip:port with no '/' --> give index.html if exists, if not 403 forbidden
 
-}
+
 
 
 ##########

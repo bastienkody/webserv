@@ -4,10 +4,14 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include<vector>
+#include "Server.hpp"
 
 /*	
 	Opens config file outside of the constructor to throw and still have the object
 */
+
+class Server;
 
 class ConfigFile
 {
@@ -26,6 +30,9 @@ class ConfigFile
 		std::fstream	_fs;
 		std::string		_filename;
 		std::string		_rawData;
+
+		std::vector<Server>	_servers;
+
 };
 
 std::ostream& operator<<(std::ostream& os, const ConfigFile &rhs);
