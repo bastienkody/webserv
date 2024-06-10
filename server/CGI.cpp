@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 14:31:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/10 18:34:26 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/10 18:54:54 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+
+/*creer fonction avant cgi() qui va soit selon ressource request appeler cgi soit lire .html*/
 
 /*
 check si j'ai tout body via content_length (en checkant _header dans Request obj)
