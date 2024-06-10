@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 14:31:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/06 16:59:46 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/10 18:34:26 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,23 +18,25 @@
 #include <stdlib.h>
 
 /*
-recuperer Request object
 check si j'ai tout body via content_length (en checkant _header dans Request obj)
+creer env a partir des headers
+build av
 creer pipe, fork et dup fd pour que resultat script soit recuperable vu qu'il va ecrire sur stdout
 check verb (voir url selon les scripts qu'on aura) pour exec script correspondant
 launch execve
 */
 
 /* MISE EN PLACE PROG CGI :
-- lire le contenu de pipe_fd[0] sans read
-- Rendre le code plus propre et pouvoir lancer au moins GET POST ET DELETE
-- Faire scripts pour methodes citees au dessus
++ Rendre le code plus propre et pouvoir lancer des scripts
+~ creer pathname pour execve
 - mettre gestion erreur
+
 - continuer recherche sur scripts cgi
 
 */
 
-int	cgi(Request rq, char **av, char **env)
+
+int	check_body_size(Request rq)
 {
 	int body_length = rq.getBody().size();
 
@@ -46,9 +48,80 @@ int	cgi(Request rq, char **av, char **env)
 				return (std::cout<< "Error: wrong body size"<<std::endl, -1);
 		}
 	}
+	return (0);
+}
+
+char **create_env(Request rq)
+{
+	char **env_array = new char *[rq.getHeader().size() + 1];
+	int i = 0;
+	for (std::map<std::string, std::string>::const_iterator it = rq.getHeader().begin(); it != rq.getHeader().end(); it++)
+	{
+		std::string tmp;
+		// std::cout<<"it->first : " << it->first<<std::endl;
+		tmp.append(it->first + "=" + it->second);
+		env_array[i] = strdup(tmp.c_str());
+		i++;
+	}
+	env_array[i] = NULL;
+	return (env_array);
+}
+
+std::string create_path_name(Request rq) /*CHANGER POUR PLUS RECUP METHOD MAIS NOM SCRIPT A LANCER*/
+{
+	std::string pathname;
+
+	pathname = "cgi-bin/" + rq.getRql().getVerb() + ".py";
+	return (pathname);
+}
+
+void	exec_son(Request rq, char **av, int *pipe_fd)
+{
+	dup2(pipe_fd[1], STDOUT_FILENO);
+	close(pipe_fd[1]);
+	close(pipe_fd[0]);
 	
+	char **env;
+	std::string pathname;
+	env = create_env(rq);
+	pathname = create_path_name(rq);
+	std::cerr<< "pathname : "<< pathname<<std::endl;
+	execve(pathname.c_str(), av, env);
+	perror("Execve");
+}
+
+char	*exec_father(Request rq, int *pipe_fd)
+{
+	// wait(NULL);
+	int status;
+	char *buff;
+	buff = (char *) malloc(sizeof(char) * (100 + 1));
+	if (!buff)
+		return (NULL);
+	for (int i = 0; i < 100; i++)
+		buff[i] = '\0';
+	dup2(pipe_fd[0], STDIN_FILENO);
+	status = read(pipe_fd[0], buff, 100);
+	if (status == -1)
+		return (NULL);
+	std::cout<< "buff : "<< buff;
+	close(pipe_fd[0]);
+	close(pipe_fd[1]);
+	return (buff);
+}
+
+int cgi(Request rq, char **av, char **env)
+{
+	if (check_body_size(rq) == -1)
+		return (-1);
+
+	/*creation av
+		av[0] -> nom script
+		av[1] -> nom fichier demande*/
+
 	int pipe_fd[2];
 	int status;
+	char *buff;
 
 	status = pipe(pipe_fd);
 	if (status == -1)
@@ -57,40 +130,22 @@ int	cgi(Request rq, char **av, char **env)
 	if (status == -1)
 		return (perror("fork"), -1);
 	else if (status == 0)
-	{
-		dup2(pipe_fd[1], STDOUT_FILENO);
-		close(pipe_fd[1]);
-		close(pipe_fd[0]);
-		if (rq.getRql().getVerb() == "POST")
-			execve("cgi-bin/test.py", av, env);
-		return (perror("Execve"), -1);
-	}
+		exec_son(rq, av, pipe_fd);
 	else
-	{
-		wait(NULL);
-		char *buff;
-		buff = (char *) malloc(sizeof(char) * (100 + 1));
-		if (!buff)
-			return (std::cout<< "Error: Malloc"<<std::endl, -1);
-		for (int i = 0; i < 100; i++)
-			buff[i] = '\0';
-		dup2(pipe_fd[0], STDIN_FILENO);
-		status = read(pipe_fd[0], buff, 100);
-		if (status == -1)
-			return (perror("read"), -1);
-		std::cout<< "buff : "<< buff;
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		free(buff);
-	}
+		buff = exec_father(rq, pipe_fd);
 	return (0);
 }
 
 int	main(int ac, char **av, char **env)
 {
-	std::string data = "POST http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n";
-	Request rq(data);
-	cgi(rq, av, env);
+	std::string data[] = {"POST http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
+						"GET http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
+						"DELETE http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n"};
+	for (int i = 0; i < 3; i++)
+	{
+		Request rq(data[i]);
+		cgi(rq, av, env);
+	}
 	return (0);
 }
 

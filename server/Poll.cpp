@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/24 15:04:51 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/04 16:35:03 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/10 14:15:25 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	Poll::add_to_poll(int new_fd)
 	if (this->_count >= 256)
 		return (std::cout<<"Error: Not enough space in \"poll_fds\""<<std::endl, -1);
 	_fds[_count].fd = new_fd;
-	_fds[_count].events = POLLIN;
+	_fds[_count].events = POLLIN | POLLOUT;
 	this->_count++;
 	return (0);
 }
