@@ -3,27 +3,31 @@ sources:
 https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms-fr
 https://docs.nginx.com/nginx/admin-guide/web-server/web-server/
 https://www.solo.io/topics/nginx/nginx-configuration/
+https://nginx.org/en/docs/
 
 ######################
 | Nginx.conf server  |
 ######################
 - No variables
-- One entry per line, terminated by a semi colon ';'
-	VERB WS 
+- One entry per line, terminated by a semi colon ';', no multiline at all
+	VERB WS DATA WS;
+VERB: WORD
+WORD: alnum chars
+DATA: WORD *(WS WORD)
 - no specific order (except repetition?)
-- Only the server part (and locations whitin)
-- Locations : no nested locations
+- Accept comments ? '#'
 
 Locations data seems to always override server's ones.
 Plus the subject mostly ask routes (=locations?) to have some precisions (autoindex, accepted methods etc)
---> maybe we can only accept those precisions insie locations, but not in server?
+--> maybe we can only accept those precisions insie locations, but not in server? 
+--> NO! Locations are specific ones and server general ones (ie locations data missing)
 
 Server:
 	- host and port --> "listen 10.33.3.5:8080" 
 		all optional ? (nginx oui, sujet non?), ip opt and port opt too (set some default)
 		if several entries, only the first used discard laters ?? nginx tests needed
 		if multiple server same host:port -> first server takes all
-	- server_name --> "server_name blabla"
+	- server_name --> "server_name blabla bliablia blobloblob etc"
 		all optional, name part mandatory
 	- default error_pages --> "error_page html/site1/error.html"
 		all optional, specify what page for what error code ?
