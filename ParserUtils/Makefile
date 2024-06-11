@@ -1,15 +1,14 @@
 ##		SOURCE FILES	###
-HEADERS			=	ConfigFile.hpp Server.hpp Location.hpp ../ParserUtils/ParserUtils.hpp
-BUILD_DIR		=	./build
-SRC_DIR 		=	./
-PARSER_UTILS	=	../ParserUtils
-vpath %.cpp ${SRCS_DIR} ${PARSER_UTILS}
+HEADERS		=	ParserUtils.hpp
+BUILD_DIR	=	./build
+SRC_DIR 	= 	./
+vpath %.cpp ${SRCS_NAME}
 
-SRCS_NAME 	=	ConfigFile.cpp Server.cpp main.cpp Location.cpp ParserUtils.cpp
+SRCS_NAME 	=	ParserUtils.cpp main.cpp
 OBJS		=	${SRCS_NAME:%.cpp=$(BUILD_DIR)/%.o}
 
 ###		DEFINITIONS		###
-NAME		=	configFile
+NAME		=	parserUtils
 CXX			=	c++
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 -g3
 

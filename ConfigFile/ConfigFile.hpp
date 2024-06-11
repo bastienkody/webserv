@@ -6,6 +6,7 @@
 #include<string>
 #include<vector>
 #include "Server.hpp"
+#include "../ParserUtils/ParserUtils.hpp"
 
 class Server;
 
@@ -21,7 +22,8 @@ class ConfigFile
 		std::string const & getRawData() const;
 		std::vector<Server> const & getServers() const;
 
-		void	openReadFileData();
+		void	openReadFileToStr(); // throw
+		void	readAllInfos(); // throw
 
 	private:
 		std::fstream	_fs;

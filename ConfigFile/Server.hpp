@@ -5,13 +5,16 @@
 #include<string>
 #include<vector>
 #include<map>
+#include "Location.hpp"
+
+class Location;
 
 class Server
 {
 	public:
 		Server();
 		~Server();
-		Server(const std::string name);
+		//Server(const std::string name);
 		Server(const Server & src);
 		Server & operator=(const Server & rhs);
 
@@ -27,6 +30,8 @@ class Server
 		std::vector<std::string> const & getCgiPathes() const;
 		std::vector<std::string> const & getCgiExt() const;
 
+		void	readInfos(std::string & raw); //throw
+
 	private:
 		std::vector<std::string> _names;
 		std::string _ip;
@@ -39,12 +44,7 @@ class Server
 		std::map<std::string,std::string> _errorPages;
 		std::vector<std::string> _cgiPathes;
 		std::vector<std::string> _cgiExt;
-
-
-
-
+		std::vector<Location> _locations;
 };
-
-std::ostream& operator<<(std::ostream& os, const Server &rhs);
 
 #endif
