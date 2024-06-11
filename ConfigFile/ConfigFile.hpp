@@ -7,10 +7,6 @@
 #include<vector>
 #include "Server.hpp"
 
-/*	
-	Opens config file outside of the constructor to throw and still have the object
-*/
-
 class Server;
 
 class ConfigFile
@@ -23,6 +19,7 @@ class ConfigFile
 		ConfigFile & operator=(const ConfigFile & rhs);
 
 		std::string const & getRawData() const;
+		std::vector<Server> const & getServers() const;
 
 		void	openReadFileData();
 

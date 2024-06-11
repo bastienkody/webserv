@@ -4,6 +4,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<map>
 
 class Server
 {
@@ -22,6 +23,7 @@ class Server
 		std::string const & getAutoindex() const;
 		std::string const & getMaxBodySize() const;
 		std::string const & getAllowMethods() const;
+		std::map<std::string,std::string> const & getErrorPages() const;
 		std::vector<std::string> const & getCgiPathes() const;
 		std::vector<std::string> const & getCgiExt() const;
 
@@ -34,6 +36,7 @@ class Server
 		std::string	_autoindex;
 		std::string	_maxBodysize;	//stored as a string but ovlf checks needed when reading + use of neg (not zero) if not provided
 		std::string	_allowMethods;
+		std::map<std::string,std::string> _errorPages;
 		std::vector<std::string> _cgiPathes;
 		std::vector<std::string> _cgiExt;
 

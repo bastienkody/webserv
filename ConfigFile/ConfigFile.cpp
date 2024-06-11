@@ -21,6 +21,7 @@ std::ostream & operator<<(std::ostream& os, const ConfigFile &rhs)
 {return (os << rhs.getRawData());} 
 //	Getter
 std::string const & ConfigFile::getRawData() const {return (_rawData);}
+std::vector<Server> const & ConfigFile::getServers() const {return (_servers);}
 
 void	ConfigFile::openReadFileData()
 {

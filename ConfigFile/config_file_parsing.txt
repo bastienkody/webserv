@@ -10,10 +10,11 @@ https://nginx.org/en/docs/
 ######################
 - No variables
 - One entry per line, terminated by a semi colon ';', no multiline at all
-	VERB WS DATA WS;
+	VERB WS DATA OWS ; OWS \n
 VERB: WORD
-WORD: alnum chars
+WORD: alnum _-+=/:.,?&@#!<>*$€%
 DATA: WORD *(WS WORD)
+- no quotes and no spaces
 - no specific order (except repetition?)
 - Accept comments ? '#'
 
@@ -29,8 +30,8 @@ Server:
 		if multiple server same host:port -> first server takes all
 	- server_name --> "server_name blabla bliablia blobloblob etc"
 		all optional, name part mandatory
-	- default error_pages --> "error_page html/site1/error.html"
-		all optional, specify what page for what error code ?
+	- default error_pages --> "error_page 404 html/site1/error404.html"
+		all optional, specify what page for what error code
 	- body size limit --> "max_body_size 10000000"
 		all optional, int part mandatory, what overflow?
 
