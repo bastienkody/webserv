@@ -1,11 +1,9 @@
 #include"ConfigFile.hpp"
 
-//	Default
+//	constructors + copy
 ConfigFile::ConfigFile() {}
 ConfigFile::~ConfigFile() {}
-//	Param constructor
 ConfigFile::ConfigFile(const std::string filename) : _filename(filename) {}
-//	Copy constructor (+ copy operator)
 ConfigFile::ConfigFile(const ConfigFile & src) {*this = src;}
 ConfigFile & ConfigFile::operator=(const ConfigFile & rhs)
 {
@@ -13,22 +11,21 @@ ConfigFile & ConfigFile::operator=(const ConfigFile & rhs)
 	{
 		this->_filename = rhs._filename;
 		this->_rawData = rhs.getRawData();
+		this->_servers = rhs.getServers();
 	}
 	return (*this);
 }
-//	os stream << redefinition
-std::ostream & operator<<(std::ostream& os, const ConfigFile &rhs)
-{return (os << rhs.getRawData());} 
+
 //	Getter
 std::string const & ConfigFile::getRawData() const {return (_rawData);}
 std::vector<Server> const & ConfigFile::getServers() const {return (_servers);}
 
+//	Store filename into string _rawData
 void	ConfigFile::openReadFileToStr()
 {
 	_fs.open(_filename.c_str(), std::fstream::in);
 	if (_fs.fail())
 		throw std::invalid_argument("Confgfile: " + _filename + " failed to open.");
-
 
 	// test size vs string.max (cf. cpp01/04)
 	_fs.seekg(0, std::ios_base::end);
@@ -65,9 +62,6 @@ void	ConfigFile::readAllInfos()
 		if (line.size() == 0) // skip empty line
 			continue;
 		std::cout << line <<std::endl;
-		std::cout << line.find("server") <<std::endl;
-		std::cout << ParserUtils::eraseOWS(line).compare("server{") <<std::endl;
-
 		if (line.find("server") != std::string::npos && ParserUtils::eraseOWS(line).compare("server{") == 0)
 		{
 			_servers.push_back(Server());

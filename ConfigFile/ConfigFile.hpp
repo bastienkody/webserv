@@ -34,6 +34,4 @@ class ConfigFile
 
 };
 
-std::ostream& operator<<(std::ostream& os, const ConfigFile &rhs);
-
 #endif
