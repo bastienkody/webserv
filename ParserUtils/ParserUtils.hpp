@@ -10,6 +10,8 @@ class ParserUtils
 		static std::string	trimOWS(std::string s);
 		static std::string	eraseOWS(std::string s);
 		static std::string	eraseSufixComments(std::string s);
+		static int			firstWsPos(std::string line);
+		static bool			checkRmSemiColon(std::string & line);
 };
 
 

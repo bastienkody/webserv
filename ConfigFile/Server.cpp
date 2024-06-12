@@ -20,6 +20,7 @@ Server & Server::operator=(const Server & rhs)
 		_cgiPathes = rhs.getCgiExt();
 		_cgiExt = rhs.getCgiExt();
 		_allowMethods = rhs.getAllowMethods();
+		_locations = rhs.getLocations();
 	}
 	return (*this);
 }
@@ -36,6 +37,7 @@ std::string const & Server::getAllowMethods() const	{return (_allowMethods);}
 std::map<std::string,std::string> const & Server::getErrorPages() const {return (_errorPages);}
 std::vector<std::string>const & Server::getCgiPathes() const	{return (_cgiPathes);}
 std::vector<std::string> const & Server::getCgiExt() const	{return (_cgiExt);}
+std::vector<Location> const & Server::getLocations() const {return (_locations);}
 
 //	setters
 

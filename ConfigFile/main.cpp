@@ -11,6 +11,7 @@ int	main(int ac, char **av)
 		config.openReadFileToStr();
 		std::cout << config.getRawData()<< std::endl;
 		config.readAllInfos();
+		std::cout << "index first location" + config.getServers().front().getLocations().front().getIndex() << std::endl;
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << std::endl;

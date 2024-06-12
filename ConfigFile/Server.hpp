@@ -29,6 +29,7 @@ class Server
 		std::map<std::string,std::string> const & getErrorPages() const;
 		std::vector<std::string> const & getCgiPathes() const;
 		std::vector<std::string> const & getCgiExt() const;
+		std::vector<Location> const & getLocations() const;
 
 		void	readInfos(std::string & raw); //throw
 
