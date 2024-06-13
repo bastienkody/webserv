@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 14:31:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/10 18:54:54 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/13 16:33:32 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 
-/*creer fonction avant cgi() qui va soit selon ressource request appeler cgi soit lire .html*/
+/*creer fonction avant cgi() qui va selon ressource request appeler cgi gerer .html*/
 
 /*
 check si j'ai tout body via content_length (en checkant _header dans Request obj)
@@ -38,21 +38,6 @@ launch execve
 */
 
 
-int	check_body_size(Request rq)
-{
-	int body_length = rq.getBody().size();
-
-	for (std::multimap<std::string, std::string>::const_iterator it = rq.getHeader().begin(); it!=rq.getHeader().end(); ++it)
-	{
-		if (it->first == "content-length")
-		{
-			if (atoi(it->second.c_str()) != body_length)
-				return (std::cout<< "Error: wrong body size"<<std::endl, -1);
-		}
-	}
-	return (0);
-}
-
 char **create_env(Request rq)
 {
 	char **env_array = new char *[rq.getHeader().size() + 1];
@@ -60,7 +45,6 @@ char **create_env(Request rq)
 	for (std::map<std::string, std::string>::const_iterator it = rq.getHeader().begin(); it != rq.getHeader().end(); it++)
 	{
 		std::string tmp;
-		// std::cout<<"it->first : " << it->first<<std::endl;
 		tmp.append(it->first + "=" + it->second);
 		env_array[i] = strdup(tmp.c_str());
 		i++;
@@ -69,11 +53,11 @@ char **create_env(Request rq)
 	return (env_array);
 }
 
-std::string create_path_name(Request rq) /*CHANGER POUR PLUS RECUP METHOD MAIS NOM SCRIPT A LANCER*/
+std::string create_path_name(Request rq)
 {
 	std::string pathname;
 
-	pathname = "cgi-bin/" + rq.getRql().getVerb() + ".py";
+	pathname = "cgi-bin" + rq.getRql().getUrl().getPath();
 	return (pathname);
 }
 
@@ -114,9 +98,6 @@ char	*exec_father(Request rq, int *pipe_fd)
 
 int cgi(Request rq, char **av, char **env)
 {
-	if (check_body_size(rq) == -1)
-		return (-1);
-
 	/*creation av
 		av[0] -> nom script
 		av[1] -> nom fichier demande*/
@@ -138,28 +119,15 @@ int cgi(Request rq, char **av, char **env)
 	return (0);
 }
 
-int	main(int ac, char **av, char **env)
-{
-	std::string data[] = {"POST http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
-						"GET http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
-						"DELETE http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n"};
-	for (int i = 0; i < 3; i++)
-	{
-		Request rq(data[i]);
-		cgi(rq, av, env);
-	}
-	return (0);
-}
-
-// int main(int ac, char **av, char **env)
+// int	main(int ac, char **av, char **env)
 // {
-// 	int status;
-// 	status = fork();
-// 	if (status == 0)
+// 	std::string data[] = {"POST http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
+// 						"GET http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
+// 						"DELETE http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n"};
+// 	for (int i = 0; i < 3; i++)
 // 	{
-// 		execve("cgi-bin/test.py", av, env);
-// 		perror("Execve");
+// 		Request rq(data[i]);
+// 		cgi(rq, av, env);
 // 	}
-// 	wait(NULL);
 // 	return (0);
 // }
