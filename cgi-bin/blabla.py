@@ -3,4 +3,4 @@
 # import cgi
 
 
-print("Blabla get")
+print("Blabla")

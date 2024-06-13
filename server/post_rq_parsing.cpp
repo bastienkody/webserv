@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/13 16:03:38 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/13 17:03:27 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ Response	post_rq_parsing(Request rq)
 		cgi(&rp, rq, NULL, NULL);
 	else
 		rq_html(&rp, rq, path);
-	/*creer response*/
+	/*finir response (lineState et header)*/
 	return (rp);
 }
 

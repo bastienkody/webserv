@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/13 16:28:12 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:09:23 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,17 +38,40 @@ void	get_html(Response *rp, Request rq)
 		buff += tmp + "\n";
 	}
 	rp->setBody(buff);
-	/*set rp header ?*/
 }
 
-void post_html(Response *rp, Request rq)
+void post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
 {
-	/*check si ressource existe et si post is allow avec Location obj*/
+	/*check si post is allow avec Location obj*/
+	std::string path = "www" + rq.getRql().getUrl().getPath();
+	if (access(path.c_str(), R_OK) == -1)
+		return (rp->setBody("Error"));
 }
 
 void delete_html(Response *rp, Request rq)
 {
-	/*check si ressource existe et si delete is allow avec Location obj*/
+	/*check si delete is allow avec Location obj*/
+	std::string path = "www" + rq.getRql().getUrl().getPath();
+	if (access(path.c_str(), X_OK) == -1)
+		return (rp->setBody("Error"));
+	int pipe_fd[2];
+	int status;
+
+	status = pipe(pipe_fd);
+	if (status == -1)
+		return (rp->setBody("Error"));
+	status = fork();
+	if (status == -1)
+		return (rp->setBody("Error"));
+	else if (status == 0)
+	{
+		char **env = create_env(rq);
+		std::string tmp = "rm";
+		const char **av = create_av(tmp.c_str(), &path.c_str()[3]);
+		execve("/bin/rm", av, env);
+		return (rp->setBody("Error"));
+	}
+	wait(NULL);
 }
 
 void	rq_html(Response *rp, Request rq)

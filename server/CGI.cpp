@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 14:31:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/13 16:33:32 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:03:30 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,20 +37,28 @@ launch execve
 
 */
 
+const char	**create_av(const char *name, const char *arg)
+{
+	const char **av;
+
+	av[0] = &name[0];
+	av[1] = &arg[0];
+	av[2] = NULL;
+}
 
 char **create_env(Request rq)
 {
-	char **env_array = new char *[rq.getHeader().size() + 1];
+	char **env = new char *[rq.getHeader().size() + 1];
 	int i = 0;
 	for (std::map<std::string, std::string>::const_iterator it = rq.getHeader().begin(); it != rq.getHeader().end(); it++)
 	{
 		std::string tmp;
 		tmp.append(it->first + "=" + it->second);
-		env_array[i] = strdup(tmp.c_str());
+		env[i] = strdup(tmp.c_str());
 		i++;
 	}
-	env_array[i] = NULL;
-	return (env_array);
+	env[i] = NULL;
+	return (env);
 }
 
 std::string create_path_name(Request rq)
@@ -61,16 +69,16 @@ std::string create_path_name(Request rq)
 	return (pathname);
 }
 
-void	exec_son(Request rq, char **av, int *pipe_fd)
+void	exec_son(Request rq, int *pipe_fd)
 {
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	close(pipe_fd[1]);
 	close(pipe_fd[0]);
 	
-	char **env;
-	std::string pathname;
-	env = create_env(rq);
-	pathname = create_path_name(rq);
+	std::string path = rq.getRql().getUrl().getPath();
+	char **env = create_env(rq);
+	const char **av = create_av(&(path.c_str())[1], NULL);
+	std::string pathname = create_path_name(rq);
 	std::cerr<< "pathname : "<< pathname<<std::endl;
 	execve(pathname.c_str(), av, env);
 	perror("Execve");
@@ -96,12 +104,8 @@ char	*exec_father(Request rq, int *pipe_fd)
 	return (buff);
 }
 
-int cgi(Request rq, char **av, char **env)
+int cgi(Request rq)
 {
-	/*creation av
-		av[0] -> nom script
-		av[1] -> nom fichier demande*/
-
 	int pipe_fd[2];
 	int status;
 	char *buff;
@@ -113,13 +117,13 @@ int cgi(Request rq, char **av, char **env)
 	if (status == -1)
 		return (perror("fork"), -1);
 	else if (status == 0)
-		exec_son(rq, av, pipe_fd);
+		exec_son(rq, pipe_fd);
 	else
 		buff = exec_father(rq, pipe_fd);
 	return (0);
 }
 
-// int	main(int ac, char **av, char **env)
+// int	main(void)
 // {
 // 	std::string data[] = {"POST http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
 // 						"GET http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
@@ -127,7 +131,17 @@ int cgi(Request rq, char **av, char **env)
 // 	for (int i = 0; i < 3; i++)
 // 	{
 // 		Request rq(data[i]);
-// 		cgi(rq, av, env);
+// 		cgi(rq);
 // 	}
 // 	return (0);
 // }
+
+
+int main(void)
+{
+	std::string str = "blabla";
+	const char *tmp;
+
+	tmp = &str.c_str()[0];
+	std::cout << "tmp : "<< tmp<<std::endl;
+}
