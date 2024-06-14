@@ -1,33 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rq_hmtl.cpp                                        :+:      :+:    :+:   */
+/*   rq_html.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/13 19:09:23 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/14 23:11:26 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Poll.hpp"
-#include "../bastien/RequestParsing/Request.hpp"
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <stdlib.h>
-#include <fstream>
+#include "../include/Server.hpp"
 
 /*gerer directory (comment ??)*/
 
-void	get_html(Response *rp, Request rq) 
+void	get_html(Response *rp, Request rq)
 {
-	/*check si get is allow avec Location obj*/
 	std::string buff;
 	std::string path = "www" + rq.getRql().getUrl().getPath();
-	if (access(path.c_str(), R_OK) == -1)
-		return (rp->setBody("Error"));
+	int status;
 
+	/*check dir -> return 0 si pas un dir*/
+	status = check_file(rq, "www", 1);
+	if (status > 0)
+		return ;
 	std::ifstream my_html(path);
 	if (!my_html)
 		return (rp->setBody("Error"));
@@ -40,23 +36,19 @@ void	get_html(Response *rp, Request rq)
 	rp->setBody(buff);
 }
 
-void post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
-{
-	/*check si post is allow avec Location obj*/
-	std::string path = "www" + rq.getRql().getUrl().getPath();
-	if (access(path.c_str(), R_OK) == -1)
-		return (rp->setBody("Error"));
-}
+void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
+{}
 
-void delete_html(Response *rp, Request rq)
+void	delete_html(Response *rp, Request rq)
 {
-	/*check si delete is allow avec Location obj*/
-	std::string path = "www" + rq.getRql().getUrl().getPath();
-	if (access(path.c_str(), X_OK) == -1)
-		return (rp->setBody("Error"));
+	std::string path = rq.getRql().getUrl().getPath();
 	int pipe_fd[2];
 	int status;
 
+	/*check dir -> return 0 si pas un dir*/
+	status = check_file(rq, "www", 2);
+	if (status > 0)
+		return (rp->setBody("Error"));
 	status = pipe(pipe_fd);
 	if (status == -1)
 		return (rp->setBody("Error"));
@@ -67,9 +59,11 @@ void delete_html(Response *rp, Request rq)
 	{
 		char **env = create_env(rq);
 		std::string tmp = "rm";
-		const char **av = create_av(tmp.c_str(), &path.c_str()[3]);
+		char **av = create_av(tmp.c_str(), &path.c_str()[1]);
 		execve("/bin/rm", av, env);
-		return (rp->setBody("Error"));
+		rp->setBody("Error");
+		perror("Execve");
+		exit(1);
 	}
 	wait(NULL);
 }
@@ -91,5 +85,5 @@ void	rq_html(Response *rp, Request rq)
 			return ;
 		}
 	}
-	std::cout<< "This method is not supported"<<std::endl;
+	throw Exception(4);
 }
