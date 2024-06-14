@@ -61,7 +61,6 @@ void	ConfigFile::readAllInfos()
 		raw.erase(0, raw.find('\n') + 1);
 		if (line.size() == 0) // skip empty line
 			continue;
-		std::cout << line <<std::endl;
 		if (line.find("server") != std::string::npos && ParserUtils::eraseOWS(line).compare("server{") == 0)
 		{
 			_servers.push_back(Server());
