@@ -5,52 +5,93 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/05 14:31:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/13 19:03:30 by mmuesser         ###   ########.fr       */
+/*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
+/*   Updated: 2024/06/14 22:05:06 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Poll.hpp"
-#include "../bastien/RequestParsing/Request.hpp"
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <stdlib.h>
+#include "../include/CGI.hpp"
+#include "../include/Exception.hpp"
 
-/*creer fonction avant cgi() qui va selon ressource request appeler cgi gerer .html*/
+CGI::CGI(void){}
+CGI::~CGI(void){}
+CGI::CGI(const CGI &obj){*this = obj;}
 
-/*
-check si j'ai tout body via content_length (en checkant _header dans Request obj)
-creer env a partir des headers
-build av
-creer pipe, fork et dup fd pour que resultat script soit recuperable vu qu'il va ecrire sur stdout
-check verb (voir url selon les scripts qu'on aura) pour exec script correspondant
-launch execve
-*/
-
-/* MISE EN PLACE PROG CGI :
-+ Rendre le code plus propre et pouvoir lancer des scripts
-~ creer pathname pour execve
-- mettre gestion erreur
-
-- continuer recherche sur scripts cgi
-
-*/
-
-const char	**create_av(const char *name, const char *arg)
+CGI & CGI::operator=(const CGI &obj)
 {
-	const char **av;
-
-	av[0] = &name[0];
-	av[1] = &arg[0];
-	av[2] = NULL;
+	if (this != &obj)
+	{
+		this->_rp = obj.getRp();
+		this->_rq = obj.getRq();
+	}
+	return (*this);
 }
 
-char **create_env(Request rq)
+Response	*CGI::getRp()	const {return _rp;}
+Request		 CGI::getRq()	const {return _rq;}
+
+CGI::CGI(Response *rp, Request rq) : _rp(rp), _rq(rq)
 {
-	char **env = new char *[rq.getHeader().size() + 1];
+	int status;
+	int pipe_fd[2];
+
+	status = check_file(this->_rq, "cgi-bin", 2);
+	if (status > 0)
+		throw Exception(1);
+	status = pipe(pipe_fd);
+	if (status == -1)
+		throw Exception(2);
+	status = fork();
+	if (status == -1)
+		throw Exception(3);
+	else if (status == 0)
+		this->exec_son(pipe_fd);
+	else
+		this->exec_father(pipe_fd);
+}
+
+void	CGI::exec_son(int *pipe_fd)
+{
+	dup2(pipe_fd[1], STDOUT_FILENO);
+	close(pipe_fd[1]);
+	close(pipe_fd[0]);
+	
+	std::string name = _rq.getRql().getUrl().getPath();
+	std::string pathname = "cgi-bin" + name;
+	char **env = create_env();
+	char **av = create_av();
+	execve(pathname.c_str(), av, env);
+	delete [] env;
+	perror("Execve");
+	exit(1);
+}
+
+/*definir limite pour reponse body*/
+void	CGI::exec_father(int *pipe_fd)
+{
+	// wait(NULL);
+	int status;
+	char *buff;
+	buff = (char *) malloc(sizeof(char) * (100 + 1));
+	if (!buff)
+		return ;
+	for (int i = 0; i < 100; i++)
+		buff[i] = '\0';
+	dup2(pipe_fd[0], STDIN_FILENO);
+	status = read(pipe_fd[0], buff, 100);
+	if (status == -1)
+		return ;
+	this->getRp()->setBody(buff);
+	std::cout<< "buff : "<<this->getRp()->getBody()<<std::endl;
+	close(pipe_fd[0]);
+	close(pipe_fd[1]);
+}
+
+char	**CGI::create_env()
+{
+	char **env = new char *[_rq.getHeader().size() + 1];
 	int i = 0;
-	for (std::map<std::string, std::string>::const_iterator it = rq.getHeader().begin(); it != rq.getHeader().end(); it++)
+	for (std::map<std::string, std::string>::const_iterator it = _rq.getHeader().begin(); it != _rq.getHeader().end(); it++)
 	{
 		std::string tmp;
 		tmp.append(it->first + "=" + it->second);
@@ -61,87 +102,12 @@ char **create_env(Request rq)
 	return (env);
 }
 
-std::string create_path_name(Request rq)
+char	**CGI::create_av()
 {
-	std::string pathname;
+	char **av;
 
-	pathname = "cgi-bin" + rq.getRql().getUrl().getPath();
-	return (pathname);
-}
-
-void	exec_son(Request rq, int *pipe_fd)
-{
-	dup2(pipe_fd[1], STDOUT_FILENO);
-	close(pipe_fd[1]);
-	close(pipe_fd[0]);
-	
-	std::string path = rq.getRql().getUrl().getPath();
-	char **env = create_env(rq);
-	const char **av = create_av(&(path.c_str())[1], NULL);
-	std::string pathname = create_path_name(rq);
-	std::cerr<< "pathname : "<< pathname<<std::endl;
-	execve(pathname.c_str(), av, env);
-	perror("Execve");
-}
-
-char	*exec_father(Request rq, int *pipe_fd)
-{
-	// wait(NULL);
-	int status;
-	char *buff;
-	buff = (char *) malloc(sizeof(char) * (100 + 1));
-	if (!buff)
-		return (NULL);
-	for (int i = 0; i < 100; i++)
-		buff[i] = '\0';
-	dup2(pipe_fd[0], STDIN_FILENO);
-	status = read(pipe_fd[0], buff, 100);
-	if (status == -1)
-		return (NULL);
-	std::cout<< "buff : "<< buff;
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
-	return (buff);
-}
-
-int cgi(Request rq)
-{
-	int pipe_fd[2];
-	int status;
-	char *buff;
-
-	status = pipe(pipe_fd);
-	if (status == -1)
-		return (perror("pipe"), -1);
-	status = fork();
-	if (status == -1)
-		return (perror("fork"), -1);
-	else if (status == 0)
-		exec_son(rq, pipe_fd);
-	else
-		buff = exec_father(rq, pipe_fd);
-	return (0);
-}
-
-// int	main(void)
-// {
-// 	std::string data[] = {"POST http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
-// 						"GET http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n",
-// 						"DELETE http://localhost:80/home.html?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\ncontent-length: 73\nformat: text\n\nthis is the body firstline\nthis is the body secondline (with a final lf)\n"};
-// 	for (int i = 0; i < 3; i++)
-// 	{
-// 		Request rq(data[i]);
-// 		cgi(rq);
-// 	}
-// 	return (0);
-// }
-
-
-int main(void)
-{
-	std::string str = "blabla";
-	const char *tmp;
-
-	tmp = &str.c_str()[0];
-	std::cout << "tmp : "<< tmp<<std::endl;
+	std::string name = _rq.getRql().getUrl().getPath();
+	av[0] = strdup(&(name.c_str())[1]);
+	av[1] = NULL;
+	return (av);
 }
