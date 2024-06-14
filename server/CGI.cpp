@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 22:05:06 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/14 23:11:37 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ CGI::CGI(Response *rp, Request rq) : _rp(rp), _rq(rq)
 	int status;
 	int pipe_fd[2];
 
+	/*check dir -> return 0 si pas un dir*/
 	status = check_file(this->_rq, "cgi-bin", 2);
 	if (status > 0)
 		throw Exception(1);
@@ -82,7 +83,7 @@ void	CGI::exec_father(int *pipe_fd)
 	if (status == -1)
 		return ;
 	this->getRp()->setBody(buff);
-	std::cout<< "buff : "<<this->getRp()->getBody()<<std::endl;
+	std::cout<< "buff : "<<this->getRp()->getBody();
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
 }

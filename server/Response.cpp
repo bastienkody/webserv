@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:54:11 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/13 16:09:15 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/14 21:45:36 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,13 @@ Response::Response(void)
 Response::~Response(void)
 {}
 
-std::string Response::getLineState(void)
-{return (_lineState):}
+std::string Response::getLineState(void) const
+{return (_lineState);}
 
-std::string Response::getHeader(void)
+std::string Response::getHeader(void) const
 {return (_header);}
 
-std::string Response::getBody(void)
+std::string Response::getBody(void) const
 {return (_body);}
 
 void	Response::setLineState(std::string lineState)

@@ -6,21 +6,11 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/06 16:40:57 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/14 15:34:43 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include <sys/socket.h> /*socket, listen, bind, accept...*/
-// #include <arpa/inet.h> /*inet_pton et inet_ntop  (transforme ip en chaine de caracteres et inversement)*/
-// #include <string.h> /*memset*/
-// #include <netdb.h> /*struc addrinfo*/
-// #include <unistd.h> /*fcntl*/
-// #include <fcntl.h> /*fcntl*/
-// #include <stdio.h> /*perror*/
-// #include <stdlib.h> /*exit*/
-// #include <iostream> /*std::*/
-// #include <poll.h> /*poll*/
-#include "../include/Poll.hpp"
+#include "../include/Server.hpp"
 
 int create_socket_server(const char *port)
 {
