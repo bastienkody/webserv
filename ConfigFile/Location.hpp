@@ -15,6 +15,8 @@ class Location
 		~Location();
 		Location(const Location & src);
 		Location & operator=(const Location & rhs);
+	//	printer
+		void	printAll() const;
 	//	getters
 		std::string const & getPath() const;
 		bool		const & getIsPathAbsolute() const;
@@ -51,10 +53,10 @@ class Location
 		std::string	_maxBodysize;	//stored as a string but ovlf checks needed when reading + use of neg (not zero) if not provided
 		std::string	_redirection;
 		// upload_files ?? i dont understand how nginx deals with it ; may we do smthg different?
+		std::vector<std::string>	_cgiExt;
 		std::map<std::string,std::string>	_errorPages;
 		std::vector<std::string>	_allowMethods;
 		std::vector<std::string>	_cgiPathes;
-		std::vector<std::string>	_cgiExt;
 		
 };
 

@@ -9,18 +9,41 @@ Location & Location::operator=(const Location & rhs)
 	if(this != &rhs)
 	{
 		_path = rhs.getPath();
+		_isPathAbsolute = rhs.getIsPathAbsolute();
 		_root = rhs.getRoot();
 		_index = rhs.getIndex();
 		_autoindex = rhs.getAutoIndex();
-		/*_maxBodysize = rhs.getMaxBodySize();
+		_maxBodysize = rhs.getMaxBodySize();
 		_allowMethods = rhs.getAllowMethods();
 		_redirection = rhs.getRedirection();
 		_errorPages = rhs.getErrorPages();
-		_cgiPathes = rhs.getCgiExt();
+		_cgiPathes = rhs.getCgiPathes();
 		_cgiExt = rhs.getCgiExt();
-		_allowMethods = rhs.getAllowMethods();*/
+		_allowMethods = rhs.getAllowMethods();
 	}
 	return (*this);
+}
+
+//	printer
+void	Location::printAll() const
+{
+	std::cout << "#### Location printer ####" << std::endl;
+	std::cout << "Path:\t" + getPath() << std::endl;
+	std::cout << "Absolute path?:\t" << getIsPathAbsolute() << std::endl;
+	std::cout << "Root:\t" + getRoot() << std::endl;
+	std::cout << "Index:\t" + getIndex() << std::endl;
+	std::cout << "Autoindex:\t" + getAutoIndex() << std::endl;
+	std::cout << "Maxbodysize:\t" + getMaxBodySize() << std::endl;
+	std::cout << "Redirection:\t" + getRedirection() << std::endl;
+	for (std::map<std::string,std::string>::const_iterator it = getErrorPages().begin(); it != getErrorPages().end(); ++it)
+		std::cout << "errPages:\t" + it->first + "-->" + it->second << std::endl;
+	for (std::vector<std::string>::const_iterator it = getAllowMethods().begin(); it != getAllowMethods().end(); ++it)
+		std::cout << "allow method:\t" + *it << std::endl;
+	for (std::vector<std::string>::const_iterator it = getCgiExt().begin(); it != getCgiExt().end(); ++it)
+		std::cout << "cgi ext:\t" + *it << std::endl;
+	for (std::vector<std::string>::const_iterator it = getCgiPathes().begin(); it != getCgiPathes().end(); ++it)
+		std::cout << "cgi path:\t" + *it << std::endl;
+	std::cout << "#### end of location ####" << std::endl;
 }
 
 //	getters
@@ -43,7 +66,6 @@ void	Location::setPath(std::string ogline)	// actually called in server part
 	line.erase(0, line.find("location") + 8);
 	line.erase(line.find('{'), 1);
 	line = ParserUtils::trimOWS(line);
-	std::cout << "\npath after parse:" + line << std::endl;
 
 	_isPathAbsolute = false;
 	if (line[0] == '=' && isspace(line[1]))
@@ -54,6 +76,8 @@ void	Location::setPath(std::string ogline)	// actually called in server part
 	}
 	if (ParserUtils::firstWsPos(line) != -1)
 		throw std::invalid_argument("No whitespace allowed in location path: " + ogline);
+	if (line.size() == 0)
+		throw std::invalid_argument("Bad config line (empty location path): " + ogline);
 	_path = line;
 }
 
@@ -65,6 +89,8 @@ void	Location::setRoot(std::string line)
 	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
 	if (ParserUtils::firstWsPos(element) != -1)
 		throw std::invalid_argument("Bad config line (extra ws): " + line);
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
 	_root = element;
 }
 
@@ -76,6 +102,8 @@ void	Location::setIndex(std::string line)
 	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
 	if (ParserUtils::firstWsPos(element) != -1)
 		throw std::invalid_argument("Bad config line (extra ws):" + line);
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
 	_index = element;
 }
 
@@ -98,6 +126,8 @@ void	Location::setMaxBodySize(std::string line)
 	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
 	if (ParserUtils::firstWsPos(element) != -1)
 		throw std::invalid_argument("Bad config line (extra ws):" + line);
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
 	for (std::string::iterator it = element.begin(); it != element.end(); ++it)
 		if (isdigit(*it) == false)
 			throw std::invalid_argument("Bad config line (maxbodysize not digit):" + line);
@@ -118,6 +148,8 @@ void	Location::setRedirection(std::string line)
 	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
 	if (ParserUtils::firstWsPos(element) != -1)
 		throw std::invalid_argument("Bad config line (extra ws):" + line);
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
 	_redirection = element;
 }
 
@@ -136,6 +168,8 @@ void	Location::setErrorPages(std::string line)
 
 	if (ParserUtils::firstWsPos(val) != -1)
 		throw std::invalid_argument("Bad config line (extra ws in error page path):" + line);
+	if (key.size() == 0 || val.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
 	_errorPages[key] = val;
 }
 
@@ -146,6 +180,8 @@ void	Location::setAllowMethods(std::string line)
 		throw std::invalid_argument("Bad config line (no ws): " + line);
 
 	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1))); // "GET, POST, DELETE"
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
 	while (element.size() > 0)
 	{
 		unsigned int	sep_pos = element.find(',') != std::string::npos ? element.find(',') : element.size();
@@ -164,11 +200,15 @@ void	Location::setCgiPathes(std::string line)
 		throw std::invalid_argument("Bad config line (no ws): " + line);
 
 	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
 	while (element.size() > 0)
 	{
 		unsigned int	sep_pos = element.find(',') != std::string::npos ? element.find(',') : element.size();
 		std::string	path(ParserUtils::trimOWS(element.substr(0, sep_pos)));
 		element.erase(0, sep_pos +  1);
+		if (path.size() == 0)
+			throw std::invalid_argument("Bad config line (empty val): " + line);
 		_cgiPathes.push_back(path);
 	}
 }
@@ -179,22 +219,25 @@ void	Location::setCgiExt(std::string line)
 	if (ows_pos == -1)
 		throw std::invalid_argument("Bad config line (no ws): " + line);
 
-	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1))); // "GET, POST, DELETE"
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
 	while (element.size() > 0)
 	{
 		unsigned int	sep_pos = element.find(',') != std::string::npos ? element.find(',') : element.size();
 		std::string	ext(ParserUtils::trimOWS(element.substr(0, sep_pos)));
 		element.erase(0, sep_pos +  1);
+		if (ext.size() == 0)
+			throw std::invalid_argument("Bad config line (empty val): " + line);
 		_cgiExt.push_back(ext);
 	}
 }
 
 /*
-	reads all location info 
+	reads all location info
 */
 void	Location::readInfos(std::string & raw)
 {
-	std::cout << "from location.readinfo() :" << std::endl;
 	std::string	line, rawLine;
 
 	while (raw.find('\n') != std::string::npos)
@@ -204,17 +247,14 @@ void	Location::readInfos(std::string & raw)
 		raw.erase(0, raw.find('\n') + 1);
 		if (line.size() == 0)
 			continue;
-		std::cout << line;
 		if (line.compare("}") == 0)
 			break;
 		else
 		{
 			if (ParserUtils::checkRmSemiColon(line) == false)
 				throw std::invalid_argument("Bad config line (no terminating semicolon): " + line);
-			std::cout << "\tlocation attribute" << std::endl;
 			if (isValidElementLabel(line) == false)
-				//throw std::invalid_argument("Bad config element found: " + line);
-				std::cout << "bad line for now" << std::endl;
+				throw std::invalid_argument("Bad config element found: " + line);
 		}
 	}
 }
@@ -234,7 +274,6 @@ bool	Location::isValidElementLabel(std::string line)
 								&Location::setAllowMethods, &Location::setCgiPathes,
 								&Location::setCgiExt};
 
-	std::cout << "line:" + line + "&&label:" + label<< std::endl;
 	for (int i = 0; i < 9; ++i)
 	{
 		if (label.compare(valid[i]) == 0)

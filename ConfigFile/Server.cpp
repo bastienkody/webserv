@@ -46,7 +46,6 @@ std::vector<Location> const & Server::getLocations() const {return (_locations);
 */
 void	Server::readInfos(std::string & raw)
 {
-	std::cout << "from server.readinfo() :" << std::endl;
 	std::string	line, rawLine;
 
 	while (raw.find('\n') != std::string::npos)
@@ -56,7 +55,6 @@ void	Server::readInfos(std::string & raw)
 		raw.erase(0, raw.find('\n') + 1);
 		if (line.size() == 0) // skip empty line
 			continue;
-		std::cout << line;
 		if (line.find("location") != std::string::npos) // && ParserUtils::eraseOWS(line).compare("server{") == 0) // to be modified to get the path
 		{
 			_locations.push_back(Location());
