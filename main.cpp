@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/18 18:38:59 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/18 18:43:03 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 
 
-RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ ET CREER FONCTION PRE EXEC_RQ)
+RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 
 	~ finir mise en place serv test
 		~ creer class poll pour faciliter manip (notamment l'update du pollfd) puis finir implementation
