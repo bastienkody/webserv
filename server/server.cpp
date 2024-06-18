@@ -6,11 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 15:34:43 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/18 18:41:33 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
+
 
 int create_socket_server(const char *port)
 {
@@ -43,7 +44,7 @@ int create_socket_server(const char *port)
 	return (server_fd);
 }
 
-int	read_recv_data(int i, Poll *poll_fds)
+char	*read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
 	char buff[10000];
@@ -51,47 +52,27 @@ int	read_recv_data(int i, Poll *poll_fds)
 	memset(&buff, 0, sizeof buff); /*vide le buffer a chaque fois (pas sur de le garder mais utile pour l'instant)*/
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
 	if (nb_bytes < 0)
-		return (perror("recv"), -1);
+		return (perror("recv"), NULL);
 	else if (nb_bytes == 0)
-		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, 0);
+		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, NULL);
 	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
-	/*
-		1	parsing build objet grace a buff
-		2	appel a cgi (pas forcement directement mais en tout cas sans repasser par read_recv)
-		3	si cgi a eu tout ce dont il avait besoin parsing modifie nb_bytes en x qui signifie qu'on peut quitter read_recv
-			sinon parsing modifie nb_bytes en y et return objet
-		4	nouvel appel a recv pour lire suite body
-		5	appel a parsing avec objet != NULL donc pas besoin de rebuild juste append
-		6	repeter a partir 2 autant de fois que necessaires
-	*/
-	return (0);
+	return (buff); /*faire return buff*/
 }
 
-/*int	function(char *buff, int *nb_bytes, bool)
+int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 {
-	parse buff et cree obj
-	envoie a cgi
-	cgi renvoie erreur manque info
-	appel a read_recv
-	append a obj
-	envoie a cgi etc...
-}*/
+	Request rq(buff);
 
-/*int	read_recv_data(int i, Poll *poll_fds)
-{
-	int nb_bytes;
-	char buff[10000];
-	int status;
-
-	memset(&buff, 0, sizeof buff);
-	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
-	if (nb_bytes < 0)
-		return (perror("recv"), -1);
-	else if (nb_bytes == 0)
-		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, 0);
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;	
+	while (check_body_size(rq) == -1)
+	{
+		char *tmp = read_recv_data(i, poll_fds);
+		if (!tmp)
+			return (std::cerr<< "Error read_recv_data"<<std::endl, -1);
+		rq.appendBody(tmp);
+	}
+	exec_rq
 	return (0);
-}*/
+}
 
 void	accept_new_connection(int server_fd, Poll *poll_fds)
 {
