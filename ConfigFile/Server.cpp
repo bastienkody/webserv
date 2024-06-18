@@ -1,7 +1,8 @@
 #include"Server.hpp"
+#include"Location.hpp"
 
 //	constructors + copy
-Server::Server() {} 
+Server::Server(): _ip("0.0.0.0"), _port("80")	{}
 Server::~Server() {}
 Server::Server(const Server & src) {*this = src;}
 Server & Server::operator=(const Server & rhs)
@@ -27,11 +28,11 @@ Server & Server::operator=(const Server & rhs)
 //	printer
 void	Server::printAll() const
 {
-	std::cout << "#### Server printer ####" << std::endl;
+	std::cout << "#### Server printer (location nb:" << getLocations().size() << ") ####" << std::endl;
 	std::cout << "Ip:\t" + getIp() << std::endl;
 	std::cout << "Port:\t" << getPort() << std::endl;
 	for (std::vector<std::string>::const_iterator it = getNames().begin(); it != getNames().end(); ++it)
-		std::cout << "servername:\t" + *it << std::endl;
+		std::cout << "name:\t" + *it << std::endl;
 	std::cout << "Root:\t" + getRoot() << std::endl;
 	std::cout << "Index:\t" + getIndex() << std::endl;
 	std::cout << "Autoindex:\t" + getAutoIndex() << std::endl;
@@ -58,12 +59,44 @@ std::vector<Location> const & Server::getLocations() const {return (_locations);
 //	setters
 void	Server::setNames(std::string line)
 {
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
 
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	while (element.size() > 0)
+	{
+		ows_pos = ParserUtils::firstWsPos(element);
+		if (ows_pos == -1)
+			ows_pos = element.size();
+		std::string	name(ParserUtils::trimOWS(element.substr(0, ows_pos)));
+		element.erase(0, ows_pos +  1);
+		_names.push_back(name);
+	}
 }
 
 void	Server::setIpPort(std::string line)
 {
-
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1))); // 1.1.1.1:80
+	if (ParserUtils::firstWsPos(element) != -1)
+		throw std::invalid_argument("Bad config line (extra ws): " + line);
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	if (element.find(':') != std::string::npos)
+	{
+		_ip = element.substr(0, element.find(':'));
+		_port = element.substr(element.find(':') + 1, element.size() - 1);
+		return;
+	}
+	if (element.find('.') != std::string::npos)
+		_ip = element;
+	else
+		_port = element;
 }
 
 /*
@@ -105,8 +138,12 @@ bool	Server::isValidElementLabel(std::string line)
 	if (ows_pos == -1)
 		throw std::invalid_argument("Bad config line (label) (no ws):" + line);
 	std::string	label = line.substr(0, ows_pos);
-	std::string valid[2] = {"server_names", "listen",}; // "root", "index", "autoindex","max_body_size", "error_page", "allow_methods", "cgi", "cgi_ext"};
-	void (Server::*ptrFct[2])(std::string) = { &Server::setNames, &Server::setIpPort,}; //&Location::setIndex,&Location::setAutoIndex, &Location::setMaxBodySize,&Location::setRedirection, &Location::setErrorPages,&Location::setAllowMethods, &Location::setCgiPathes,&Location::setCgiExt};
+	std::string valid[10] = {"server_name", "listen", "root", "index", "autoindex","max_body_size", "error_page", "allow_methods", "cgi", "cgi_ext"};
+	void (Server::*ptrFct[10])(std::string) = { &Server::setNames, &Server::setIpPort,
+												&ConfigFile::setRoot, &ConfigFile::setIndex,
+												&ConfigFile::setAutoIndex, &ConfigFile::setMaxBodySize,
+												&ConfigFile::setErrorPages, &ConfigFile::setAllowMethods,
+												&ConfigFile::setCgiPathes,&ConfigFile::setCgiExt};
 
 	for (int i = 0; i < 10; ++i)
 	{

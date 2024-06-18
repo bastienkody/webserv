@@ -1,4 +1,5 @@
 #include"ConfigFile.hpp"
+#include"Server.hpp"
 
 //	constructors + copy
 ConfigFile::ConfigFile() {}
@@ -14,6 +15,15 @@ ConfigFile & ConfigFile::operator=(const ConfigFile & rhs)
 		this->_servers = rhs.getServers();
 	}
 	return (*this);
+}
+
+//	printer
+void	ConfigFile::printAll() const
+{
+	std::cout << "#### Config printer (server nb:" << getServers().size() << ") ####" << std::endl;
+	for (std::vector<Server>::const_iterator it = getServers().begin(); it != getServers().end(); ++it)
+		it->printAll();
+	std::cout << "#### end of config ####" << std::endl;
 }
 
 //	Store filename into string _rawData

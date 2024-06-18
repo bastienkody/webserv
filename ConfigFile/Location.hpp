@@ -9,6 +9,8 @@
 #include "ConfigFile.hpp"
 #include "../ParserUtils/ParserUtils.hpp"
 
+class ConfigFile;
+
 class Location: public ConfigFile
 {
 	public:

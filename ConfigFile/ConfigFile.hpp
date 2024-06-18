@@ -5,16 +5,11 @@
 #include<fstream>
 #include<string>
 #include<vector>
-#include "Server.hpp"
-#include "Location.hpp"
+#include<map>
 #include "../ParserUtils/ParserUtils.hpp"
 
-class Server;
-class Locations;
 
-/*
-	Polymorphism? faire heriter location et server, remonter les setters generiques ici?
-*/
+class Server;
 
 class ConfigFile
 {
@@ -24,6 +19,8 @@ class ConfigFile
 		ConfigFile(const std::string filename);
 		ConfigFile(const ConfigFile & src);
 		ConfigFile & operator=(const ConfigFile & rhs);
+	//	printer
+		void	printAll() const;
 	//	getetrs
 		std::string const & getRawData() const;
 		std::vector<Server> const & getServers() const;

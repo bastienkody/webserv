@@ -5,10 +5,10 @@
 #include<string>
 #include<vector>
 #include<map>
-#include "Location.hpp"
 #include "ConfigFile.hpp"
+#include "Location.hpp"
 
-class Location;
+class ConfigFile;
 
 class Server: public ConfigFile
 {
@@ -23,7 +23,7 @@ class Server: public ConfigFile
 		std::vector<std::string> const & getNames() const;
 		std::string const & getIp() const;
 		std::string const & getPort() const;
-		std::vector<Location> const & Server::getLocations() const;
+		std::vector<Location> const & getLocations() const;
 	// setters
 		void	setNames(std::string line);
 		void	setIpPort(std::string line);

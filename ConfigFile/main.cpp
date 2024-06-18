@@ -10,8 +10,7 @@ int	main(int ac, char **av)
 	try{
 		config.openReadFileToStr();
 		config.readAllInfos();
-		for (std::vector<Location>::const_iterator it = config.getServers().front().getLocations().begin(); it != config.getServers().front().getLocations().end(); ++it)
-			it->printAll();
+		config.printAll();
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << std::endl;
