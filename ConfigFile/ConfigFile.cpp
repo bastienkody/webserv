@@ -139,9 +139,8 @@ void	ConfigFile::setMaxBodySize(std::string line)
 		throw std::invalid_argument("Bad config line (extra ws):" + line);
 	if (element.size() == 0)
 		throw std::invalid_argument("Bad config line (empty val): " + line);
-	for (std::string::iterator it = element.begin(); it != element.end(); ++it)
-		if (isdigit(*it) == false)
-			throw std::invalid_argument("Bad config line (maxbodysize not digit):" + line);
+	if (ParserUtils::isStrDigit(element) == false)
+		throw std::invalid_argument("Bad config line (maxbodysize not digit):" + line);
 
 	std::stringstream	str(element);
 	unsigned int		i;
@@ -164,10 +163,10 @@ void	ConfigFile::setErrorPages(std::string line)
 	std::string	key(ParserUtils::trimOWS(element.substr(0, ows_pos)));					// "404"
 	std::string	val(ParserUtils::trimOWS(element.substr(ows_pos, element.size() -1)));	// "/404.html"
 
-	if (ParserUtils::firstWsPos(val) != -1)
-		throw std::invalid_argument("Bad config line (extra ws in error page path):" + line);
-	if (key.size() == 0 || val.size() == 0)
-		throw std::invalid_argument("Bad config line (empty val): " + line);
+	if (ParserUtils::firstWsPos(val) != -1 || val.size() == 0 )
+		throw std::invalid_argument("Bad config line (extra ws or empty page path):" + line);
+	if (key.size() != 3 || ParserUtils::isStrDigit(key) == false)
+		throw std::invalid_argument("Bad config line (bad error code size or not digit): " + line);
 	_errorPages[key] = val;
 }
 
@@ -185,7 +184,7 @@ void	ConfigFile::setAllowMethods(std::string line)
 		unsigned int	sep_pos = element.find(',') != std::string::npos ? element.find(',') : element.size();
 		std::string	method(ParserUtils::trimOWS(element.substr(0, sep_pos)));
 		if (method.compare("GET") && method.compare("POST") && method.compare("DELETE"))
-			throw std::invalid_argument("Bad method found on allow_method line:" + line);
+			throw std::invalid_argument("Bad config line (only methods GET,POST,DELETE) :" + line);
 		element.erase(0, sep_pos +  1);
 		_allowMethods.push_back(method);
 	}

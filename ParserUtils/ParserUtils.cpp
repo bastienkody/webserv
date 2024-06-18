@@ -53,10 +53,39 @@ int	ParserUtils::firstWsPos(std::string line)
 	return ows_pos;
 }
 
+//	check terminating semicolon and removes it
 bool	ParserUtils::checkRmSemiColon(std::string & line)
 {
 	if (line[line.size()-1] != ';')
 		return false;
 	line.erase(line.size() -1, 1);
 	return true;
+}
+
+//	only digit? (no sign accepted)
+bool	ParserUtils::isStrDigit(std::string & line)
+{
+	for (std::string::iterator it = line.begin(); it != line.end(); ++it)
+		if (isdigit(*it) == false)
+			return false;
+	return true;
+}
+
+//	only alpha?
+bool	ParserUtils::isStrAlpha(std::string & line)
+{
+	for (std::string::iterator it = line.begin(); it != line.end(); ++it)
+		if (isalpha(*it) == false)
+			return false;
+	return true;
+}
+
+//	returns occurences of c
+unsigned int	ParserUtils::charCount(std::string & line, char c)
+{
+	unsigned int	nb = 0;
+	for (std::string::iterator it = line.begin(); it != line.end(); ++it)
+		if (*it == c)
+			++nb;
+	return nb;
 }

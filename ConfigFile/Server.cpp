@@ -2,7 +2,7 @@
 #include"Location.hpp"
 
 //	constructors + copy
-Server::Server(): _ip("0.0.0.0"), _port("80")	{}
+Server::Server(): _ip("0.0.0.0"), _port(80)	{}
 Server::~Server() {}
 Server::Server(const Server & src) {*this = src;}
 Server & Server::operator=(const Server & rhs)
@@ -53,7 +53,7 @@ void	Server::printAll() const
 //	getters
 std::vector<std::string> const & Server::getNames() const	{return (_names);}
 std::string const & Server::getIp() const	{return (_ip);}
-std::string const & Server::getPort() const	{return (_port);}
+unsigned int const & Server::getPort() const	{return (_port);}
 std::vector<Location> const & Server::getLocations() const {return (_locations);}
 
 //	setters
@@ -77,26 +77,77 @@ void	Server::setNames(std::string line)
 	}
 }
 
+bool	Server::checkIpv4(std::string line)
+{
+	std::stringstream	sstr;
+	unsigned int		nb;
+	unsigned int		sep_pos;
+
+	if (ParserUtils::charCount(line, '.') != 3)
+		return false;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		sep_pos = (i != 2 ? line.find('.') : line.size() - 2);
+		sstr.str(line.substr(0, sep_pos));
+		line.erase(0, sep_pos + 1);
+		std::cout << sstr.str() + ",size:" << sstr.str().size() << std::endl;
+		if (sstr.str().size() > 3)
+			return false;
+		sstr >> nb;
+		if (sstr.fail() || !sstr.eof() || nb > 255)
+			return false;
+	}
+	return true;
+}
+
+bool	Server::checkPort(std::string line)
+{
+	std::stringstream	sstr(line);
+	unsigned int		port;
+
+	sstr >> port;
+	if (sstr.fail() || !sstr.eof() || port >= MAX_PORTS_NUMBER)
+		return false;
+	return true;
+}
+
 void	Server::setIpPort(std::string line)
 {
 	int	ows_pos = ParserUtils::firstWsPos(line);
 	if (ows_pos == -1)
 		throw std::invalid_argument("Bad config line (no ws): " + line);
-	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1))); // 1.1.1.1:80
+
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
 	if (ParserUtils::firstWsPos(element) != -1)
 		throw std::invalid_argument("Bad config line (extra ws): " + line);
 	if (element.size() == 0)
 		throw std::invalid_argument("Bad config line (empty val): " + line);
+
 	if (element.find(':') != std::string::npos)
 	{
-		_ip = element.substr(0, element.find(':'));
-		_port = element.substr(element.find(':') + 1, element.size() - 1);
+		std::string	ip = element.substr(0, element.find(':'));
+		if (checkIpv4(ip) == false)
+			throw std::invalid_argument("Bad config line (invalid IP address): " + line);
+		_ip = ip;
+		std::string	port = element.substr(element.find(':') + 1, element.size() - 1);
+		if (checkPort(port) == false)
+			throw std::invalid_argument("Bad config line (invalid port): " + line);
+		_port = atoi(port.c_str());
 		return;
 	}
 	if (element.find('.') != std::string::npos)
+	{
+		if (checkIpv4(element) == false)
+			throw std::invalid_argument("Bad config line (invalid IP address): " + line);
 		_ip = element;
+	}
 	else
-		_port = element;
+	{
+		if (checkPort(element) == false)
+			throw std::invalid_argument("Bad config line (invalid port): " + line);
+		_port = atoi(element.c_str());
+	}
 }
 
 /*

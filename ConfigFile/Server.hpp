@@ -2,11 +2,14 @@
 #define SERVER_HPP
 
 #include<iostream>
+#include<sstream>
 #include<string>
 #include<vector>
 #include<map>
 #include "ConfigFile.hpp"
 #include "Location.hpp"
+
+#define MAX_PORTS_NUMBER 65635
 
 class ConfigFile;
 
@@ -22,11 +25,14 @@ class Server: public ConfigFile
 	// getters
 		std::vector<std::string> const & getNames() const;
 		std::string const & getIp() const;
-		std::string const & getPort() const;
+		unsigned int const & getPort() const;
 		std::vector<Location> const & getLocations() const;
 	// setters
 		void	setNames(std::string line);
 		void	setIpPort(std::string line);
+
+		bool	checkIpv4(std::string line);
+		bool	checkPort(std::string line);
 
 		void	readInfos(std::string & raw); //throw
 		bool	isValidElementLabel(std::string line);
@@ -34,7 +40,7 @@ class Server: public ConfigFile
 	private:
 		std::vector<std::string>	_names;
 		std::string					_ip;
-		std::string					_port;
+		unsigned int				_port;
 		std::vector<Location>		_locations;
 };
 
