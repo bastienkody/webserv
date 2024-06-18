@@ -16,10 +16,6 @@ ConfigFile & ConfigFile::operator=(const ConfigFile & rhs)
 	return (*this);
 }
 
-//	Getter
-std::string const & ConfigFile::getRawData() const {return (_rawData);}
-std::vector<Server> const & ConfigFile::getServers() const {return (_servers);}
-
 //	Store filename into string _rawData
 void	ConfigFile::openReadFileToStr()
 {
@@ -47,9 +43,7 @@ void	ConfigFile::openReadFileToStr()
 	delete [] buf;
 }
 
-/*
-	read the whole config file line by line (erase comment + trim OWS) looking for server parts
-*/
+//	Read the whole config file line by line (erase comment + trim OWS) looking for server parts
 void	ConfigFile::readAllInfos()
 {
 	std::string	raw(_rawData), line, rawLine;
@@ -72,6 +66,157 @@ void	ConfigFile::readAllInfos()
 	}
 }
 
+//	Config specific getters
+std::string const & ConfigFile::getRawData() const {return (_rawData);}
+std::vector<Server> const & ConfigFile::getServers() const {return (_servers);}
 
+//	Getters for children
+std::string const & ConfigFile::getRoot() const {return _root;}
+std::string const & ConfigFile::getIndex() const {return _index;}
+std::string const & ConfigFile::getAutoIndex() const {return _autoindex;}
+std::string const & ConfigFile::getMaxBodySize() const {return _maxBodysize;}
+std::string const & ConfigFile::getRedirection() const {return _redirection;}
+std::map<std::string, std::string> const & ConfigFile::getErrorPages() const {return _errorPages;}
+std::vector<std::string> const & ConfigFile::getAllowMethods() const {return _allowMethods;}
+std::vector<std::string> const & ConfigFile::getCgiPathes() const {return _cgiPathes;}
+std::vector<std::string> const & ConfigFile::getCgiExt() const {return _cgiExt;}
 
+//	Setters for children
+void	ConfigFile::setRoot(std::string line)
+{
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (ParserUtils::firstWsPos(element) != -1)
+		throw std::invalid_argument("Bad config line (extra ws): " + line);
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	_root = element;
+}
 
+void	ConfigFile::setIndex(std::string line)
+{
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (ParserUtils::firstWsPos(element) != -1)
+		throw std::invalid_argument("Bad config line (extra ws):" + line);
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	_index = element;
+}
+
+void	ConfigFile::setAutoIndex(std::string line)
+{
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (element.compare("on") && element.compare("off"))
+		throw std::invalid_argument("Bad config line (autoindex == on or off)");
+	_autoindex = element;
+}
+
+void	ConfigFile::setMaxBodySize(std::string line)
+{
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (ParserUtils::firstWsPos(element) != -1)
+		throw std::invalid_argument("Bad config line (extra ws):" + line);
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	for (std::string::iterator it = element.begin(); it != element.end(); ++it)
+		if (isdigit(*it) == false)
+			throw std::invalid_argument("Bad config line (maxbodysize not digit):" + line);
+
+	std::stringstream	str(element);
+	unsigned int		i;
+	str >> i;
+	if (str.fail() || !str.eof())
+		throw std::invalid_argument("Bad config line (maxbodysize vs unsigned int):" + line);
+	_maxBodysize = element;
+}
+
+void	ConfigFile::setErrorPages(std::string line)
+{
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1))); // "404 /404.html"
+	if ((ows_pos = ParserUtils::firstWsPos(element)) == -1)
+		throw std::invalid_argument("Bad config line (err pages needs 2 elements: code and path)");
+
+	std::string	key(ParserUtils::trimOWS(element.substr(0, ows_pos)));					// "404"
+	std::string	val(ParserUtils::trimOWS(element.substr(ows_pos, element.size() -1)));	// "/404.html"
+
+	if (ParserUtils::firstWsPos(val) != -1)
+		throw std::invalid_argument("Bad config line (extra ws in error page path):" + line);
+	if (key.size() == 0 || val.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	_errorPages[key] = val;
+}
+
+void	ConfigFile::setAllowMethods(std::string line)
+{
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1))); // "GET, POST, DELETE"
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	while (element.size() > 0)
+	{
+		unsigned int	sep_pos = element.find(',') != std::string::npos ? element.find(',') : element.size();
+		std::string	method(ParserUtils::trimOWS(element.substr(0, sep_pos)));
+		if (method.compare("GET") && method.compare("POST") && method.compare("DELETE"))
+			throw std::invalid_argument("Bad method found on allow_method line:" + line);
+		element.erase(0, sep_pos +  1);
+		_allowMethods.push_back(method);
+	}
+}
+
+void	ConfigFile::setCgiPathes(std::string line)
+{
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	while (element.size() > 0)
+	{
+		unsigned int	sep_pos = element.find(',') != std::string::npos ? element.find(',') : element.size();
+		std::string	path(ParserUtils::trimOWS(element.substr(0, sep_pos)));
+		element.erase(0, sep_pos +  1);
+		if (path.size() == 0)
+			throw std::invalid_argument("Bad config line (empty val): " + line);
+		_cgiPathes.push_back(path);
+	}
+}
+
+void	ConfigFile::setCgiExt(std::string line)
+{
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (no ws): " + line);
+
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
+	if (element.size() == 0)
+		throw std::invalid_argument("Bad config line (empty val): " + line);
+	while (element.size() > 0)
+	{
+		unsigned int	sep_pos = element.find(',') != std::string::npos ? element.find(',') : element.size();
+		std::string	ext(ParserUtils::trimOWS(element.substr(0, sep_pos)));
+		element.erase(0, sep_pos +  1);
+		if (ext.size() == 0)
+			throw std::invalid_argument("Bad config line (empty val): " + line);
+		_cgiExt.push_back(ext);
+	}
+}

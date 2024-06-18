@@ -6,9 +6,15 @@
 #include<string>
 #include<vector>
 #include "Server.hpp"
+#include "Location.hpp"
 #include "../ParserUtils/ParserUtils.hpp"
 
 class Server;
+class Locations;
+
+/*
+	Polymorphism? faire heriter location et server, remonter les setters generiques ici?
+*/
 
 class ConfigFile
 {
@@ -18,20 +24,48 @@ class ConfigFile
 		ConfigFile(const std::string filename);
 		ConfigFile(const ConfigFile & src);
 		ConfigFile & operator=(const ConfigFile & rhs);
-
+	//	getetrs
 		std::string const & getRawData() const;
 		std::vector<Server> const & getServers() const;
+	//	getters for children
+		std::string const & getRoot() const;
+		std::string const & getIndex() const;
+		std::string const & getAutoIndex() const;
+		std::string const & getMaxBodySize() const;
+		std::string const & getRedirection() const;
+		std::map<std::string, std::string> const & getErrorPages() const;
+		std::vector<std::string> const & getAllowMethods() const;
+		std::vector<std::string> const & getCgiExt() const;
+		std::vector<std::string> const & getCgiPathes() const;
+	//	setters for children
+		void	setRoot(std::string line);
+		void	setIndex(std::string line);
+		void	setAutoIndex(std::string line);
+		void	setMaxBodySize(std::string line);
+		void	setAllowMethods(std::string line);
+		void	setErrorPages(std::string line);
+		void	setCgiPathes(std::string line);
+		void	setCgiExt(std::string line);
 
 		void	openReadFileToStr(); // throw
 		void	readAllInfos(); // throw
 
 	private:
-		std::fstream	_fs;
-		std::string		_filename;
-		std::string		_rawData;
-
+		std::fstream		_fs;
+		std::string			_filename;
+		std::string			_rawData;
 		std::vector<Server>	_servers;
-
+	protected:
+		std::string	_root;
+		std::string	_index;
+		std::string	_autoindex;
+		std::string	_maxBodysize;	//stored as a string but ovlf checks needed when reading + use of neg (not zero) if not provided
+		std::string	_redirection;
+		// upload_files ?? i dont understand how nginx deals with it ; may we do smthg different?
+		std::map<std::string,std::string>	_errorPages;
+		std::vector<std::string>	_allowMethods;
+		std::vector<std::string>	_cgiExt;
+		std::vector<std::string>	_cgiPathes;
 };
 
 #endif
