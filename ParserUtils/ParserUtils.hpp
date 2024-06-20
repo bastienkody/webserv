@@ -12,8 +12,8 @@ class ParserUtils
 		static std::string	eraseSufixComments(std::string s);
 		static int			firstWsPos(std::string line);
 		static bool			checkRmSemiColon(std::string & line);
-		static bool			isStrDigit(std::string & line);
-		static bool			isStrAlpha(std::string & line);
+		static bool			isStrDigit(const std::string & line);
+		static bool			isStrAlpha(const std::string & line);
 		static unsigned int	charCount(std::string & line, char c); // bc I dont want to include algorithm
 };
 

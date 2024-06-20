@@ -63,18 +63,18 @@ bool	ParserUtils::checkRmSemiColon(std::string & line)
 }
 
 //	only digit? (no sign accepted)
-bool	ParserUtils::isStrDigit(std::string & line)
+bool	ParserUtils::isStrDigit(const std::string & line)
 {
-	for (std::string::iterator it = line.begin(); it != line.end(); ++it)
+	for (std::string::const_iterator it = line.begin(); it != line.end(); ++it)
 		if (isdigit(*it) == false)
 			return false;
 	return true;
 }
 
 //	only alpha?
-bool	ParserUtils::isStrAlpha(std::string & line)
+bool	ParserUtils::isStrAlpha(const std::string & line)
 {
-	for (std::string::iterator it = line.begin(); it != line.end(); ++it)
+	for (std::string::const_iterator it = line.begin(); it != line.end(); ++it)
 		if (isalpha(*it) == false)
 			return false;
 	return true;

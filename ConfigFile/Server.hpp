@@ -4,6 +4,7 @@
 #include<iostream>
 #include<sstream>
 #include<string>
+#include<cstdlib>
 #include<vector>
 #include<map>
 #include "ConfigFile.hpp"

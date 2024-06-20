@@ -79,21 +79,19 @@ void	Server::setNames(std::string line)
 
 bool	Server::checkIpv4(std::string line)
 {
-	std::stringstream	sstr;
-	unsigned int		nb;
 	unsigned int		sep_pos;
 
 	if (ParserUtils::charCount(line, '.') != 3)
 		return false;
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
-		sep_pos = (i != 2 ? line.find('.') : line.size() - 2);
-		sstr.str(line.substr(0, sep_pos));
+		sep_pos = (i != 3 ? line.find('.') : line.size());
+		std::stringstream	sstr(line.substr(0, sep_pos));
 		line.erase(0, sep_pos + 1);
-		std::cout << sstr.str() + ",size:" << sstr.str().size() << std::endl;
-		if (sstr.str().size() > 3)
-			return false;
+		if (sstr.str().size() > 3 || ParserUtils::isStrDigit(sstr.str()) == false)
+			return  false;
+		unsigned int	nb;
 		sstr >> nb;
 		if (sstr.fail() || !sstr.eof() || nb > 255)
 			return false;
@@ -107,7 +105,7 @@ bool	Server::checkPort(std::string line)
 	unsigned int		port;
 
 	sstr >> port;
-	if (sstr.fail() || !sstr.eof() || port >= MAX_PORTS_NUMBER)
+	if (sstr.fail() || !sstr.eof() || port >= MAX_PORTS_NUMBER || ParserUtils::isStrDigit(line) == false)
 		return false;
 	return true;
 }
@@ -133,7 +131,7 @@ void	Server::setIpPort(std::string line)
 		std::string	port = element.substr(element.find(':') + 1, element.size() - 1);
 		if (checkPort(port) == false)
 			throw std::invalid_argument("Bad config line (invalid port): " + line);
-		_port = atoi(port.c_str());
+		_port = std::atoi(port.c_str());
 		return;
 	}
 	if (element.find('.') != std::string::npos)
@@ -146,7 +144,7 @@ void	Server::setIpPort(std::string line)
 	{
 		if (checkPort(element) == false)
 			throw std::invalid_argument("Bad config line (invalid port): " + line);
-		_port = atoi(element.c_str());
+		_port = std::atoi(element.c_str());
 	}
 }
 
