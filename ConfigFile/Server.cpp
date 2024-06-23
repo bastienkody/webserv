@@ -4,7 +4,7 @@
 //	constructors + copy
 Server::Server(): _ip("0.0.0.0"), _port(80)	{}
 Server::~Server() {}
-Server::Server(const Server & src) {*this = src;}
+Server::Server(const Server & src): ConfigFile() {*this = src;}
 Server & Server::operator=(const Server & rhs)
 {
 	if(this != &rhs)

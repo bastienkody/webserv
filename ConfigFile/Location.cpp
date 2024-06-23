@@ -3,7 +3,7 @@
 // constructors + copy
 Location::Location() {}
 Location::~Location() {}
-Location::Location(const Location & src) {*this = src;}
+Location::Location(const Location & src): ConfigFile() {*this = src;}
 Location & Location::operator=(const Location & rhs)
 {
 	if(this != &rhs)
