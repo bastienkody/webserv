@@ -7,10 +7,13 @@
 
 /*
 	Test socketpair to communicate between server and cgi (pipes limit is around 15ko)
-	Fd can be given as it is for pipe, or via envar
-	use of read and write:
-		for unknown size, char by char which can be super long
-		if size is known: no pb for writing, and maybe we can also commuinicate it to cgi via envar to read once ?
+	use of read and write with unknown size --> buffer[1024] avec du memset avant chaque read
+	socket fd is forward to cgi child by a dup on stdout
+	I cant make it work "biderictionnal" with a dup for stdin + stdout on the same socketfd in cgi child 
+		id like to send the rq to cgi stdin (writint it in father socketfd) and then just read the socketfd in father but it doesnot work
+		it should be possible since socket are biderectionnal
+		maybe a read/write pb only (trying to write before reading/flushing the socketpair?)
+		it would work with two socketpair (one to send data to cgi, one to get get data from cgi) but ewwww
 */
 
 void	msgChildToParent(void)
@@ -45,9 +48,9 @@ void	msgChildToParent(void)
 void	childExecveToParent(char **envp)
 {
 	int		pid, fd[2];
-	char	binary[] = {"/usr/bin/echo"};
-	char	arg[] = {"echo"};
-	char	arg2[] = {"reponse html envoye par le cgi"};
+	char	binary[] = {"/usr/bin/ls"};
+	char	arg[] = {"ls"};
+	char	arg2[] = {"-la"};
 	char	*av[] = {arg, arg2, NULL};
 
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd) < 0)

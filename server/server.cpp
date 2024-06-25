@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Server.hpp"
+#include "../include/server.hpp"
+#include "ConfigFile/ConfigFile.hpp"
 
 
 int create_socket_server(const char *port)
@@ -44,22 +45,22 @@ int create_socket_server(const char *port)
 	return (server_fd);
 }
 
-char	*read_recv_data(int i, Poll *poll_fds)
+char	*read_recv_data(int i, Poll poll_fds)
 {
 	int nb_bytes;
 	char buff[10000];
 
 	memset(&buff, 0, sizeof buff); /*vide le buffer a chaque fois (pas sur de le garder mais utile pour l'instant)*/
-	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
+	nb_bytes = recv(poll_fds.getFds(i).fd, &buff, 10000, 0);
 	if (nb_bytes < 0)
-		return (perror("recv"), NULL);
+		return (perror("recv"), (char*)NULL);
 	else if (nb_bytes == 0)
-		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, NULL);
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
-	return (buff); /*faire return buff*/
+		return (poll_fds.remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, (char*)NULL);
+	std::cout<< "[Client "<< poll_fds.getFds(i).fd<< "] " << buff;
+	return (buff);
 }
 
-int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
+int	function(std::string buff, Poll poll_fds, int i, ConfigFile config)
 {
 	Request rq(buff);
 
@@ -70,22 +71,22 @@ int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 			return (std::cerr<< "Error read_recv_data"<<std::endl, -1);
 		rq.appendBody(tmp);
 	}
-	exec_rq
+	//exec_rq
 	return (0);
 }
 
-void	accept_new_connection(int server_fd, Poll *poll_fds)
+/*	attention a exit nsp si on appelle bien les destructeurs cpp	*/
+void	accept_new_connection(int server_fd, Poll poll_fds)
 {
 	int client_fd;
-	int status;
 
 	client_fd = accept(server_fd, NULL, NULL);
 	if (client_fd < 0)
 		return (perror("accept"), close(server_fd), exit(1));
-	status = poll_fds->add_to_poll(client_fd);
-	if (status < 0)
+	if (poll_fds.getCount() > 255)
 		return (close(server_fd), close(client_fd), exit(1));
-	std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;
+	poll_fds.add_to_poll(client_fd);
+	std::cout<< "[Server] New connexion with client fd : " << poll_fds.getFds(poll_fds.getCount() - 1).fd<<std::endl;
 }
 
 /*verifie quelle socket server a recu une nouvelle connexion*/

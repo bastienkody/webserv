@@ -10,12 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef SERVERs_HPP
+#define SERVERs_HPP
 
 #include "Poll.hpp"
 #include "Response.hpp"
-#include "../bastien/RequestParsing/Request.hpp"
+#include "../RequestParsing/Request.hpp"
 
 #include <poll.h>
 #include <iostream>
@@ -35,8 +35,8 @@
 
 /*server.cpp*/
 int 	create_socket_server(const char *port);
-int		read_recv_data(int i, Poll *poll_fds);
-void	accept_new_connection(int server_fd, Poll *poll_fds);
+char*	read_recv_data(int i, Poll poll_fds);
+void	accept_new_connection(int server_fd, Poll poll_fds);
 int		check_serv_socket(int fd, int *serv_fds);
 
 /*rq_html.cpp*/

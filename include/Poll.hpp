@@ -15,7 +15,7 @@
 #define POLL_HPP
 
 
-#include "Server.hpp"
+#include "server.hpp"
 #include <poll.h>
 // #include <iostream>
 // #include <sys/socket.h> /*socket, listen, bind, accept...*/
@@ -38,18 +38,13 @@ class	Poll
 		int				getCount(void) const;
 		void			setFds(int i, int new_fd, short event);
 		void			setCount(int count);
-		int 			add_to_poll(int new_fd);
+		void			add_to_poll(int new_fd); // throw
 		void			remove_to_poll(int i);
-		int				wait(void); /*trouver meilleur nom ?*/
+		int				call_to_poll(void);
 
 	private :
 		struct pollfd	_fds[256];
 		int				_count;
 };
-
-int 	create_socket_server(const char *port);
-int		read_recv_data(int i, Poll *poll_fds);
-void	accept_new_connection(int server_fd, Poll *poll_fds);
-int		check_serv_socket(int fd, int *serv_fds);
 
 #endif

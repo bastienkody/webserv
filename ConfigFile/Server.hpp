@@ -27,6 +27,7 @@ class Server: public ConfigFile
 		std::vector<std::string> const & getNames() const;
 		std::string const & getIp() const;
 		unsigned int const & getPort() const;
+		std::string const & getPortSTR() const;
 		std::vector<Location> const & getLocations() const;
 	// setters
 		void	setNames(std::string line);
@@ -41,6 +42,7 @@ class Server: public ConfigFile
 	private:
 		std::vector<std::string>	_names;
 		std::string					_ip;
+		std::string					_portSTR;
 		unsigned int				_port;
 		std::vector<Location>		_locations;
 };
