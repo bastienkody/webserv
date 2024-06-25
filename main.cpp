@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/18 18:43:03 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/25 16:50:44 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,28 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 	- gerer leaks et fds
 -------------------------*/
 
-
-
 #include "ConfigFile.hpp"
+
+unsigned int *list_server_fd(ConfigFile config)
+{
+	unsigned int *dest;
+
+	dest = (unsigned int *) malloc(sizeof(unsigned int) * (config.getServers().size()));
+	if (!dest)
+		return (0);
+	for (size_t i = 0; i < config.getServers().size(); i++)
+	{
+		dest[i] = config.getServers().getPort()[i];
+	}
+	return (dest);
+}
 
 void	launch_server(ConfigFile config)
 {
 	Poll poll_fds = config.getPollFds();
+	unsigned int *server_fd;
+
+	server_fd = list_server_fd(config);
 	while (1)
 	{
 		status = poll_fds.wait(); /*appel a poll*/
@@ -58,7 +73,7 @@ void	launch_server(ConfigFile config)
 				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
 				if (!buff)
 					return (0);
-				function(buff, &poll_fds, i, config);
+				function(buff, &poll_fds, i, config, server_fd);
 			}
 		}
 	}

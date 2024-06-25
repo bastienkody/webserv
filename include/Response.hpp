@@ -6,10 +6,9 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:48:03 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 17:36:24 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/25 16:18:40 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
