@@ -1,0 +1,116 @@
+#######################
+| Requestline parsing |
+#######################
+sources :
+	https://datatracker.ietf.org/doc/html/rfc7230#section-3.1.1
+	https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Identifying_resources_on_the_Web
+	https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
+	get		: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET
+	post	: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST
+	delete	: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE
+################################################################################
+
+Always be 3 compoments, separated by whitespace(s):
+METHOD	WS	REQUEST_TARGET	WS	HTTP_VERSION	CRLF
+ie :	GET / HTTP/1.1
+		POST http://exampleform.com/home/login/form HTTP/1.1
+		DELETE /thatfile.html HTTP/1.1
+
+On peut lire en mode "trim":
+	- premier segment == method
+	- dernier segment === "HTTP/1.1"
+	- le reste post strtrim des WS == uri
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+| Methods : GET, POST or DELETE |
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+if any other, return:
+	501 Not Implemented - if bulshit
+	405 Method Not Allowed - if [CONNECT, HEAD, OPTIONS, PATHC, PUT, TRACE]
+
+@@@@@@@@@@@@@@@@@@@@@@@@
+| Request target : URL |
+@@@@@@@@@@@@@@@@@@@@@@@@
+used example : http://www.example.com:80/path/to/myfile.html?key1=value1&key2=value2#SomewhereInTheDocument
+(1-2-3 as a group is optional [absolute form], 4 is always mandatory [absolute path (if not with 1-2 or 1-2-3)])
+
+quid des charatcere encoded : "%1A" -> hexa 1A ... 
+
+1 - protocol | mandatory
+------------------------
+"http"
+on accepte que lui ; throw if https/ftp/mailto etc
+
+1sep:	mandatory if 1
+"://"
+
+2 - authority | mandatory if 1
+------------------------------
+domain name	: "www.example.com"
+or ip		: "127.0.0.1"
+might match the given config file
+
+2sep:	optional (if 3 - port is given)
+":"
+
+3 - port | optional
+-------------------
+"80" by default
+may be changed via config file
+
+4 - path | mandatory
+--------------------
+"/path/to/myfile.html"
+not obviously the real location; see redirection in config file
+always precedeed by a single '/'
+
+4sep:	optional (if query given)
+"?"
+
+5 - query | optional
+--------------------
+"key1=value1" -> solo
+"key1=value1&key2=value2" multiple with a "&" as a sep
+
+6 - fragment/anchor | optional
+------------------------------
+"#SomewhereInTheDocument"
+mozzila says it is not sent to the server with the request, need to dig
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@
+| HTTP Version : HTTP/1.1 |
+@@@@@@@@@@@@@@@@@@@@@@@@@@@
+only 1.1, if not what to answer?
+
+
+############################################
+| CODE STRUCTURE FOR WHOLE REQUEST PARSING |
+############################################
+Class	Request
+	class	RequestLine;
+	class	Header; (or just map?)
+	string	body; (waht if chunked?)
+
+Class Requestline
+	std::string	fullRequest;
+	uint		method;
+	class		url;
+
+Class URL
+	string	protocol;
+	string	authority;
+	uint	port; (conv via sstrean for ovlf/neg etc)
+	string	path;
+	map		queries;
+	string	anchor;
+
+Most work in constructor
+Use of exception for error? argh je sais pas en vrai il faudrait avoir créé
+la classe pour pouvoir creer la reponse d'erreur ; genre ici on note tout naivement
+et dans la partie reponse on check si error ou cgi (lequel checkerait d'autres erreurs)
+OUI!
+
+What about "syntax" problem? are they even possible?
+ie. for rqline: bad sep, query with no "=", no path at all 
+maybe here we can throw exceptions

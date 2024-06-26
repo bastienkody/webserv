@@ -1,0 +1,43 @@
+###########
+| Webserv |
+###########
+
+----------
+Research : 
+----------
+	- rfc 9112
+	- rfc 9110
+	- https://beeceptor.com/docs/concepts/http-headers/
+	- webdocs mozzila : https://developer.mozilla.org/en-US/docs/Web/HTTP
+	- socket (bouquin jm rifflet)
+	- multiplexing (epoll ou select)
+	- desgin oop for the project
+	- configuration file : what is accepted? cf. nginx.conf
+
+-----------------------
+Drafts implementations:
+-----------------------
+	- server nginx on a good/portable environnement for testing (at home + 42dump)
+	- creation and simple communication via sockets
+	- trying to multiplex sockets via poll, select etc
+	- persistent connection (==keep-alive) vs pipeling and domain sharding (both not to implemnt?) 
+	- parsing from the server : 
+		- request line (method+uri+version)
+			- only rq error (bad method/version, ie. not file presence for get or body for post, uri checked by cgi?)
+			--> use of exceptions to deal with errors? (bad method, version, lack of body) Could be status code? but what for good ones?
+			--> or return a state : the status code or the work to do
+		- header : 
+			- dealt at server not only cgi (for basic ones?)
+			- mandatory ones? ie: content lenght for POST should be check here or at cgi
+			- i think some are ignored (extra entry? see nginx)
+			- detect (some) errors from key value here?
+			- nginx tests needed!!
+		- whole message parsing from the server (ie. reject, is there a body)
+	- Creating the response :
+		- if error on rq line: read exception or status code returned to create the satus line
+		- if header error: nsp
+		- if body/lack of: nsp
+		- GET: send to cgi (that would check everything?)
+		- POST: if body ok --> send to cgi 
+		- DELETE: permisison to be checked here or at cgi?
+

@@ -54,6 +54,7 @@ void	Server::printAll() const
 std::vector<std::string> const & Server::getNames() const	{return (_names);}
 std::string const & Server::getIp() const	{return (_ip);}
 unsigned int const & Server::getPort() const	{return (_port);}
+std::string const & Server::getPortSTR() const	{return (_portSTR);}
 std::vector<Location> const & Server::getLocations() const {return (_locations);}
 
 //	setters
@@ -131,6 +132,7 @@ void	Server::setIpPort(std::string line)
 		std::string	port = element.substr(element.find(':') + 1, element.size() - 1);
 		if (checkPort(port) == false)
 			throw std::invalid_argument("Bad config line (invalid port): " + line);
+		_portSTR = port;
 		_port = std::atoi(port.c_str());
 		return;
 	}
@@ -144,6 +146,7 @@ void	Server::setIpPort(std::string line)
 	{
 		if (checkPort(element) == false)
 			throw std::invalid_argument("Bad config line (invalid port): " + line);
+		_portSTR = element;
 		_port = std::atoi(element.c_str());
 	}
 }

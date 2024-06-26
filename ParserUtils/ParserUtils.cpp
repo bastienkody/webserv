@@ -30,6 +30,7 @@ std::string	ParserUtils::eraseOWS(std::string s)
 	return res;
 }
 
+// must add a eraseAfterDelim(std::string s, std::string delim, bool delimRm) et eraseBefore (bool pour savoir si rm le delim aussi)
 //	rm everything after a #
 std::string	ParserUtils::eraseSufixComments(std::string s)
 {
@@ -48,9 +49,7 @@ int	ParserUtils::firstWsPos(std::string line)
 		++it;
 		++ows_pos;
 	}
-	if (it == ite)
-		return -1;
-	return ows_pos;
+	return it==ite ? -1 : ows_pos;
 }
 
 //	check terminating semicolon and removes it
