@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/26 17:21:15 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:38:32 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int	function(std::string buff, Poll poll_fds, int i, ConfigFile config)
 		rq.appendBody(tmp);
 	}
 	/*check rq_header*/
-	//exec_rq
+	exec_rq(rq);
 	return (0);
 }
 
