@@ -44,6 +44,10 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 
 void	launch_server(ConfigFile config, Poll poll_fds)
 {
+	int	server_fd[config.getServers().size()];
+	for (int i = 0; i < config.getServers().size() - 1; ++i)
+		server_fd[i] = poll_fds.getFds(i).fd;
+
 	while (true)
 	{
 		int	status = poll_fds.call_to_poll();
@@ -55,11 +59,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 		{
 			if ((poll_fds.getFds(i).revents && POLLIN) != 1) /*revents = event attendu pour la socket et POLLIN = event pour signal entrant*/
 				continue ;
-			/*
-				je comprend pas l'appel a check_serv_fd et accept_new_connection
-				c quoi server_fd par rappport a Poll.getfds() ?
-			*/
-			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1);
+			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1)
 				accept_new_connection(server_fd[status], poll_fds); /*si c'est une nouvelle connexion*/
 			else
 			{
@@ -94,14 +94,12 @@ int	main(int ac, char **av)
 		if (fd == -1)
 			return 1;
 		try{
-			poll_fds.add_to_poll(fd);
+			poll_fds.add_to_poll(fd); // add_to_poll met pollin|pollout mais sur serverdocket juste besoin de pollin nsp si pb
 		}
 		catch(const std::exception& e){
 			std::cerr << e.what() << std::endl;
 			return 1;
 		}
-		
-			return 1;
 	}
 	launch_server(config, poll_fds);
 }

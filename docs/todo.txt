@@ -2,6 +2,11 @@
 | Webserv |
 ###########
 
+---------
+Sources :
+---------
+server guide : http://beej.us/guide/bgnet/
+
 ----------
 Research : 
 ----------
