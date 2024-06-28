@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/26 17:38:00 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/28 13:19:07 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,4 +122,5 @@ int	main(int ac, char **av)
 			return 1;
 	}
 	launch_server(config, poll_fds);
+	return 0;
 }

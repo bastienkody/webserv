@@ -31,7 +31,7 @@ int	check_body_size(Request rq)
 	return (0);
 }
 
-Response	exec_rq(Request rq)
+Response	exec_rq(Request rq, ConfigFile config)
 {
 	Response rp;
 	std::string tmp;
