@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/28 13:19:07 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:41:19 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,11 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 	- gerer leaks et fds
 -------------------------*/
 
-
-
-#include "ConfigFile/ConfigFile.hpp"
-#include "ConfigFile/Server.hpp"
-#include "ConfigFile/Location.hpp"
-#include "include/Poll.hpp"
-#include "include/server.hpp"
-#include <iostream>
-#include <string>
-
+#include "../ConfigFile/ConfigFile.hpp"
+#include "../ConfigFile/Server.hpp"
+#include "../ConfigFile/Location.hpp"
+#include "../include/Poll.hpp"
+#include "../include/server.hpp"
 
 unsigned int *list_server_fd(ConfigFile config)
 {
@@ -52,7 +47,7 @@ unsigned int *list_server_fd(ConfigFile config)
 		return (0);
 	for (size_t i = 0; i < config.getServers().size(); i++)
 	{
-		dest[i] = config.getServers().getPort()[i];
+		dest[i] = config.getServers()[i].getPort();
 	}
 	return (dest);
 }
@@ -77,12 +72,12 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				je comprend pas l'appel a check_serv_fd et accept_new_connection
 				c quoi server_fd par rappport a Poll.getfds() ?
 			*/
-			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1);
+			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1)
 				accept_new_connection(server_fd[status], poll_fds); /*si c'est une nouvelle connexion*/
 			else
 			{
 				char *buff;
-				buff = read_recv_data(i, poll_fds); /*si un client deja co envoie une requete*/
+				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
 				if (!buff)
 					return;
 				function(buff, &poll_fds, i, config);
@@ -118,8 +113,6 @@ int	main(int ac, char **av)
 			std::cerr << e.what() << std::endl;
 			return 1;
 		}
-		
-			return 1;
 	}
 	launch_server(config, poll_fds);
 	return 0;

@@ -6,12 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 23:11:37 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:31:34 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/CGI.hpp"
-#include "../include/Exception.hpp"
+#include "../include/server.hpp"
 
 CGI::CGI(void){}
 CGI::~CGI(void){}
@@ -35,7 +35,7 @@ CGI::CGI(Response *rp, Request rq) : _rp(rp), _rq(rq)
 	int status;
 	int pipe_fd[2];
 
-	/*check dir -> return 0 si pas un dir*/
+	/*check dir -> return 0 si pas un dir ???*/
 	status = check_file(this->_rq, "cgi-bin", 2);
 	if (status > 0)
 		throw Exception(1);

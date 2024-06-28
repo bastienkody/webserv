@@ -6,13 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/28 13:20:15 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:41:45 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../ConfigFile/ConfigFile.hpp"
 #include "../include/server.hpp"
-#include "ConfigFile/ConfigFile.hpp"
-
 
 int create_socket_server(const char *port)
 {
@@ -45,22 +44,22 @@ int create_socket_server(const char *port)
 	return (server_fd);
 }
 
-char	*read_recv_data(int i, Poll poll_fds)
+char	*read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
 	char buff[10000];
 
 	memset(&buff, 0, sizeof buff); /*vide le buffer a chaque fois (pas sur de le garder mais utile pour l'instant)*/
-	nb_bytes = recv(poll_fds.getFds(i).fd, &buff, 10000, 0);
+	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
 	if (nb_bytes < 0)
 		return (perror("recv"), (char*)NULL);
 	else if (nb_bytes == 0)
-		return (poll_fds.remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, (char*)NULL);
-	std::cout<< "[Client "<< poll_fds.getFds(i).fd<< "] " << buff;
+		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, (char*)NULL);
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
 	return (buff);
 }
 
-int	function(std::string buff, Poll poll_fds, int i, ConfigFile config)
+int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 {
 	Request rq(buff);
 
@@ -91,7 +90,7 @@ void	accept_new_connection(int server_fd, Poll poll_fds)
 }
 
 /*verifie quelle socket server a recu une nouvelle connexion*/
-int	check_serv_socket(int fd, int *serv_fds)
+int	check_serv_socket(int fd, unsigned int *serv_fds)
 {
 	for (int i = 0; i < 3; i++)
 	{

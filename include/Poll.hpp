@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 16:37:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 17:33:16 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:35:34 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,8 @@
 #ifndef POLL_HPP
 #define POLL_HPP
 
-
-#include "server.hpp"
 #include <poll.h>
-// #include <iostream>
-// #include <sys/socket.h> /*socket, listen, bind, accept...*/
-// #include <arpa/inet.h> /*inet_pton et inet_ntop  (transforme ip en chaine de caracteres et inversement)*/
-// #include <string.h> /*memset*/
-// #include <netdb.h> /*struc addrinfo*/
-// #include <unistd.h> /*fcntl*/
-// #include <fcntl.h> /*fcntl*/
-// #include <stdio.h> /*perror*/
-// #include <stdlib.h> /*exit*/
-
+#include <iostream>
 
 class	Poll
 {

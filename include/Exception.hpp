@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 18:48:39 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 23:02:06 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:28:46 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class Exception : public std::exception
 				return (char *) "Error check_file";
 			else if (_mode == 2)
 				return (char *) "Error pipe";
-			else if (mode == 3)
+			else if (_mode == 3)
 				return (char *) "Error fork"; 
 			else 
 				return (char *) "Error Method no supported";

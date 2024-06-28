@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Server.hpp"
+#include "../include/server.hpp"
+#include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
 #include "../include/Exception.hpp"
 
@@ -37,39 +38,27 @@ Response	exec_rq(Request rq, ConfigFile config)
 	std::string tmp;
 	std::string path = rq.getRql().getUrl().getPath();
 
-	if (check_body_size(rq) == -1)
-		return (rp);
-
-	/*check si method is allow pour ressource rq*/
-
-	for (size_t i = 0; i < path.size(); i++)
-	{
-		if (path[i] == '.')
-		{
-			tmp = &path[i];
-			break ;
-		}
-	}
+	(void) config;
+	tmp = &path[path.size() - 3];
 	try{
 		if (tmp == ".py")
 				CGI cgi(&rp, rq);
 		else if (path[path.size() - 1] == '/')
-			rq_dir(&rp, rq);
+			int blabla;// rq_dir(&rp, rq);
 		else
 			rq_html(&rp, rq);
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << std::endl;
 	}
-	/*finir response (lineState et header)*/
 	return (rp);
 }
 
-int main(void)
-{
-	std::string request = "GET http://localhost:80/home.txt?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\nformat: text\n";
+// int main(void)
+// {
+// 	std::string request = "GET http://localhost:80/home.txt?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\nformat: text\n";
 
-	Request rq(request);
-	rq.print();
-	exec_rq(rq);
-}
+// 	Request rq(request);
+// 	rq.print();
+// 	exec_rq(rq);
+// }

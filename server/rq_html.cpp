@@ -6,11 +6,13 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 23:11:26 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:39:30 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Server.hpp"
+#include "../include/server.hpp"
+#include "../RequestParsing/Request.hpp"
+#include "../include/Exception.hpp"
 
 /*gerer directory (comment ??)*/
 
@@ -59,7 +61,7 @@ void	delete_html(Response *rp, Request rq)
 	{
 		char **env = create_env(rq);
 		std::string tmp = "rm";
-		char **av = create_av(tmp.c_str(), &path.c_str()[1]);
+		char **av = create_av(rq);
 		execve("/bin/rm", av, env);
 		rp->setBody("Error");
 		perror("Execve");
