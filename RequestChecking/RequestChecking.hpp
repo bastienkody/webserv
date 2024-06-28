@@ -5,12 +5,21 @@
 #include<string>
 #include "../RequestParsing/Request.hpp"
 
+#define	EXPECTED_VERSION "HTTP/1.1"
+#define GET "GET"
+#define POST "POST"
+#define DELETE "DELETE"
+
 class Request;
 
 class RequestChecking
 {
 	public:
-		static	bool CheckBasics(Request rq);
+		static int	CheckBasics(const Request & rq);
+		static int	CheckHeaderKey(const Request & rq);
+		static int	CheckRequiredHeaderPOST(const Request & rq);
+		static int	CheckRequiredHeaderDELETE(const Request & rq);
+		static int	CheckRequiredHeaderGET(const Request & rq);
 
 };
 
