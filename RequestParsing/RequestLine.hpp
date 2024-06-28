@@ -4,6 +4,7 @@
 #include<iostream>
 #include<string>
 #include "URL.hpp"
+#include "../ParserUtils/ParserUtils.hpp"
 
 #define	EXPECTED_VERSION "HTTP/1.1"
 #define GET "GET"
@@ -25,17 +26,13 @@ class RequestLine
 		std::string	const & getFull() const;
 		std::string	const & getVerb() const;
 		std::string	const & getVersion() const;
-		bool		const & getIsVersionGood() const;
-		bool		const & getIsVerbGood() const;
 		URL			const & getUrl() const;
 
 	private:
 		
 		std::string		_fullRequestLine;
 		std::string		_verb;
-		bool			_isVerbGood;
 		std::string		_version;
-		bool			_isVersionGood;
 		URL				_Url;
 		
 };
