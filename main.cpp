@@ -74,9 +74,10 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 			{
 				char *buff;
 				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
-				if (!buff)
-					continue ;
-				function(buff, &poll_fds, i, config);
+				//if (!buff)		// problem here (char * non malloce depuis read received data qui rend null toujours)
+					//continue;
+				//function(buff, &poll_fds, i, config);
+				send(poll_fds.getFds(i).fd, "piece of response!", sizeof("piece of response!"), 0);
 			}
 		}
 	}

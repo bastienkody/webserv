@@ -63,6 +63,7 @@ int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 {
 	Request rq(buff);
 
+	std::cout << "in function" << std::endl;
 	while (check_body_size(rq) == -1)
 	{
 		char *tmp = read_recv_data(i, poll_fds);
@@ -71,7 +72,9 @@ int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 		rq.appendBody(tmp);
 	}
 	/*check rq_header*/
+	std::cout << "in function before rq" << std::endl;
 	exec_rq(rq, config);
+	std::cout << "in function after rq" << std::endl;
 	return (0);
 }
 
