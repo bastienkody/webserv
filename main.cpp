@@ -69,11 +69,11 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 			if ((poll_fds.getFds(i).revents && POLLIN) != 1) /*revents = event attendu pour la socket et POLLIN = event pour signal entrant*/
 				continue ;
 			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1)
-				accept_new_connection(server_fd[status], poll_fds); /*si c'est une nouvelle connexion*/
+				accept_new_connection(server_fd[status], &poll_fds); /*si c'est une nouvelle connexion*/
 			else
 			{
 				char *buff;
-				buff = read_recv_data(i, poll_fds); /*si un client deja co envoie une requete*/
+				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
 				if (!buff)
 					continue ;
 				function(buff, &poll_fds, i, config);

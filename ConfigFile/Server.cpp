@@ -12,6 +12,7 @@ Server & Server::operator=(const Server & rhs)
 		_names = rhs.getNames();
 		_ip = rhs.getIp();
 		_port = rhs.getPort();
+		_portSTR = rhs.getPortSTR();
 		_root = rhs.getRoot();
 		_index = rhs.getIndex();
 		_autoindex = rhs.getAutoIndex();
