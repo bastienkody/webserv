@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/28 18:41:19 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/30 16:20:28 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,16 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 #include "../include/Poll.hpp"
 #include "../include/server.hpp"
 
-unsigned int *list_server_fd(ConfigFile config)
+unsigned int *list_server_fd(Poll poll_fds)
 {
 	unsigned int *dest;
 
-	dest = (unsigned int *) malloc(sizeof(unsigned int) * (config.getServers().size()));
+	dest = (unsigned int *) malloc(sizeof(unsigned int) * (poll_fds.getCount()));
 	if (!dest)
 		return (0);
-	for (size_t i = 0; i < config.getServers().size(); i++)
+	for (size_t i = 0; i < poll_fds.getCount(); i++)
 	{
-		dest[i] = config.getServers()[i].getPort();
+		dest[i] = poll_fds.getFds(i).fd;
 	}
 	return (dest);
 }
@@ -56,7 +56,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd;
 
-	server_fd = list_server_fd(config);
+	server_fd = list_server_fd(poll_fds);
 	while (true)
 	{
 		int	status = poll_fds.call_to_poll();
@@ -68,18 +68,14 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 		{
 			if ((poll_fds.getFds(i).revents && POLLIN) != 1) /*revents = event attendu pour la socket et POLLIN = event pour signal entrant*/
 				continue ;
-			/*
-				je comprend pas l'appel a check_serv_fd et accept_new_connection
-				c quoi server_fd par rappport a Poll.getfds() ?
-			*/
 			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1)
-				accept_new_connection(server_fd[status], poll_fds); /*si c'est une nouvelle connexion*/
+				accept_new_connection(server_fd[status], &poll_fds); /*si c'est une nouvelle connexion*/
 			else
 			{
 				char *buff;
 				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
 				if (!buff)
-					return;
+					continue ;
 				function(buff, &poll_fds, i, config);
 			}
 		}
@@ -99,7 +95,6 @@ int	main(int ac, char **av)
 	catch(const std::exception& e){
 		return std::cerr << e.what() << std::endl, 1;
 	}
-
 	Poll poll_fds;
 	for (size_t i = 0; i < config.getServers().size(); i++)
 	{

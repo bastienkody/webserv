@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 16:37:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/28 18:35:34 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/30 16:06:28 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ class	Poll
 		void			add_to_poll(int new_fd); // throw
 		void			remove_to_poll(int i);
 		int				call_to_poll(void);
+
+		void			list_fd();
 
 	private :
 		struct pollfd	_fds[256];

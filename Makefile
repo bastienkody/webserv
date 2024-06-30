@@ -28,7 +28,7 @@ vpath %.hpp include/ ConfigFile/ ParserUtils/ RequestParsing/
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-	$(CC) $(FLAG) $(OBJS) $(INCLUDE) -o $(NAME)
+	$(CXX) $(CXXFLAG) $(OBJS) $(INCLUDE) -o $(NAME)
 	@echo "$(GREEN)Compiled!$(DEF_COLOR)"
 	@echo "Launch the program with $(RED)./${NAME}"
 

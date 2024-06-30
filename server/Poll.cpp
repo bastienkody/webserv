@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/24 15:04:51 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/26 14:49:51 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/30 16:18:57 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	Poll::add_to_poll(int new_fd)
 		throw std::out_of_range("Error: Not enough space in poll_fds");
 	_fds[_count].fd = new_fd;
 	_fds[_count].events = POLLIN | POLLOUT;
-	this->_count++;
+	this->_count += 1;
 }
 
 void	Poll::remove_to_poll(int i)
@@ -61,4 +61,14 @@ void	Poll::setFds(int i, int new_fd, short event)
 void	Poll::setCount(int count)
 {
 	this->_count = count;
+}
+
+void	Poll::list_fd()
+{
+	int i = 0;
+	while(i < _count)
+	{
+		std::cout<< "fds[" << i << "] : " << _fds[i].fd <<std::endl;
+		i++;
+	}
 }
