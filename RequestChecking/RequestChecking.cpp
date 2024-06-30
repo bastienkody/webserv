@@ -49,6 +49,7 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 			return 2;
 		if (it->first.compare("Content-Length"))
 		{
+			// cant return here if ever a chunk happens later, content_l must be ignored
 			content_lenght = true;
 			lenght = ParserUtils::trimOWS(it->second);
 		}
@@ -60,5 +61,5 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 	unsigned int		i, j;
 	str >> i;
 	str2 >> j;
-	return (i >= j ? 1 : 0);
+	return (i >= j ? 1 : 413);
 }
