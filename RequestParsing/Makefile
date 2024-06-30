@@ -2,9 +2,9 @@
 HEADERS		=	Request.hpp RequestLine.hpp URL.hpp ../ParserUtils/ParserUtils.hpp
 BUILD_DIR	=	./build
 SRC_DIR 	= 	./
-vpath %.cpp ${SRCS_NAME}
+vpath %.cpp ${SRCS_NAME} ../ParserUtils
 
-SRCS_NAME 	=	Request.cpp RequestLine.cpp URL.cpp main.cpp ../ParserUtils/ParserUtils.cpp
+SRCS_NAME 	=	Request.cpp RequestLine.cpp URL.cpp main.cpp ParserUtils.cpp
 OBJS		=	${SRCS_NAME:%.cpp=$(BUILD_DIR)/%.o}
 
 ###		DEFINITIONS		###
