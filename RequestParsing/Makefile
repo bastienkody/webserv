@@ -1,10 +1,10 @@
 ##		SOURCE FILES	###
-HEADERS		=	Request.hpp RequestLine.hpp URL.hpp ../ParserUtils/ParserUtils.hpp
+HEADERS		=	Request.hpp RequestLine.hpp URL.hpp
 BUILD_DIR	=	./build
 SRC_DIR 	= 	./
-vpath %.cpp ${SRCS_NAME} ../ParserUtils
+vpath %.cpp ${SRCS_NAME}
 
-SRCS_NAME 	=	Request.cpp RequestLine.cpp URL.cpp main.cpp ParserUtils.cpp
+SRCS_NAME 	=	Request.cpp RequestLine.cpp URL.cpp main.cpp
 OBJS		=	${SRCS_NAME:%.cpp=$(BUILD_DIR)/%.o}
 
 ###		DEFINITIONS		###

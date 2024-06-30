@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/18 18:43:03 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/30 16:20:28 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,22 +32,31 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 	- gerer leaks et fds
 -------------------------*/
 
+#include "../ConfigFile/ConfigFile.hpp"
+#include "../ConfigFile/Server.hpp"
+#include "../ConfigFile/Location.hpp"
+#include "../include/Poll.hpp"
+#include "../include/server.hpp"
 
+unsigned int *list_server_fd(Poll poll_fds)
+{
+	unsigned int *dest;
 
-#include "ConfigFile/ConfigFile.hpp"
-#include "ConfigFile/Server.hpp"
-#include "ConfigFile/Location.hpp"
-#include "include/Poll.hpp"
-#include "include/server.hpp"
-#include <iostream>
-#include <string>
+	dest = (unsigned int *) malloc(sizeof(unsigned int) * (poll_fds.getCount()));
+	if (!dest)
+		return (0);
+	for (size_t i = 0; i < poll_fds.getCount(); i++)
+	{
+		dest[i] = poll_fds.getFds(i).fd;
+	}
+	return (dest);
+}
 
 void	launch_server(ConfigFile config, Poll poll_fds)
 {
-	int	server_fd[config.getServers().size()];
-	for (int i = 0; i < config.getServers().size() - 1; ++i)
-		server_fd[i] = poll_fds.getFds(i).fd;
+	unsigned int *server_fd;
 
+	server_fd = list_server_fd(poll_fds);
 	while (true)
 	{
 		int	status = poll_fds.call_to_poll();
@@ -66,7 +75,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				char *buff;
 				buff = read_recv_data(i, poll_fds); /*si un client deja co envoie une requete*/
 				if (!buff)
-					return;
+					continue ;
 				function(buff, &poll_fds, i, config);
 			}
 		}
@@ -86,7 +95,6 @@ int	main(int ac, char **av)
 	catch(const std::exception& e){
 		return std::cerr << e.what() << std::endl, 1;
 	}
-
 	Poll poll_fds;
 	for (size_t i = 0; i < config.getServers().size(); i++)
 	{
@@ -94,7 +102,7 @@ int	main(int ac, char **av)
 		if (fd == -1)
 			return 1;
 		try{
-			poll_fds.add_to_poll(fd); // add_to_poll met pollin|pollout mais sur serverdocket juste besoin de pollin nsp si pb
+			poll_fds.add_to_poll(fd);
 		}
 		catch(const std::exception& e){
 			std::cerr << e.what() << std::endl;
@@ -102,4 +110,5 @@ int	main(int ac, char **av)
 		}
 	}
 	launch_server(config, poll_fds);
+	return 0;
 }

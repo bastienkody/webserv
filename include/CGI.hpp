@@ -6,16 +6,17 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:30:22 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 21:43:48 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/28 18:29:36 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CGI_HPP
 #define CGI_HPP
 
-#include "Server.hpp"
-#include "../bastien/RequestParsing/Request.hpp"
-#include "Response.hpp"
+// #include "Server.hpp"
+#include "../RequestParsing/Request.hpp"
+#include "../include/Response.hpp"
+#include "../include/Exception.hpp"
 #include <errno.h>
 
 class CGI

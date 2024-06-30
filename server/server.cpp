@@ -6,13 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/18 18:41:33 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/06/30 16:20:03 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../ConfigFile/ConfigFile.hpp"
 #include "../include/server.hpp"
-#include "ConfigFile/ConfigFile.hpp"
-
 
 // passer le add_to_poll ici ? utiliser les excptions ?
 int create_socket_server(const char *port)
@@ -56,8 +55,8 @@ char	*read_recv_data(int i, Poll poll_fds)
 	if (nb_bytes < 0)
 		return (perror("recv"), (char*)NULL);
 	else if (nb_bytes == 0)
-		return (poll_fds.remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds.getFds(i).fd << " is closed."<<std::endl, (char*)NULL);
-	std::cout<< "[Client "<< poll_fds.getFds(i).fd<< "] " << buff;
+		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, (char*)NULL);
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
 	return (buff);
 }
 
@@ -72,26 +71,27 @@ int	function(std::string buff, Poll poll_fds, int i, ConfigFile config)
 			return (std::cerr<< "Error read_recv_data"<<std::endl, -1);
 		rq.appendBody(tmp);
 	}
-	//exec_rq
+	/*check rq_header*/
+	exec_rq(rq, config);
 	return (0);
 }
 
 /*	attention a exit nsp si on appelle bien les destructeurs cpp	*/
-void	accept_new_connection(int server_fd, Poll poll_fds)
+void	accept_new_connection(int server_fd, Poll *poll_fds)
 {
 	int client_fd;
 
 	client_fd = accept(server_fd, NULL, NULL);
 	if (client_fd < 0)
 		return (perror("accept"), close(server_fd), exit(1));
-	if (poll_fds.getCount() > 255)
+	if (poll_fds->getCount() > 255)
 		return (close(server_fd), close(client_fd), exit(1));
-	poll_fds.add_to_poll(client_fd);
-	std::cout<< "[Server] New connexion with client fd : " << poll_fds.getFds(poll_fds.getCount() - 1).fd<<std::endl;
+	poll_fds->add_to_poll(client_fd);
+	std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;
 }
 
 /*verifie quelle socket server a recu une nouvelle connexion*/
-int	check_serv_socket(int fd, int *serv_fds)
+int	check_serv_socket(int fd, unsigned int *serv_fds)
 {
 	for (int i = 0; i < 3; i++)
 	{

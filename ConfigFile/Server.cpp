@@ -31,6 +31,7 @@ void	Server::printAll() const
 	std::cout << "#### Server printer (location nb:" << getLocations().size() << ") ####" << std::endl;
 	std::cout << "Ip:\t" + getIp() << std::endl;
 	std::cout << "Port:\t" << getPort() << std::endl;
+	std::cout << "PortSTR:\t" << getPortSTR() << std::endl;
 	for (std::vector<std::string>::const_iterator it = getNames().begin(); it != getNames().end(); ++it)
 		std::cout << "name:\t" + *it << std::endl;
 	std::cout << "Root:\t" + getRoot() << std::endl;
@@ -132,7 +133,9 @@ void	Server::setIpPort(std::string line)
 		std::string	port = element.substr(element.find(':') + 1, element.size() - 1);
 		if (checkPort(port) == false)
 			throw std::invalid_argument("Bad config line (invalid port): " + line);
+		// std::cerr<< "port s: " << port<<std::endl;
 		_portSTR = port;
+		// std::cerr<< "port s2: " << _portSTR<<std::endl;
 		_port = std::atoi(port.c_str());
 		return;
 	}
@@ -179,6 +182,7 @@ void	Server::readInfos(std::string & raw)
 				throw std::invalid_argument("Bad config line (no terminating semicolon): " + rawLine);
 			if (isValidElementLabel(line) == false)
 				throw std::invalid_argument("Bad config element found: " + rawLine);
+			// std::cerr<<" portSTR 2: " << _portSTR<<std::endl;
 		}
 	}
 }
@@ -195,13 +199,14 @@ bool	Server::isValidElementLabel(std::string line)
 												&ConfigFile::setRoot, &ConfigFile::setIndex,
 												&ConfigFile::setAutoIndex, &ConfigFile::setMaxBodySize,
 												&ConfigFile::setErrorPages, &ConfigFile::setAllowMethods,
-												&ConfigFile::setCgiPathes,&ConfigFile::setCgiExt};
+												&ConfigFile::setCgiPathes, &ConfigFile::setCgiExt};
 
 	for (int i = 0; i < 10; ++i)
 	{
 		if (label.compare(valid[i]) == 0)
 		{
 			(this->*ptrFct[i])(line);
+			// std::cerr << i << " portSTR : " << _portSTR<<std::endl;
 			return (true);
 		}
 	}
