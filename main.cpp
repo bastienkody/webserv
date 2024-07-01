@@ -32,11 +32,11 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 	- gerer leaks et fds
 -------------------------*/
 
-#include "../ConfigFile/ConfigFile.hpp"
-#include "../ConfigFile/Server.hpp"
-#include "../ConfigFile/Location.hpp"
-#include "../include/Poll.hpp"
-#include "../include/server.hpp"
+#include "ConfigFile/ConfigFile.hpp"
+#include "ConfigFile/Server.hpp"
+#include "ConfigFile/Location.hpp"
+#include "include/Poll.hpp"
+#include "include/server.hpp"
 
 unsigned int *list_server_fd(Poll poll_fds)
 {
@@ -66,7 +66,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 			continue;
 		for(int i = 0; i < poll_fds.getCount(); i++)
 		{
-			if ((poll_fds.getFds(i).revents && POLLIN) != 1) /*revents = event attendu pour la socket et POLLIN = event pour signal entrant*/
+			if ((poll_fds.getFds(i).revents & POLLIN) != 1) /*revents = event attendu pour la socket et POLLIN = event pour signal entrant*/
 				continue ;
 			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1)
 				accept_new_connection(server_fd[status], &poll_fds); /*si c'est une nouvelle connexion*/
@@ -77,7 +77,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				//if (!buff)		// problem here (char * non malloce depuis read received data qui rend null toujours)
 					//continue;
 				//function(buff, &poll_fds, i, config);
-				send(poll_fds.getFds(i).fd, "piece of response!", sizeof("piece of response!"), 0);
+				//send(poll_fds.getFds(i).fd, "piece of response!", sizeof("piece of response!"), 0);
 			}
 		}
 	}
