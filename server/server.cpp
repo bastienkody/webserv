@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 18:36:23 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 18:54:42 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,10 @@ std::string read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
 	std::string dest;
-	char buff[10000];
+	char buff[4096];
 	
 	memset(&buff, 0, sizeof(buff));
-	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
+	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 4096, 0);
 	if (nb_bytes < 0)
 		return (perror("recv"), "error recv");
 	else if (nb_bytes == 0)
