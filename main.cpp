@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 18:33:16 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 19:20:33 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				std::string buff;
 				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
 				if (buff == "error recv")
-					return ;
+					return ; /*leaks pas encore gere*/
 				else if (buff == "connection closed")
 					continue ;
 				// function(buff, &poll_fds, i, config);
