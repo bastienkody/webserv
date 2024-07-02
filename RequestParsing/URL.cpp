@@ -6,7 +6,7 @@ URL::~URL(){}
 URL::URL(const URL & src) {*this = src;}
 URL & URL::operator=(const URL & rhs)
 {
-	// std::cout << "why is URL copy op called????" << std::endl;
+	std::cout << "why is URL copy op called????" << std::endl;
 	if(this != &rhs)
 	{
 		this->_fullURL = rhs.getFull();

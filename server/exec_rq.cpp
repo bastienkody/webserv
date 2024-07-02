@@ -44,7 +44,7 @@ Response	exec_rq(Request rq, ConfigFile config)
 		if (tmp == ".py")
 				CGI cgi(&rp, rq);
 		else if (path[path.size() - 1] == '/')
-			int blabla;// rq_dir(&rp, rq);
+			(void) tmp;// rq_dir(&rp, rq);
 		else
 			rq_html(&rp, rq);
 	}

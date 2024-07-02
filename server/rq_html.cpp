@@ -6,13 +6,14 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/28 18:39:30 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:22:17 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 #include "../RequestParsing/Request.hpp"
 #include "../include/Exception.hpp"
+#include <fstream>
 
 /*gerer directory (comment ??)*/
 
@@ -26,7 +27,7 @@ void	get_html(Response *rp, Request rq)
 	status = check_file(rq, "www", 1);
 	if (status > 0)
 		return ;
-	std::ifstream my_html(path);
+	std::ifstream my_html(path.c_str());
 	if (!my_html)
 		return (rp->setBody("Error"));
 	while (!my_html.eof())
@@ -39,7 +40,10 @@ void	get_html(Response *rp, Request rq)
 }
 
 void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
-{}
+{
+	(void) rp;
+	(void) rq;
+}
 
 void	delete_html(Response *rp, Request rq)
 {

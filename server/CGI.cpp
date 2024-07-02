@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/28 18:31:34 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:16:02 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,9 @@ char	**CGI::create_av()
 {
 	char **av;
 
+	av = (char **) malloc(sizeof(char *) * 2);
+	if (!av)
+		return (NULL);
 	std::string name = _rq.getRql().getUrl().getPath();
 	av[0] = strdup(&(name.c_str())[1]);
 	av[1] = NULL;
