@@ -44,7 +44,7 @@ int create_socket_server(const char *port)
 	return (server_fd);
 }
 
-char	*read_recv_data(int i, Poll *poll_fds)
+std::string	read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
 	char buff[10000];
@@ -52,9 +52,9 @@ char	*read_recv_data(int i, Poll *poll_fds)
 	memset(&buff, 0, sizeof buff); /*vide le buffer a chaque fois (pas sur de le garder mais utile pour l'instant)*/
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
 	if (nb_bytes < 0)
-		return (perror("recv"), (char*)NULL);
+		return (perror("recv"), "");
 	else if (nb_bytes == 0)
-		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, (char*)NULL);
+		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, "");
 	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
 	return (buff);
 }
@@ -62,19 +62,20 @@ char	*read_recv_data(int i, Poll *poll_fds)
 int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 {
 	Request rq(buff);
+	int	code;
 
-	std::cout << "in function" << std::endl;
-	while (check_body_size(rq) == -1)
+	//First check syntax, verb, version, host header present and headerfield syntax
+	if ((code = RequestChecking::CheckBasics(rq)) != 0)
+		return (exec_rq_error(rq, config, code), 0);
+	//If post method, check if chunked (getMaxbodysize to be corrected)
+	if (rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(rq, config.getMaxBodySize())) != 1)
 	{
-		char *tmp = read_recv_data(i, poll_fds);
-		if (!tmp)
-			return (std::cerr<< "Error read_recv_data"<<std::endl, -1);
-		rq.appendBody(tmp);
+		if (code == 413 || code == 0) // maybe 0 must become a 400 
+			return (exec_rq_error(rq, config, code), 0);
+		if (code == 2)
+			rq.unchunk(poll_fds->getFds(i).fd);
 	}
-	/*check rq_header*/
-	std::cout << "in function before rq" << std::endl;
 	exec_rq(rq, config);
-	std::cout << "in function after rq" << std::endl;
 	return (0);
 }
 

@@ -37,6 +37,9 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 #include "ConfigFile/Location.hpp"
 #include "include/Poll.hpp"
 #include "include/server.hpp"
+#include <unistd.h>
+
+static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 4\nContent-Type: text/html\nConnection: Closed\n\nBody\n");
 
 unsigned int *list_server_fd(Poll poll_fds)
 {
@@ -72,15 +75,15 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				accept_new_connection(server_fd[status], &poll_fds); /*si c'est une nouvelle connexion*/
 			else
 			{
-				char *buff;
-				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
-				//if (!buff)		// problem here (char * non malloce depuis read received data qui rend null toujours)
-					//continue;
-				//function(buff, &poll_fds, i, config);
-				//send(poll_fds.getFds(i).fd, "piece of response!", sizeof("piece of response!"), 0);
+				std::string request = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
+				if (request.size() == 0) // utiliser un try catch plutot nan??
+					continue;
+				function(request, &poll_fds, i, config);
+				send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
 			}
 		}
 	}
+	free(server_fd);
 }
 
 int	main(int ac, char **av)

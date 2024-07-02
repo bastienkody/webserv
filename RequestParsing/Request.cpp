@@ -1,4 +1,6 @@
 #include"Request.hpp"
+#include <cstring>
+#include <stdexcept>
 
 //	Default
 Request::Request(){}
@@ -55,7 +57,22 @@ Request::Request(std::string rq)
 	_body = rq;
 }
 
-void	Request::appendBody(std::string data) 
+void	Request::appendBody(std::string data)  {_body += data;}
+
+
+void	Request::unchunk(int fd)
 {
-	_body += data;
+	char		buf[1024];
+	std::string	firstline, chunk;
+
+	memset(buf, 0, 1024);
+	while(firstline.compare("0"))
+	{
+		if (recv(fd, &buf, 1023, 0) < 0)
+			throw std::runtime_error("recv error while unchunking");
+		chunk = buf;
+		firstline = chunk.substr(0, chunk.find("\r\n"));
+		_body += chunk.substr(chunk.find("\r\n"), chunk.size() - 1);
+	}
+	
 }

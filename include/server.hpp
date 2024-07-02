@@ -16,6 +16,7 @@
 #include "Poll.hpp"
 #include "Response.hpp"
 #include "../RequestParsing/Request.hpp"
+#include "../RequestChecking/RequestChecking.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 
 #include <iostream>
@@ -33,7 +34,7 @@
 
 /*server.cpp*/
 int 	create_socket_server(const char *port);
-char*	read_recv_data(int i, Poll *poll_fds);
+std::string	read_recv_data(int i, Poll *poll_fds);
 int		function(std::string buff, Poll *poll_fds, int i, ConfigFile config);
 void	accept_new_connection(int server_fd, Poll *poll_fds);
 int		check_serv_socket(int fd, unsigned int *serv_fds);
@@ -47,6 +48,7 @@ void	rq_html(Response *rp, Request rq);
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);
 Response	exec_rq(Request rq, ConfigFile config);
+Response	exec_rq_error(Request rq, ConfigFile config, int code);
 
 /*utils.cpp*/
 char		**create_av(Request rq);
