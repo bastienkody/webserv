@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 17:23:05 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 18:36:23 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,21 +44,21 @@ int create_socket_server(const char *port)
 	return (server_fd);
 }
 
-char	*read_recv_data(int i, Poll *poll_fds)
+std::string read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
-	char  *buff;
-
-	buff = (char *) malloc(sizeof(char) * (10001));
-	if (!buff)
-		return (NULL);
-	nb_bytes = recv(poll_fds->getFds(i).fd, &buff[0], 10000, 0);
+	std::string dest;
+	char buff[10000];
+	
+	memset(&buff, 0, sizeof(buff));
+	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 10000, 0);
 	if (nb_bytes < 0)
-		return (perror("recv"), (char*)NULL);
+		return (perror("recv"), "error recv");
 	else if (nb_bytes == 0)
-		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, (char*)NULL);
+		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, "connection closed");
+	dest = buff;
 	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
-	return (buff);
+	return (dest);
 }
 
 int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
@@ -69,8 +69,8 @@ int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 	while (check_body_size(rq) == -1)
 	{
 		std::string tmp = read_recv_data(i, poll_fds);
-		// if (!tmp)
-		// 	return (std::cerr<< "Error read_recv_data"<<std::endl, -1);
+		if (tmp == "error recv")
+			return (-1);
 		rq.appendBody(tmp);
 	}
 	/*check rq_header*/

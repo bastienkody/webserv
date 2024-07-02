@@ -23,7 +23,7 @@ int	RequestChecking::CheckHeaderKey(const Request & rq)
 
 	for (; it!=ite; ++it)
 	{
-		if (it->first.size() == 0 || isspace(it->first[it->first.size() - 1])) /*j'ai pour pouvoir ompiler mais pas sur que c'est ce que tu veux*/
+		if (it->first.size() == 0 || isspace(it->first[it->first.size() - 1]))
 			return 400;
 		if (it->first.compare("Host") == 0)
 			isHostPresent = true;

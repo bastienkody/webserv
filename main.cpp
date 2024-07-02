@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 16:36:06 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 18:33:16 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,10 +74,12 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				accept_new_connection(server_fd[status], &poll_fds); /*si c'est une nouvelle connexion*/
 			else
 			{
-				char	*buff;
+				std::string buff;
 				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
-				if (!buff)		// problem here (char * non malloce depuis read received data qui rend null toujours)
+				if (buff == "error recv")
 					return ;
+				else if (buff == "connection closed")
+					continue ;
 				// function(buff, &poll_fds, i, config);
 				//send(poll_fds.getFds(i).fd, "piece of response!", sizeof("piece of response!"), 0);
 			}
