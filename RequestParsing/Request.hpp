@@ -5,6 +5,7 @@
 #include<string>
 #include<map>
 #include<algorithm>
+#include <sys/socket.h>
 #include "RequestLine.hpp"
 
 class RequestLine;
@@ -23,6 +24,7 @@ class Request
 		std::string							const & getBody() const;
 
 		void	appendBody(std::string data);
+		void	unchunk(int fd);
 		void	print() const;
 
 	private:

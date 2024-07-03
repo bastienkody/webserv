@@ -13,6 +13,8 @@
 #include "../include/server.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
+#include "../StatusCode/StatusCode.hpp"
+#include <sstream>
 #include "../include/Exception.hpp"
 
 /*ajouter Location obj pour check methods allows*/
@@ -54,6 +56,21 @@ Response	exec_rq(Request rq, ConfigFile config)
 	return (rp);
 }
 
+Response	exec_rq_error(__attribute__((unused))Request rq, __attribute__((unused))ConfigFile config, int code)
+{
+	StatusCode		sc;
+	Response		rp;
+	std::stringstream	sstr;
+
+	sstr << code;
+
+	// create status line
+	rp.setLineState("HTTP 1.1 " + sstr.str() + sc.getPhrase(code));
+	// create header
+	// check if error page exists in config file to fulfill body; if not no body?
+	
+	return (rp);
+}
 // int main(void)
 // {
 // 	std::string request = "GET http://localhost:80/home.txt?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\nformat: text\n";

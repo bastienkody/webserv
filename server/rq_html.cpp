@@ -84,9 +84,9 @@ void	rq_html(Response *rp, Request rq)
 		{
 			switch(i)
 			{
-				case 0: get_html(rp, rq);
-				case 1: post_html(rp, rq);
-				case 2: delete_html(rp, rq);
+				case 0: get_html(rp, rq); break;
+				case 1: post_html(rp, rq); break;
+				case 2: delete_html(rp, rq); break;
 			}
 			return ;
 		}

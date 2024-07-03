@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 19:20:33 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/03 18:50:03 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,9 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 #include "ConfigFile/Location.hpp"
 #include "include/Poll.hpp"
 #include "include/server.hpp"
+#include <unistd.h>
+
+static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nBody\n");
 
 unsigned int *list_server_fd(Poll poll_fds)
 {
@@ -81,11 +84,23 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				else if (buff == "connection closed")
 					continue ;
 				// function(buff, &poll_fds, i, config);
-				//send(poll_fds.getFds(i).fd, "piece of response!", sizeof("piece of response!"), 0);
+				send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
 			}
 		}
 	}
+	free(server_fd);
 }
+
+int	verif_host(ConfigFile config, int i)
+{
+	for (int y = 0; y < i; y++)
+	{
+		if (config.getServers()[y].getIp() == config.getServers()[i].getIp()
+			&& config.getServers()[y].getPort() == config.getServers()[i].getPort())
+			return (1);
+	}
+	return (0);
+} 
 
 int	main(int ac, char **av)
 {
@@ -103,6 +118,8 @@ int	main(int ac, char **av)
 	Poll poll_fds;
 	for (size_t i = 0; i < config.getServers().size(); i++)
 	{
+		if (verif_host(config, i) == 1)
+			continue ;
 		int fd = create_socket_server(config.getServers()[i].getPortSTR().c_str());
 		if (fd == -1)
 			return 1;
@@ -114,6 +131,7 @@ int	main(int ac, char **av)
 			return 1;
 		}
 	}
+	std::cout<< "poll_fds count : " << poll_fds.getCount()<<std::endl;
 	launch_server(config, poll_fds);
 	return 0;
 }

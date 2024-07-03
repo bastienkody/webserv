@@ -64,17 +64,19 @@ std::string read_recv_data(int i, Poll *poll_fds)
 int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 {
 	Request rq(buff);
+	int	code;
 
-	std::cout << "in function" << std::endl;
-	while (check_body_size(rq) == -1)
+	//First check syntax, verb, version, host header present and headerfield syntax
+	if ((code = RequestChecking::CheckBasics(rq)) != 0)
+		return (exec_rq_error(rq, config, code), 0);
+	//If post method, check if chunked (getMaxbodysize to be corrected)
+	if (rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(rq, config.getMaxBodySize())) != 1)
 	{
-		std::string tmp = read_recv_data(i, poll_fds);
-		if (tmp == "error recv")
-			return (-1);
-		rq.appendBody(tmp);
+		if (code == 413 || code == 0) // maybe 0 must become a 400 
+			return (exec_rq_error(rq, config, code), 0);
+		if (code == 2)
+			rq.unchunk(poll_fds->getFds(i).fd);
 	}
-	/*check rq_header*/
-	std::cout << "in function before rq" << std::endl;
 	exec_rq(rq, config);
 	std::cout << "in function after rq" << std::endl;
 	return (0);
