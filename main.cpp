@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/30 16:20:28 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 19:20:33 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ unsigned int *list_server_fd(Poll poll_fds)
 	dest = (unsigned int *) malloc(sizeof(unsigned int) * (poll_fds.getCount()));
 	if (!dest)
 		return (0);
-	for (size_t i = 0; i < poll_fds.getCount(); i++)
+	for (int i = 0; i < poll_fds.getCount(); i++)
 	{
 		dest[i] = poll_fds.getFds(i).fd;
 	}
@@ -58,7 +58,9 @@ unsigned int *list_server_fd(Poll poll_fds)
 void	launch_server(ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd;
+	int size_server_fd = poll_fds.getCount();
 
+	(void) config;
 	server_fd = list_server_fd(poll_fds);
 	while (true)
 	{
@@ -71,15 +73,18 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 		{
 			if ((poll_fds.getFds(i).revents & POLLIN) != 1) /*revents = event attendu pour la socket et POLLIN = event pour signal entrant*/
 				continue ;
-			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd)) != -1)
+			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, size_server_fd)) != -1)
 				accept_new_connection(server_fd[status], &poll_fds); /*si c'est une nouvelle connexion*/
 			else
 			{
-				std::string request = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
-				if (request.size() == 0) // utiliser un try catch plutot nan??
-					continue;
-				function(request, &poll_fds, i, config);
-				send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
+				std::string buff;
+				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
+				if (buff == "error recv")
+					return ; /*leaks pas encore gere*/
+				else if (buff == "connection closed")
+					continue ;
+				// function(buff, &poll_fds, i, config);
+				//send(poll_fds.getFds(i).fd, "piece of response!", sizeof("piece of response!"), 0);
 			}
 		}
 	}

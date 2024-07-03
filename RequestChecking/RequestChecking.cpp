@@ -1,5 +1,4 @@
 #include"RequestChecking.hpp"
-#include <algorithm>
 
 int RequestChecking::CheckBasics(const Request & rq)
 {
@@ -24,7 +23,7 @@ int	RequestChecking::CheckHeaderKey(const Request & rq)
 
 	for (; it!=ite; ++it)
 	{
-		if (it->first.size() == 0 || isspace(it->first.back()))
+		if (it->first.size() == 0 || isspace(it->first[it->first.size() - 1]))
 			return 400;
 		if (it->first.compare("Host") == 0)
 			isHostPresent = true;
@@ -33,9 +32,9 @@ int	RequestChecking::CheckHeaderKey(const Request & rq)
 }
 
 //	looking for wether content_lenght or transfer-encoding
-//	none : 0 (find the error code)
-//	content_lenght : 1 (no chunk, its ok now)
-//	chunked = 2 (on ignore un potentiel content-length, faut unchunk la rq)
+//	none : 0 (or error code?)
+//	content_lenght : 1
+//	chunked = 2 (on ignore un potentiel content-length)
 //	content-lenght > max_body_size --> 413 Payload too large
 int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max_body_size)
 {
@@ -57,10 +56,8 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 	}
 	if (content_lenght == false)
 		return 0;
-	if (max_body_size.size() == 0 || max_body_size.compare("-1")) // pas de maxbody en config : on est good
-		return (1);
 
-	std::stringstream	str(max_body_size), str2(lenght); // conv err with lenght (header content) possible
+	std::stringstream	str(max_body_size), str2(lenght);
 	unsigned int		i, j;
 	str >> i;
 	str2 >> j;

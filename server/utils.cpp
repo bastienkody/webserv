@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/28 18:42:40 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:24:06 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@ char	**create_av(Request rq)
 {
 	char **av;
 
+	av = (char **) malloc(sizeof(char *) * 2);
+	if (!av)
+		return (NULL);
 	std::string name = rq.getRql().getUrl().getPath();
 	av[0] = strdup(&(name.c_str())[1]);
 	av[1] = NULL;

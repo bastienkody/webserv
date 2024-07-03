@@ -28,12 +28,12 @@ vpath %.hpp include/ ConfigFile/ ParserUtils/ RequestParsing/ RequestChecking/
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-	$(CXX) $(CXXFLAG) $(OBJS) $(INCLUDE) -o $(NAME)
+	$(CXX) $(CXXFLAGS) $(OBJS) $(INCLUDE) -o $(NAME)
 	@echo "$(GREEN)Compiled!$(DEF_COLOR)"
 	@echo "Launch the program with $(RED)./${NAME}"
 
 $(OBJ_DIR)%.o : %.cpp $(HEADER) Makefile | $(OBJF)
-	$(CC) $(FLAG) $(INCLUDE) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 
 clean :

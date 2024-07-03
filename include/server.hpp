@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/30 16:17:56 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/02 18:33:19 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int 	create_socket_server(const char *port);
 std::string	read_recv_data(int i, Poll *poll_fds);
 int		function(std::string buff, Poll *poll_fds, int i, ConfigFile config);
 void	accept_new_connection(int server_fd, Poll *poll_fds);
-int		check_serv_socket(int fd, unsigned int *serv_fds);
+int		check_serv_socket(int fd, unsigned int *serv_fds, int size);
 
 /*rq_html.cpp*/
 void	get_html(Response *rp, Request rq);
