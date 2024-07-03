@@ -39,7 +39,7 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 #include "include/server.hpp"
 #include <unistd.h>
 
-static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 4\nContent-Type: text/html\nConnection: Closed\n\nBody\n");
+static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nBody\n");
 
 unsigned int *list_server_fd(Poll poll_fds)
 {
@@ -84,7 +84,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				else if (buff == "connection closed")
 					continue ;
 				// function(buff, &poll_fds, i, config);
-				//send(poll_fds.getFds(i).fd, "piece of response!", sizeof("piece of response!"), 0);
+				send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
 			}
 		}
 	}
