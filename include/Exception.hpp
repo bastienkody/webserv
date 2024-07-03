@@ -22,7 +22,7 @@ class Exception : public std::exception
 		Exception(void) throw() {}
 		~Exception(void) throw() {}
 		Exception(int mode) throw() : _mode(mode) {}
-		char *what() const throw()
+		char const *what() const throw()
 		{
 			if (_mode == 1)
 				return (char *) "Error check_file";
