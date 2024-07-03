@@ -42,8 +42,8 @@ class Server: public ConfigFile
 	private:
 		std::vector<std::string>	_names;
 		std::string					_ip;
-		std::string					_portSTR;
 		unsigned int				_port;
+		std::string					_portSTR;
 		std::vector<Location>		_locations;
 };
 

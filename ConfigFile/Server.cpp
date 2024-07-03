@@ -2,7 +2,7 @@
 #include"Location.hpp"
 
 //	constructors + copy
-Server::Server(): _ip("0.0.0.0"), _port(80)	{}
+Server::Server(): _ip("0.0.0.0"), _port(8080), _portSTR("8080")	{}
 Server::~Server() {}
 Server::Server(const Server & src): ConfigFile() {*this = src;}
 Server & Server::operator=(const Server & rhs)
