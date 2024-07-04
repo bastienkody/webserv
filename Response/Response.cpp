@@ -37,10 +37,10 @@ void	Response::setLineState(int code)
 	_lineState = "HTTP/1.1 " + sstr.str() + " " + sc.getPhrase(code);
 }
 
-void	Response::setHeader(__attribute__((unused))Request rq, ConfigFile config)
+void	Response::setHeader(__attribute__((unused))Request rq, __attribute__((unused))ConfigFile config)
 {
-	_header += createTimeStr() + "\n"; // date
-	_header += "server: webserv 1.0\n"; // server
+	_header += hcreateTimeStr() + "\n"; // date
+	_header += hcreateServer() + "\n"; // server
 	// connection
 	// etag
 	// host ?
@@ -56,7 +56,7 @@ void	Response::setBody(std::string body)
 /*
 	utils header
 */
-std::string	Response::createTimeStr() const
+std::string	Response::hcreateTimeStr() const
 {
 	// date: Thu, 04 Jul 2024 12:24:32 GMT
 	std::time_t s_epoch = std::time(0);
@@ -69,11 +69,16 @@ std::string	Response::createTimeStr() const
 	return res;
 }
 
-std::string	Response::createAllowMethods(ConfigFile config) const
+std::string	Response::hcreateServer() const
+{
+	return "server: webserv 1.0";
+}
+
+std::string	Response::hcreateAllowMethods(__attribute__((unused))ConfigFile config) const
 {
 	std::string res("allow: ");
 
-
+	return res;
 
 }
 

@@ -10,6 +10,12 @@
 
 class RequestLine;
 
+/*
+	ajouter un element RawData qui s'appendra si la req est lue en plusieurs read_recv
+	Passez par un "appendData" a chaque read_recv (attention)
+	Puis parser la requete a partir d'un setRq (vs le const parametric!)
+*/
+
 class Request
 {
 	public:

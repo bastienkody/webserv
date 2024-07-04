@@ -62,6 +62,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 
 	(void) config;
 	server_fd = list_server_fd(poll_fds);
+	// std::vector<Connection>
 	while (true)
 	{
 		int	status = poll_fds.call_to_poll();
@@ -84,7 +85,7 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 				else if (buff == "connection closed")
 					continue ;
 				// function(buff, &poll_fds, i, config);
-				send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
+				//send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
 			}
 		}
 	}
@@ -104,11 +105,6 @@ int	verif_host(ConfigFile config, int i)
 
 int	main(int ac, char **av)
 {
-	Response rp;
-
-	std::cout << rp.createTimeStr() << std::endl;
-	return 0;
-
 	if (ac != 2)
 		return std::cerr << "expected config file as single argument" << std::endl, 2;
 	

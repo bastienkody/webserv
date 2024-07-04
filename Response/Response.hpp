@@ -39,8 +39,9 @@ class Response
 		void	setBody(std::string body);
 
 		//	utils header
-		std::string	createTimeStr() const;
-		std::string	createAllowMethods(ConfigFile config) const;
+		std::string	hcreateTimeStr() const;
+		std::string	hcreateServer() const;
+		std::string	hcreateAllowMethods(ConfigFile config) const;
 
 	private:
 

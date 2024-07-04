@@ -51,7 +51,7 @@ std::string read_recv_data(int i, Poll *poll_fds)
 	char buff[4096];
 	
 	memset(&buff, 0, sizeof(buff));
-	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 4096, 0);
+	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 4095, 0);
 	if (nb_bytes < 0)
 		return (perror("recv"), "error recv");
 	else if (nb_bytes == 0)
