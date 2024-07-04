@@ -14,7 +14,7 @@
 #define SERVERs_HPP
 
 #include "Poll.hpp"
-#include "Response.hpp"
+#include "../Response/Response.hpp"
 #include "../RequestParsing/Request.hpp"
 #include "../RequestChecking/RequestChecking.hpp"
 #include "../ConfigFile/ConfigFile.hpp"

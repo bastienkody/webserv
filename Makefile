@@ -14,7 +14,7 @@ INCLUDE	=	-I ./include
 HNAME	=	ConfigFile Location Server \
 			CGI Exception Poll Response server \
 			ParserUtils \
-			Request RequestLine URL RequestChecking StatusCode
+			Request RequestLine URL RequestChecking StatusCode 
 HEADER	=	$(addsuffix .hpp, $(HNAME))
 
 OBJF	=	.cache_exits
@@ -22,8 +22,8 @@ OBJF	=	.cache_exits
 $(OBJF) :
 	@mkdir -p $(OBJ_DIR)
 
-vpath %.cpp ConfigFile/ ParserUtils/ RequestParsing/ server/ RequestChecking/ StatusCode/
-vpath %.hpp include/ ConfigFile/ ParserUtils/ RequestParsing/ RequestChecking/ StatusCode/
+vpath %.cpp ConfigFile/ ParserUtils/ RequestParsing/ server/ RequestChecking/ StatusCode/ Response/
+vpath %.hpp include/ ConfigFile/ ParserUtils/ RequestParsing/ RequestChecking/ StatusCode/ Response/
 
 all : $(NAME)
 

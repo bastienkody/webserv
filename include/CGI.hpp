@@ -15,7 +15,7 @@
 
 // #include "Server.hpp"
 #include "../RequestParsing/Request.hpp"
-#include "../include/Response.hpp"
+#include "../Response/Response.hpp"
 #include "../include/Exception.hpp"
 #include <errno.h>
 

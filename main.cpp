@@ -104,6 +104,11 @@ int	verif_host(ConfigFile config, int i)
 
 int	main(int ac, char **av)
 {
+	Response rp;
+
+	std::cout << rp.createTimeStr() << std::endl;
+	return 0;
+
 	if (ac != 2)
 		return std::cerr << "expected config file as single argument" << std::endl, 2;
 	
