@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/03 18:50:03 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/04 13:16:17 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ int	verif_host(ConfigFile config, int i)
 			return (1);
 	}
 	return (0);
-} 
+}
 
 int	main(int ac, char **av)
 {
@@ -131,7 +131,6 @@ int	main(int ac, char **av)
 			return 1;
 		}
 	}
-	std::cout<< "poll_fds count : " << poll_fds.getCount()<<std::endl;
 	launch_server(config, poll_fds);
 	return 0;
 }

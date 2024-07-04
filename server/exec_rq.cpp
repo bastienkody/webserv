@@ -13,26 +13,9 @@
 #include "../include/server.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
-#include "../StatusCode/StatusCode.hpp"
-#include <sstream>
 #include "../include/Exception.hpp"
 
 /*ajouter Location obj pour check methods allows*/
-
-int	check_body_size(Request rq)
-{
-	int body_length = rq.getBody().size();
-
-	for (std::multimap<std::string, std::string>::const_iterator it = rq.getHeader().begin(); it != rq.getHeader().end(); ++it)
-	{
-		if (it->first == "content-length")
-		{
-			if (atoi(it->second.c_str()) != body_length)
-				return (std::cout<< "Error: wrong body size"<<std::endl, -1);
-		}
-	}
-	return (0);
-}
 
 Response	exec_rq(Request rq, ConfigFile config)
 {
@@ -58,15 +41,13 @@ Response	exec_rq(Request rq, ConfigFile config)
 
 Response	exec_rq_error(__attribute__((unused))Request rq, __attribute__((unused))ConfigFile config, int code)
 {
-	StatusCode		sc;
 	Response		rp;
-	std::stringstream	sstr;
-
-	sstr << code;
 
 	// create status line
-	rp.setLineState("HTTP/1.1 " + sstr.str() + sc.getPhrase(code));
+	rp.setLineState(code);
 	// create header
+	rp.setHeader(rq);
+	
 	// check if error page exists in config file to fulfill body; if not no body?
 	
 	return (rp);

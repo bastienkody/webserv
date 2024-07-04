@@ -12,26 +12,43 @@
 
 #include "../include/Response.hpp"
 
-Response::Response(void)
-{}
+//	default
+Response::Response(void) {}
+Response::~Response(void){}
 
-Response::~Response(void)
-{}
+//	getters
+std::string const & Response::getLineState(void) const {return (_lineState);}
+std::string const & Response::getHeader(void) const {return (_header);}
+std::string const & Response::getBody(void) const {return (_body);}
 
-std::string Response::getLineState(void) const
-{return (_lineState);}
+std::string Response::getWholeResponse(void) const
+{
+	// attention si final \n in header ajouter que un seul ici avant body
+	return _lineState + "\r\n" + _header + "\n\n" + _body; 
+}
 
-std::string Response::getHeader(void) const
-{return (_header);}
+//	setters
+void	Response::setLineState(int code)
+{
+	StatusCode		sc;
+	std::stringstream	sstr;
 
-std::string Response::getBody(void) const
-{return (_body);}
+	sstr << code;
+	_lineState = "HTTP/1.1 " + sstr.str() + " " + sc.getPhrase(code);
+}
 
-void	Response::setLineState(std::string lineState)
-{_lineState = lineState;}
-
-void	Response::setHeader(std::string header)
-{_header = header;}
+void	Response::setHeader(__attribute__((unused))Request rq)
+{
+	// connection
+	// etag
+	// date
+	// host ?
+	// server name (what if none?)
+	// allow methods (on le et toujours comme ca on est tranquille)
+	// si body (at least get and post, )
+		// content type
+		// content lenght
+}
 
 void	Response::setBody(std::string body)
 {_body = body;}

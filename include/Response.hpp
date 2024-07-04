@@ -15,6 +15,9 @@
 #define RESPONSE_HPP
 
 #include <iostream>
+#include <sstream>
+#include "../StatusCode/StatusCode.hpp"
+#include "../RequestParsing/Request.hpp"
 
 class Response
 {
@@ -23,12 +26,14 @@ class Response
 		Response(void);
 		~Response(void);
 
-		std::string getLineState() const;
-		std::string getHeader() const;
-		std::string getBody() const;
+		std::string const & getLineState() const;
+		std::string const & getHeader() const;
+		std::string const & getBody() const;
 
-		void	setLineState(std::string lineState);
-		void	setHeader(std::string header);
+		std::string getWholeResponse() const;
+
+		void	setLineState(int code);
+		void	setHeader(Request rq);
 		void	setBody(std::string body);
 
 	private:
