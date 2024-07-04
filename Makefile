@@ -30,7 +30,7 @@ all : $(NAME)
 $(NAME) : $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) $(INCLUDE) -o $(NAME)
 	@echo "$(GREEN)Compiled!$(DEF_COLOR)"
-	@echo "Launch the program with $(RED)./${NAME}"
+	@echo "Launch the program with $(RED)./${NAME}\033[0m"
 
 $(OBJ_DIR)%.o : %.cpp $(HEADER) Makefile | $(OBJF)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
