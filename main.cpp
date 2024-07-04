@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 19:20:33 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/04 13:16:17 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,17 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 	free(server_fd);
 }
 
+int	verif_host(ConfigFile config, int i)
+{
+	for (int y = 0; y < i; y++)
+	{
+		if (config.getServers()[y].getIp() == config.getServers()[i].getIp()
+			&& config.getServers()[y].getPort() == config.getServers()[i].getPort())
+			return (1);
+	}
+	return (0);
+}
+
 int	main(int ac, char **av)
 {
 	if (ac != 2)
@@ -107,6 +118,8 @@ int	main(int ac, char **av)
 	Poll poll_fds;
 	for (size_t i = 0; i < config.getServers().size(); i++)
 	{
+		if (verif_host(config, i) == 1)
+			continue ;
 		int fd = create_socket_server(config.getServers()[i].getPortSTR().c_str());
 		if (fd == -1)
 			return 1;
