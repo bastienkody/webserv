@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 15:22:17 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/04 17:49:37 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,18 @@ void	get_html(Response *rp, Request rq)
 
 void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
 {
-	(void) rp;
-	(void) rq;
+	std::string buff;
+	std::string path = "www" + rq.getRql().getUrl().getPath();
+	int status;
+
+	/*a utiliser si permet pas de post un fichier avec le meme nom qu'un deja existant*/
+	// status = check_file(rq, "www", 1);
+	// if (status == 0)
+	// 	return ;
+	std::ofstream my_html(path.c_str());
+	if (!my_html)
+		return (rp->setBody("Error"));
+	rq.getBody() >> my_html;
 }
 
 void	delete_html(Response *rp, Request rq)
