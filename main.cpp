@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/05 16:17:36 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/05 16:18:13 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "ConfigFile/Location.hpp"
 #include "include/Poll.hpp"
 #include "include/server.hpp"
-#include <unistd.h>
+
 
 static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nBody\n");
 
