@@ -33,13 +33,13 @@ void	Request::print() const
 	std::cout << "body:\t" << getBody() << std::endl;
 }
 
-//	Param constructor
-Request::Request(std::string rq)
+//	Parse into rq line, headers and body
+void	Request::parse()
 {
-	_rql = RequestLine(rq.substr(0, rq.find("\r\n")));
-	rq.erase(0, rq.find("\r\n") + 2);
-	std::string	hTmp(rq.substr(0, rq.find("\n\n") + 1));
-	rq.erase(0, rq.find("\n\n") + 2);
+	_rql = RequestLine(_raw.substr(0, _raw.find("\r\n")));
+	_raw.erase(0, _raw.find("\r\n") + 2);
+	std::string	hTmp(_raw.substr(0, _raw.find("\n\n") + 1));
+	_raw.erase(0, _raw.find("\n\n") + 2);
 
 	while (hTmp.find('\n') != std::string::npos)
 	{
@@ -54,12 +54,12 @@ Request::Request(std::string rq)
 		std::cout << "line=" + line + "|store=" + key + "-->" + value << std::endl;
 		_header.insert(std::pair<std::string, std::string>(key, value));
 	}
-	_body = rq;
+	_body = _raw;
 }
 
-void	Request::appendBody(std::string data)  {_body += data;}
+void	Request::appendRaw(std::string data)  {_raw += data;}
 
-
+ // normalement pas besoin ?
 void	Request::unchunk(int fd)
 {
 	char		buf[1024];

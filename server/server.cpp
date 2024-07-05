@@ -61,9 +61,9 @@ std::string read_recv_data(int i, Poll *poll_fds)
 	return (dest);
 }
 
-int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
+int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, ConfigFile config)
 {
-	Request rq(buff);
+	Request rq;
 	int	code;
 
 	//First check syntax, verb, version, host header present and headerfield syntax
@@ -82,18 +82,19 @@ int	function(std::string buff, Poll *poll_fds, int i, ConfigFile config)
 	return (0);
 }
 
-/*	attention a exit nsp si on appelle bien les destructeurs cpp	*/
-void	accept_new_connection(int server_fd, Poll *poll_fds)
+/*	attention a exit !! ca free bien? ca pose peut poser pb pour co. pe passer par des exceptions?	*/
+int	accept_new_connection(int server_fd, Poll *poll_fds)
 {
 	int client_fd;
 
 	client_fd = accept(server_fd, NULL, NULL);
 	if (client_fd < 0)
-		return (perror("accept"), close(server_fd), exit(1));
+		return (perror("accept"), close(server_fd), exit(1), 0);
 	if (poll_fds->getCount() > 255)
-		return (close(server_fd), close(client_fd), exit(1));
+		return (close(server_fd), close(client_fd), exit(1), 0);
 	poll_fds->add_to_poll(client_fd);
 	std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;
+	return client_fd;
 }
 
 /*verifie quelle socket server a recu une nouvelle connexion*/
