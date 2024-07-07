@@ -17,14 +17,14 @@ class Connection
 		Connection & operator=(const Connection & rhs);
 
 		int const & getFd() const;
-		Request getRq();
-		Response getRp();
+		Request  getRq();
+		Response  getRp();
 
 	private:
 
 		int			_fd;
-		Request		_rq;
-		Response	_rp;
+		Request		 _rq;
+		Response	 _rp;
 };
 
 #endif

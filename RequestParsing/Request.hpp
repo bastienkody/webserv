@@ -27,6 +27,7 @@ class Request
 		RequestLine				const & getRql() const;
 		std::map<std::string, std::string>	const & getHeader() const;
 		std::string				const & getBody() const;
+		std::string				const & getRaw() const;
 
 		void	parse();
 		void	appendRaw(std::string data);
@@ -35,7 +36,7 @@ class Request
 
 	private:
 
-		std::string				_raw;	
+		std::string				_raw;
 		RequestLine				_rql;
 		std::map<std::string, std::string>	_header;
 		std::string				_body;

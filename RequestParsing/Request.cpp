@@ -11,6 +11,7 @@ Request & Request::operator=(const Request & rhs)
 {
 	if(this != &rhs)
 	{
+		this->_raw = rhs.getRaw();
 		this->_rql = rhs.getRql();
 		this->_header = rhs.getHeader();
 		this->_body = rhs.getBody();
@@ -21,6 +22,7 @@ Request & Request::operator=(const Request & rhs)
 RequestLine							const & Request::getRql() const 	{return _rql;}
 std::map<std::string, std::string>	const & Request::getHeader() const	{return _header;}
 std::string							const & Request::getBody() const	{return _body;} 
+std::string							const & Request::getRaw() const	{return _raw;}
 //	printer
 void	Request::print() const
 {
@@ -57,7 +59,10 @@ void	Request::parse()
 	_body = _raw;
 }
 
-void	Request::appendRaw(std::string data)  {_raw += data;}
+void	Request::appendRaw(std::string data) 
+{
+	_raw += data;
+}
 
  // normalement pas besoin ?
 void	Request::unchunk(int fd)

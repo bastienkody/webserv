@@ -13,6 +13,9 @@ Connection & Connection::operator=(const Connection & rhs)
 {
 	if(this != &rhs)
 	{
+		std::cout << "copy op connection" << std::endl;
+		std::cout << "with fd:" << rhs.getFd() << std::endl;
+		std::cout << "with rqraw:" << rhs._rq.getRaw() << std::endl;
 		_fd = rhs._fd;
 		_rq = rhs._rq;
 		_rp = rhs._rp;
@@ -22,5 +25,5 @@ Connection & Connection::operator=(const Connection & rhs)
 
 //	Getter (rp and rq not const ref because theyll be modified)
 int const & Connection::getFd() const {return (_fd);}
-Request		Connection::getRq() {return (_rq);}
-Response	Connection::getRp() {return (_rp);}
+Request 	Connection::getRq()  {return (_rq);}
+Response 	Connection::getRp()  {return (_rp);}

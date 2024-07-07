@@ -48,16 +48,16 @@ std::string read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
 	std::string dest;
-	char buff[4096];
+	char buff[4];
 	
 	memset(&buff, 0, sizeof(buff));
-	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 4095, 0);
+	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 3, 0);
 	if (nb_bytes < 0)
 		return (perror("recv"), "error recv");
 	else if (nb_bytes == 0)
 		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, "connection closed");
 	dest = buff;
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff;
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff << std::endl;
 	return (dest);
 }
 

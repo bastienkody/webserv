@@ -41,6 +41,14 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 #include <unistd.h>
 #include <vector>
 
+struct client
+{
+	int fd;
+	Request rq;
+	Response rp;
+};
+
+
 static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nBody\n");
 
 unsigned int *list_server_fd(Poll poll_fds)
@@ -57,37 +65,40 @@ unsigned int *list_server_fd(Poll poll_fds)
 	return (dest);
 }
 
-std::vector<Connection>::iterator find_co_by_fd_it(__attribute__((unused))std::vector<Connection> all_co, int fd)
+std::vector<struct client>::iterator find_co_by_fd_it(__attribute__((unused))std::vector<struct client> all_co, int fd)
 {
-	std::vector<Connection>::iterator it = all_co.begin();
-	std::vector<Connection>::iterator ite = all_co.end();
+	std::vector<struct client>::iterator it = all_co.begin();
+	std::vector<struct client>::iterator ite = all_co.end();
 
 	for(; it!=ite; ++it)
 	{
-		if (fd == it->getFd())
+		if (fd == it->fd)
 			return it;
 	}
 	return ite;
 }
 
-int find_co_by_fd_pos(__attribute__((unused))std::vector<Connection> all_co, int fd)
+int find_co_by_fd_pos(__attribute__((unused))std::vector<struct client> all_co, int fd)
 {
 	for(unsigned int i = 0; i < all_co.size(); ++i)
 	{
-		if (fd == all_co[i].getFd())
+		if (fd == all_co[i].fd)
 			return i;
 	}
 	return -1;
 }
 
-void	send_response(__attribute__((unused))Connection co) {}
+void	send_response(__attribute__((unused))struct client co)
+{
+	std::cout << "send response to fd " << co.fd << std::endl;
+}
 
 void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd;
 	int size_server_fd = poll_fds.getCount();
 
-	std::vector<Connection>	all_co;
+	std::vector<struct client>	clients;
 	server_fd = list_server_fd(poll_fds);
 	while (true)
 	{
@@ -102,7 +113,11 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 			{
 				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, size_server_fd)) != -1)
-					all_co.push_back(Connection(accept_new_connection(server_fd[status], &poll_fds)));
+				{
+					struct client cli;
+					cli.fd = accept_new_connection(server_fd[status], &poll_fds);
+					clients.push_back(cli);
+				}
 				// data to read from the client request
 				else
 				{
@@ -111,16 +126,18 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 						return ; /*leaks pas encore gere*/
 					else if (buff == "connection closed")
 						continue ;
-					all_co[find_co_by_fd_pos(all_co, poll_fds.getFds(i).fd)].getRq().appendRaw(buff);
+					int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
+					clients[pos].rq.appendRaw(buff);
+					std:: cout << "on pos" << pos << " rq print:" << clients[pos].rq.getRaw() << std::endl;
 					// function(buff, &poll_fds, i, config);
 					//send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
 				}
 			}
 			// responding
-			else if (all_co.size() > 0 && (poll_fds.getFds(i).revents & POLLOUT) == 1) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
+			else if (clients.size() > 0 && (poll_fds.getFds(i).revents & POLLOUT) == 1) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
 			{
-				send_response(all_co[find_co_by_fd_pos(all_co, poll_fds.getFds(i).fd)]);
-				all_co.erase(find_co_by_fd_it(all_co, poll_fds.getFds(i).fd));
+				send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)]);
+				clients.erase(find_co_by_fd_it(clients, poll_fds.getFds(i).fd));
 			}	
 		}
 	}
