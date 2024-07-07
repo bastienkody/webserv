@@ -47,7 +47,6 @@ int create_socket_server(const char *port)
 std::string read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
-	std::string dest;
 	char buff[4];
 	
 	memset(&buff, 0, sizeof(buff));
@@ -56,9 +55,8 @@ std::string read_recv_data(int i, Poll *poll_fds)
 		return (perror("recv"), "error recv");
 	else if (nb_bytes == 0)
 		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, "connection closed");
-	dest = buff;
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff << std::endl;
-	return (dest);
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << std::endl;
+	return (buff);
 }
 
 int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, ConfigFile config)
@@ -85,9 +83,7 @@ int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, Con
 /*	attention a exit !! ca free bien? ca pose peut poser pb pour co. pe passer par des exceptions?	*/
 int	accept_new_connection(int server_fd, Poll *poll_fds)
 {
-	int client_fd;
-
-	client_fd = accept(server_fd, NULL, NULL);
+	int client_fd = accept(server_fd, NULL, NULL);
 	if (client_fd < 0)
 		return (perror("accept"), close(server_fd), exit(1), 0);
 	if (poll_fds->getCount() > 255)

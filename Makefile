@@ -8,14 +8,14 @@ OBJ_DIR	=	obj/
 #Source
 FILES	=	main ConfigFile Location Server ParserUtils Request RequestLine \
 			URL CGI exec_rq Poll Response rq_dir rq_html server utils \
-			RequestChecking StatusCode Connection
+			RequestChecking StatusCode Clients
 SRCS	=	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(FILES)))
 OBJS	=	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(FILES)))
 
 INCLUDE	=	-I ./include
 HNAME	=	ConfigFile Location Server CGI Exception Poll Response server \
 			ParserUtils Request RequestLine URL RequestChecking StatusCode \
-			Connection
+			Clients
 HEADER	=	$(addsuffix .hpp, $(HNAME))
 
 OBJF	=	.cache_exits
@@ -23,8 +23,8 @@ OBJF	=	.cache_exits
 $(OBJF) :
 	@mkdir -p $(OBJ_DIR)
 
-vpath %.cpp ConfigFile/ ParserUtils/ RequestParsing/ server/ RequestChecking/ StatusCode/ Response/ Connection/
-vpath %.hpp include/ ConfigFile/ ParserUtils/ RequestParsing/ RequestChecking/ StatusCode/ Response/ Connection/
+vpath %.cpp ConfigFile/ ParserUtils/ RequestParsing/ server/ RequestChecking/ StatusCode/ Response/ Clients/
+vpath %.hpp include/ ConfigFile/ ParserUtils/ RequestParsing/ RequestChecking/ StatusCode/ Response/ Clients/
 
 all : $(NAME)
 

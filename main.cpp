@@ -35,18 +35,12 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 #include "ConfigFile/ConfigFile.hpp"
 #include "ConfigFile/Server.hpp"
 #include "ConfigFile/Location.hpp"
-#include "Connection/Connection.hpp"
+#include "Clients/Clients.hpp"
 #include "include/Poll.hpp"
 #include "include/server.hpp"
 #include <unistd.h>
 #include <vector>
 
-struct client
-{
-	int fd;
-	Request rq;
-	Response rp;
-};
 
 
 static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nBody\n");
@@ -65,41 +59,19 @@ unsigned int *list_server_fd(Poll poll_fds)
 	return (dest);
 }
 
-std::vector<struct client>::iterator find_co_by_fd_it(__attribute__((unused))std::vector<struct client> all_co, int fd)
-{
-	std::vector<struct client>::iterator it = all_co.begin();
-	std::vector<struct client>::iterator ite = all_co.end();
 
-	for(; it!=ite; ++it)
-	{
-		if (fd == it->fd)
-			return it;
-	}
-	return ite;
-}
-
-int find_co_by_fd_pos(__attribute__((unused))std::vector<struct client> all_co, int fd)
-{
-	for(unsigned int i = 0; i < all_co.size(); ++i)
-	{
-		if (fd == all_co[i].fd)
-			return i;
-	}
-	return -1;
-}
 
 void	send_response(__attribute__((unused))struct client co)
 {
 	std::cout << "send response to fd " << co.fd << std::endl;
+	send(co.fd, rep.c_str(), rep.size(), 0);
 }
 
 void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 {
-	unsigned int *server_fd;
-	int size_server_fd = poll_fds.getCount();
-
+	unsigned int *server_fd = list_server_fd(poll_fds);
 	std::vector<struct client>	clients;
-	server_fd = list_server_fd(poll_fds);
+
 	while (true)
 	{
 		int	status = poll_fds.call_to_poll();
@@ -109,10 +81,10 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 			continue;
 		for(int i = 0; i < poll_fds.getCount(); i++)
 		{
-			if ((poll_fds.getFds(i).revents & POLLIN) == 1)
+			if (poll_fds.getFds(i).revents & POLLIN)
 			{
 				// new client requesting the server
-				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, size_server_fd)) != -1)
+				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
 				{
 					struct client cli;
 					cli.fd = accept_new_connection(server_fd[status], &poll_fds);
@@ -128,13 +100,12 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 						continue ;
 					int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
 					clients[pos].rq.appendRaw(buff);
-					std:: cout << "on pos" << pos << " rq print:" << clients[pos].rq.getRaw() << std::endl;
+					std:: cout << "rq:" << clients[pos].rq.getRaw() << std::endl;
 					// function(buff, &poll_fds, i, config);
-					//send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
 				}
 			}
 			// responding
-			else if (clients.size() > 0 && (poll_fds.getFds(i).revents & POLLOUT) == 1) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
+			else if (clients.size() > 0 && poll_fds.getFds(i).revents & POLLOUT) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
 			{
 				send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)]);
 				clients.erase(find_co_by_fd_it(clients, poll_fds.getFds(i).fd));
