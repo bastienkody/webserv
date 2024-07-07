@@ -64,6 +64,8 @@ unsigned int *list_server_fd(Poll poll_fds)
 void	send_response(__attribute__((unused))struct client co)
 {
 	std::cout << "send response to fd " << co.fd << std::endl;
+	co.rq.parse();
+	co.rq.print();
 	send(co.fd, rep.c_str(), rep.size(), 0);
 }
 
@@ -108,6 +110,7 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 			else if (clients.size() > 0 && poll_fds.getFds(i).revents & POLLOUT) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
 			{
 				send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)]);
+				// std::badalloc + core dumped here ; sometimes with curl, always with firefox
 				clients.erase(find_co_by_fd_it(clients, poll_fds.getFds(i).fd));
 			}	
 		}

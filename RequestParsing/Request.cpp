@@ -40,8 +40,8 @@ void	Request::parse()
 {
 	_rql = RequestLine(_raw.substr(0, _raw.find("\r\n")));
 	_raw.erase(0, _raw.find("\r\n") + 2);
-	std::string	hTmp(_raw.substr(0, _raw.find("\n\n") + 1));
-	_raw.erase(0, _raw.find("\n\n") + 2);
+	std::string	hTmp(_raw.substr(0, _raw.find("\n\n")));
+	_raw.erase(0, _raw.find("\n\n"));
 
 	while (hTmp.find('\n') != std::string::npos)
 	{
@@ -53,7 +53,7 @@ void	Request::parse()
 
 		std::string key = line.substr(0, line.find(':'));
 		std::string	value = ParserUtils::trimOWS(line.substr(line.find(':') + 1, line.size() - 1));
-		std::cout << "line=" + line + "|store=" + key + "-->" + value << std::endl;
+		//std::cout << "line=" + line + "|store=" + key + "-->" + value << std::endl;
 		_header.insert(std::pair<std::string, std::string>(key, value));
 	}
 	_body = _raw;
