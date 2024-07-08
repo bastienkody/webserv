@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/08 15:22:54 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:55:43 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,7 @@
 #include <unistd.h>
 #include <vector>
 
-
-
-static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\npipi\n");
+static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 133\nContent-Type: text/html\nConnection: Keep-alive\n\n<html><head><title>Hello World - First CGI Program</title></head><h2>Hello World! This is my first CGI program</h2></body?</html>\n");
 
 unsigned int *list_server_fd(Poll poll_fds)
 {
@@ -36,8 +34,6 @@ unsigned int *list_server_fd(Poll poll_fds)
 	}
 	return (dest);
 }
-
-
 
 void	send_response(__attribute__((unused))struct client co)
 {
@@ -87,7 +83,6 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 					else
 						clients[pos].rq.appendRaw(buff);
 					//std::cout << "rq:" << clients[pos].rq.getRaw() << std::endl;
-					// function(buff, &poll_fds, i, config);
 				}
 			}
 			// responding
@@ -95,6 +90,7 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 			{
 				if (clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].answered == false)
 				{
+					// function(buff, &poll_fds, i, config);
 					send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)]);
 					// std::badalloc + core dumped here ; sometimes with curl, always with firefox
 					clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].answered = true;

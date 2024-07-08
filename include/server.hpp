@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 18:33:19 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:46:24 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,6 @@ Response	exec_rq(Request rq, ConfigFile config);
 Response	exec_rq_error(Request rq, ConfigFile config, int code);
 
 /*utils.cpp*/
-char		**create_av(Request rq);
-char		**create_env(Request rq);
 int			check_file(Request rq, std::string dir, int mode);
 
 
