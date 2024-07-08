@@ -47,15 +47,15 @@ int create_socket_server(const char *port)
 std::string read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
-	char buff[4];
+	char buff[1024];
 	
 	memset(&buff, 0, sizeof(buff));
-	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 3, 0);
+	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 1023, 0);
 	if (nb_bytes < 0)
 		return (perror("recv"), "error recv");
 	else if (nb_bytes == 0)
 		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, "connection closed");
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << std::endl;
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff << std::endl;
 	return (buff);
 }
 

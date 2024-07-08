@@ -43,7 +43,7 @@ RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
 
 
 
-static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nBody\n");
+static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\npipi\n");
 
 unsigned int *list_server_fd(Poll poll_fds)
 {
@@ -76,6 +76,7 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 
 	while (true)
 	{
+		std::cout << clients.size() << std::endl;
 		int	status = poll_fds.call_to_poll();
 		if (status < 0)
 			return (perror("poll"));
@@ -87,11 +88,7 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 			{
 				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
-				{
-					struct client cli;
-					cli.fd = accept_new_connection(server_fd[status], &poll_fds);
-					clients.push_back(cli);
-				}
+					accept_new_connection(server_fd[status], &poll_fds);
 				// data to read from the client request
 				else
 				{
@@ -101,18 +98,31 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 					else if (buff == "connection closed")
 						continue ;
 					int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
-					clients[pos].rq.appendRaw(buff);
-					std:: cout << "rq:" << clients[pos].rq.getRaw() << std::endl;
+					if (pos == -1)
+					{
+						struct client cli;
+						cli.fd = poll_fds.getFds(i).fd;
+						cli.rq.appendRaw(buff);
+						cli.answered = false;
+						clients.push_back(cli);
+					}
+					else
+						clients[pos].rq.appendRaw(buff);
+					//std::cout << "rq:" << clients[pos].rq.getRaw() << std::endl;
 					// function(buff, &poll_fds, i, config);
 				}
 			}
 			// responding
 			else if (clients.size() > 0 && poll_fds.getFds(i).revents & POLLOUT) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
 			{
-				send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)]);
-				// std::badalloc + core dumped here ; sometimes with curl, always with firefox
-				clients.erase(find_co_by_fd_it(clients, poll_fds.getFds(i).fd));
-			}	
+				if (clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].answered == false)
+				{
+					send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)]);
+					// std::badalloc + core dumped here ; sometimes with curl, always with firefox
+					clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].answered = true;
+					clients.erase(find_co_by_fd_it(clients, poll_fds.getFds(i).fd));
+				}
+            }
 		}
 	}
 	free(server_fd);

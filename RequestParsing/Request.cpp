@@ -61,6 +61,7 @@ void	Request::parse()
 
 void	Request::appendRaw(std::string data) 
 {
+	_raw.reserve(_raw.size() + data.size());
 	_raw += data;
 }
 

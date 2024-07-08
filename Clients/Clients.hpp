@@ -8,6 +8,7 @@
 struct client
 {
 	int fd;
+	bool	answered;
 	Request rq;
 	Response rp;
 };
