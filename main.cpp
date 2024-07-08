@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/05 16:18:13 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/08 14:55:57 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ unsigned int *list_server_fd(Poll poll_fds)
 	if (!dest)
 		return (0);
 	for (int i = 0; i < poll_fds.getCount(); i++)
-	{
+	{	
 		dest[i] = poll_fds.getFds(i).fd;
 	}
 	return (dest);
