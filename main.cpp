@@ -87,26 +87,22 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 				std::cout << "pollin:" << poll_fds.getFds(i).fd << std::endl;
 				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
-					accept_new_connection(server_fd[status], &poll_fds);
+				{
+						struct client cli;
+						cli.fd = accept_new_connection(server_fd[status], &poll_fds);
+						clients.push_back(cli);
+				}
 				// data to read from the client request
 				else
 				{
 					std::string buff = read_recv_data(i, &poll_fds);
 					if (buff == "error recv")
-						return ; // faut pas return mais just remove le client de pollfds et de clients (a rassembler avec connection close)
+						return ; // faut pas return mais just remove le client de pollfds et de clients (via deco_client?)
 					else if (buff == "connection closed")
-					{std::cout << "deco" << std::endl; continue;}
+					{std::cout << "deco" << std::endl; continue;} // a rassembler avec error recv en vrai
 					int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
-					if (pos == -1)
-					{
-						struct client cli;
-						cli.fd = poll_fds.getFds(i).fd;
-						cli.rq.appendRaw(buff);
-						clients.push_back(cli);
-					}
-					else
+					if (pos != -1)
 						clients[pos].rq.appendRaw(buff);
-					// function(buff, &poll_fds, i, config);
 				}
 			}
 			// responding

@@ -8,6 +8,7 @@
 struct client
 {
 	int fd;
+	int	serv_sock;
 	Request rq;
 	Response rp;
 };
