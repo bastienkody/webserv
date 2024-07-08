@@ -6,18 +6,22 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/08 14:55:57 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/08 15:22:54 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigFile/ConfigFile.hpp"
 #include "ConfigFile/Server.hpp"
 #include "ConfigFile/Location.hpp"
+#include "Clients/Clients.hpp"
 #include "include/Poll.hpp"
 #include "include/server.hpp"
+#include <unistd.h>
+#include <vector>
 
 
-static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nBody\n");
+
+static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\npipi\n");
 
 unsigned int *list_server_fd(Poll poll_fds)
 {
@@ -33,15 +37,24 @@ unsigned int *list_server_fd(Poll poll_fds)
 	return (dest);
 }
 
-void	launch_server(ConfigFile config, Poll poll_fds)
-{
-	unsigned int *server_fd;
-	int size_server_fd = poll_fds.getCount();
 
-	(void) config;
-	server_fd = list_server_fd(poll_fds);
+
+void	send_response(__attribute__((unused))struct client co)
+{
+	std::cout << "send response to fd " << co.fd << std::endl;
+	co.rq.parse();
+	co.rq.print();
+	send(co.fd, rep.c_str(), rep.size(), 0);
+}
+
+void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
+{
+	unsigned int *server_fd = list_server_fd(poll_fds);
+	std::vector<struct client>	clients;
+
 	while (true)
 	{
+		std::cout << clients.size() << std::endl;
 		int	status = poll_fds.call_to_poll();
 		if (status < 0)
 			return (perror("poll"));
@@ -49,21 +62,45 @@ void	launch_server(ConfigFile config, Poll poll_fds)
 			continue;
 		for(int i = 0; i < poll_fds.getCount(); i++)
 		{
-			if ((poll_fds.getFds(i).revents & POLLIN) != 1) /*revents = event attendu pour la socket et POLLIN = event pour signal entrant*/
-				continue ;
-			if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, size_server_fd)) != -1)
-				accept_new_connection(server_fd[status], &poll_fds); /*si c'est une nouvelle connexion*/
-			else
+			if (poll_fds.getFds(i).revents & POLLIN)
 			{
-				std::string buff;
-				buff = read_recv_data(i, &poll_fds); /*si un client deja co envoie une requete*/
-				if (buff == "error recv")
-					return ; /*leaks pas encore gere*/
-				else if (buff == "connection closed")
-					continue ;
-				// function(buff, &poll_fds, i, config);
-				send(poll_fds.getFds(i).fd, rep.c_str(), rep.size(), 0);
+				// new client requesting the server
+				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
+					accept_new_connection(server_fd[status], &poll_fds);
+				// data to read from the client request
+				else
+				{
+					std::string buff = read_recv_data(i, &poll_fds);
+					if (buff == "error recv")
+						return ; /*leaks pas encore gere*/
+					else if (buff == "connection closed")
+						continue ;
+					int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
+					if (pos == -1)
+					{
+						struct client cli;
+						cli.fd = poll_fds.getFds(i).fd;
+						cli.rq.appendRaw(buff);
+						cli.answered = false;
+						clients.push_back(cli);
+					}
+					else
+						clients[pos].rq.appendRaw(buff);
+					//std::cout << "rq:" << clients[pos].rq.getRaw() << std::endl;
+					// function(buff, &poll_fds, i, config);
+				}
 			}
+			// responding
+			else if (clients.size() > 0 && poll_fds.getFds(i).revents & POLLOUT) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
+			{
+				if (clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].answered == false)
+				{
+					send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)]);
+					// std::badalloc + core dumped here ; sometimes with curl, always with firefox
+					clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].answered = true;
+					clients.erase(find_co_by_fd_it(clients, poll_fds.getFds(i).fd));
+				}
+            }
 		}
 	}
 	free(server_fd);

@@ -16,8 +16,10 @@
 
 #include <iostream>
 #include <sstream>
+#include <ctime>
 #include "../StatusCode/StatusCode.hpp"
 #include "../RequestParsing/Request.hpp"
+#include "../ConfigFile/ConfigFile.hpp"
 
 class Response
 {
@@ -33,8 +35,13 @@ class Response
 		std::string getWholeResponse() const;
 
 		void	setLineState(int code);
-		void	setHeader(Request rq);
+		void	setHeader(Request rq, ConfigFile config);
 		void	setBody(std::string body);
+
+		//	utils header
+		std::string	hcreateTimeStr() const;
+		std::string	hcreateServer() const;
+		std::string	hcreateAllowMethods(ConfigFile config) const;
 
 	private:
 

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Response.hpp"
+#include "./Response.hpp"
 
 //	default
 Response::Response(void) {}
@@ -37,13 +37,13 @@ void	Response::setLineState(int code)
 	_lineState = "HTTP/1.1 " + sstr.str() + " " + sc.getPhrase(code);
 }
 
-void	Response::setHeader(__attribute__((unused))Request rq)
+void	Response::setHeader(__attribute__((unused))Request rq, __attribute__((unused))ConfigFile config)
 {
+	_header += hcreateTimeStr() + "\n"; // date
+	_header += hcreateServer() + "\n"; // server
 	// connection
 	// etag
-	// date
 	// host ?
-	// server name (what if none?)
 	// allow methods (on le et toujours comme ca on est tranquille)
 	// si body (at least get and post, )
 		// content type
@@ -52,3 +52,34 @@ void	Response::setHeader(__attribute__((unused))Request rq)
 
 void	Response::setBody(std::string body)
 {_body = body;}
+
+/*
+	utils header
+*/
+std::string	Response::hcreateTimeStr() const
+{
+	// date: Thu, 04 Jul 2024 12:24:32 GMT
+	std::time_t s_epoch = std::time(0);
+	std::string res("date: ");
+	char	timeSTR[200];
+
+	std::strftime(timeSTR, sizeof(timeSTR), "%a, %d %b %Y %T %Z", std::localtime(&s_epoch));
+	res += timeSTR;
+
+	return res;
+}
+
+std::string	Response::hcreateServer() const
+{
+	return "server: webserv 1.0";
+}
+
+std::string	Response::hcreateAllowMethods(__attribute__((unused))ConfigFile config) const
+{
+	std::string res("allow: ");
+
+	return res;
+
+}
+
+
