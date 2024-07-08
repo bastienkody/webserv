@@ -35,12 +35,13 @@ unsigned int *list_server_fd(Poll poll_fds)
 	return (dest);
 }
 
-void	send_response(__attribute__((unused))struct client co)
+void	deco_client(std::vector<struct client>	&clients, Poll *poll_fds, int i)
 {
-	std::cout << "send response to fd " << co.fd << std::endl;
-	co.rq.parse();
-	co.rq.print();
-	send(co.fd, rep.c_str(), rep.size(), 0);
+	close(poll_fds->getFds(i).fd);
+	std::vector<struct client>::iterator it = find_co_by_fd_it(clients, poll_fds->getFds(i).fd);
+	if (it != clients.end())
+		clients.erase(it);
+	poll_fds->remove_to_poll(i);
 }
 
 void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
@@ -50,7 +51,6 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 
 	while (true)
 	{
-		std::cout << clients.size() << std::endl;
 		int	status = poll_fds.call_to_poll();
 		if (status < 0)
 			return (perror("poll"));
@@ -60,43 +60,33 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 		{
 			if (poll_fds.getFds(i).revents & POLLIN)
 			{
+				std::cout << "pollin:" << poll_fds.getFds(i).fd << std::endl;
 				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
-					accept_new_connection(server_fd[status], &poll_fds);
+				{
+						struct client cli;
+						cli.fd = accept_new_connection(server_fd[status], &poll_fds);
+						clients.push_back(cli);
+				}
 				// data to read from the client request
 				else
 				{
 					std::string buff = read_recv_data(i, &poll_fds);
 					if (buff == "error recv")
-						return ; /*leaks pas encore gere*/
+						return ; // faut pas return mais just remove le client de pollfds et de clients (via deco_client?)
 					else if (buff == "connection closed")
-						continue ;
+					{std::cout << "deco" << std::endl; continue;} // a rassembler avec error recv en vrai
 					int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
-					if (pos == -1)
-					{
-						struct client cli;
-						cli.fd = poll_fds.getFds(i).fd;
-						cli.rq.appendRaw(buff);
-						cli.answered = false;
-						clients.push_back(cli);
-					}
-					else
+					if (pos != -1)
 						clients[pos].rq.appendRaw(buff);
-					//std::cout << "rq:" << clients[pos].rq.getRaw() << std::endl;
 				}
 			}
 			// responding
 			else if (clients.size() > 0 && poll_fds.getFds(i).revents & POLLOUT) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
 			{
-				if (clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].answered == false)
-				{
-					// function(buff, &poll_fds, i, config);
-					send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)]);
-					// std::badalloc + core dumped here ; sometimes with curl, always with firefox
-					clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].answered = true;
-					clients.erase(find_co_by_fd_it(clients, poll_fds.getFds(i).fd));
-				}
-            }
+				send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)], config);
+				deco_client(clients, &poll_fds, i);
+			}
 		}
 	}
 	free(server_fd);

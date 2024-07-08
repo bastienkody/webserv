@@ -12,6 +12,9 @@
 
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/server.hpp"
+#include "../Clients/Clients.hpp"
+
+static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\npipi\n");
 
 int create_socket_server(const char *port)
 {
@@ -51,13 +54,26 @@ std::string read_recv_data(int i, Poll *poll_fds)
 	
 	memset(&buff, 0, sizeof(buff));
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 1023, 0);
+	// si nb_bytes == 0 ou < 0 => virer le client sans lui repondre
 	if (nb_bytes < 0)
 		return (perror("recv"), "error recv");
 	else if (nb_bytes == 0)
 		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, "connection closed");
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff << std::endl;
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << std::endl;
 	return (buff);
 }
+
+void	send_response(__attribute__((unused))struct client &co, __attribute__((unused))ConfigFile config)
+{
+	std::cout << "send response to fd " << co.fd << std::endl;
+	co.rq.parse();
+	co.rq.print();
+
+
+	
+	send(co.fd, rep.c_str(), rep.size(), 0);// si erreur de send => virer le client sans re essayer de lui repondre.
+}
+
 
 int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, ConfigFile config)
 {

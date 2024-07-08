@@ -8,7 +8,7 @@
 struct client
 {
 	int fd;
-	bool	answered;
+	int	serv_sock;
 	Request rq;
 	Response rp;
 };
