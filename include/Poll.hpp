@@ -26,6 +26,7 @@ class	Poll
 		struct pollfd	getFds(int i) ;
 		int				getCount(void) const;
 		void			setFds(int i, int new_fd, short event);
+		void			setEvent(int i, short event);
 		void			setCount(int count);
 		void			add_to_poll(int new_fd); // throw
 		void			remove_to_poll(int i);

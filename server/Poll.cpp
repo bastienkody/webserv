@@ -25,7 +25,7 @@ void	Poll::add_to_poll(int new_fd)
 	if (this->_count >= 256) // 255 nan vu qu'on commence a 0 ?? renommer en index vs count ??
 		throw std::out_of_range("Error: Not enough space in poll_fds");
 	_fds[_count].fd = new_fd;
-	_fds[_count].events = POLLOUT | POLLIN;
+	_fds[_count].events = POLLIN;
 	this->_count += 1;
 }
 
@@ -56,6 +56,11 @@ void	Poll::setFds(int i, int new_fd, short event)
 	this->_fds[i].fd = new_fd;
 	this->_fds[i].fd = event;
 	_count++;
+}
+
+void	Poll::setEvent(int i, short event)
+{
+	this->_fds[i].events = event;
 }
 
 void	Poll::setCount(int count)
