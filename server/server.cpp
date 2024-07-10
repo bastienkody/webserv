@@ -83,8 +83,6 @@ int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, Con
 	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(rq)) != 0)
 		return (exec_rq_error(rq, config, code), 0);
-[Server] New connexion with client fd : 7
-send response to fd 7
 	//If post method, check if chunked (getMaxbodysize to be corrected)
 	if (rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(rq, config.getMaxBodySize())) != 1)
 	{
