@@ -59,12 +59,17 @@ unsigned int *list_server_fd(Poll poll_fds)
 	return (dest);
 }
 
-void	deco_client(std::vector<struct client>	&clients, Poll *poll_fds, int i)
+void	deco_client(__attribute__((unused))std::vector<struct client>	&clients, Poll *poll_fds, int i)
 {
+	std::cout << "deco client poll_fds(i).fd:" << poll_fds->getFds(i).fd << std::endl;
+	int offset = find_co_by_fd_pos(clients, poll_fds->getFds(i).fd);
+	if (offset > -1)
+	{
+		//std::cout << "deco client clients.fd:" << *clients[offset].fd << std::endl;
+		clients.erase(clients.begin() + offset);
+	}
+	
 	close(poll_fds->getFds(i).fd);
-	std::vector<struct client>::iterator it = find_co_by_fd_it(clients, poll_fds->getFds(i).fd);
-	if (it != clients.end())
-		clients.erase(it);
 	poll_fds->remove_to_poll(i);
 }
 
@@ -91,8 +96,10 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 						struct client cli;
 						cli.fd = accept_new_connection(server_fd[status], &poll_fds);
 						clients.push_back(cli);
+						std::cout << "pollfds size:" << poll_fds.getCount() << std::endl;
 				}
 				// data to read from the client request
+				// on ne passe plus ici a partir de la 2eme requete arghhh je comprend pas
 				else
 				{
 					std::string buff = read_recv_data(i, &poll_fds);
@@ -102,14 +109,24 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 					{std::cout << "deco" << std::endl; continue;} // a rassembler avec error recv en vrai
 					int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
 					if (pos != -1)
-						clients[pos].rq.appendRaw(buff);
+					{
+						clients[pos].rq.appendRaw(buff); 
+						std::cout << "buff added to rq:" + buff << std::endl;
+					}
 				}
 			}
 			// responding
 			else if (clients.size() > 0 && poll_fds.getFds(i).revents & POLLOUT) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
 			{
-				send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)], config);
+				int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
+				if (pos < 0)
+					std::cout << "pos < 0, no rm clients" << std::endl;
+				else
+					std::cout << "client fd:" << clients[pos].fd << std::endl;
+
+				send_response(clients[pos], config);
 				deco_client(clients, &poll_fds, i);
+				std::cout << "clients.size():" << clients.size() << std::endl;
 			}
 		}
 	}

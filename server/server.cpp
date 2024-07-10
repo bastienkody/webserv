@@ -63,7 +63,7 @@ std::string read_recv_data(int i, Poll *poll_fds)
 	return (buff);
 }
 
-void	send_response(__attribute__((unused))struct client &co, __attribute__((unused))ConfigFile config)
+void	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 {
 	std::cout << "send response to fd " << co.fd << std::endl;
 	co.rq.parse();
