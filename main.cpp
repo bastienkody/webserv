@@ -82,6 +82,7 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 			return (perror("poll"));
 		else if (status == 0)
 			continue;
+		std::cout << "status:" << status << " fds nb:" << poll_fds.getCount() << std::endl;
 		for(int i = 0; i < poll_fds.getCount(); i++)
 		{
 			if (poll_fds.getFds(i).revents & POLLIN)
@@ -116,6 +117,7 @@ void	launch_server(__attribute__((unused))ConfigFile config, Poll poll_fds)
 			// responding
 			else if (clients.size() > 0 && poll_fds.getFds(i).revents & POLLOUT) // pe direct checker de quelle connection on parle? avec un iterator (pour erase)
 			{
+				std::cout << "pollout on fd" << poll_fds.getFds(i).fd << std::endl;
 				int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
 				if (pos < 0)
 					std::cout << "pos < 0, no rm clients" << std::endl;

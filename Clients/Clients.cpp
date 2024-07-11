@@ -1,5 +1,6 @@
 #include "Clients.hpp"
 
+// bad function bc it is stacked allocated
 std::vector<struct client>::iterator find_co_by_fd_it(std::vector<struct client> all_co, int fd)
 {
 	std::vector<struct client>::iterator it = all_co.begin();
