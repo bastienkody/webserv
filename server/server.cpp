@@ -63,7 +63,7 @@ std::string read_recv_data(int i, Poll *poll_fds)
 	return (buff);
 }
 
-void	send_response(struct client &co, __attribute__((unused))ConfigFile config)
+int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 {
 	std::cout << "send response to fd " << co.fd << std::endl;
 	co.rq.parse();
@@ -71,7 +71,7 @@ void	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 
 
 	
-	send(co.fd, rep.c_str(), rep.size(), 0);// si erreur de send => virer le client sans re essayer de lui repondre.
+	return send(co.fd, rep.c_str(), rep.size(), 0);// si erreur de send => virer le client sans re essayer de lui repondre.
 }
 
 

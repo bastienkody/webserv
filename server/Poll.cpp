@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "../include/Poll.hpp"
+#include <cstring>
+#include <sys/poll.h>
 
 Poll::Poll(void)
 {
@@ -32,6 +34,7 @@ void	Poll::add_to_poll(int new_fd)
 void	Poll::remove_to_poll(int i)
 {
 	_fds[i] = _fds[_count - 1]; // count commence pas a 0? // si mais mon dernier fd est a l'index count - 1
+	memset(&_fds[i], 0, sizeof(struct pollfd));
 	_count--;
 }
 
