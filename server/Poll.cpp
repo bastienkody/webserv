@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/24 15:04:51 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/30 16:18:57 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/10 18:01:09 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	Poll::add_to_poll(int new_fd)
 
 void	Poll::remove_to_poll(int i)
 {
-	_fds[i] = _fds[_count - 1]; // count commence pas a 0? // si mais mon dernier fd est a l'index count - 1
+	_fds[i] = _fds[_count - 1];
 	_count--;
 }
 
