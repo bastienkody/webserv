@@ -21,9 +21,12 @@ class ConfigFile
 		ConfigFile & operator=(const ConfigFile & rhs);
 	//	printer
 		void	printAll() const;
-	//	getetrs
+	//	getters
 		std::string const & getRawData() const;
 		std::vector<Server> const & getServers() const;
+		int getServerFromFd(int fd);
+	// setter
+		void	setServerFd(int fd, int server_nb);
 	//	getters for children
 		std::string const & getRoot() const;
 		std::string const & getIndex() const;
@@ -52,6 +55,7 @@ class ConfigFile
 		std::string			_filename;
 		std::string			_rawData;
 		std::vector<Server>	_servers;
+		std::map<int, int>	_fd_to_server_nb;
 	protected:
 		std::string	_root;
 		std::string	_index;

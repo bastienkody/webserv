@@ -145,7 +145,7 @@ int main(int ac, char **av)
 			return 1;
 		try {
 			poll_fds.add_to_poll(fd);
-			// add server.fd to config.server for further identification of the server from the client request parsing
+			config.setServerFd(fd, i); // for clients to be linked to a their own server (ie maxbodysize on that specific server)
 		}
 		catch (const std::exception &e) {
 			return std::cerr << e.what() << std::endl, 1;
