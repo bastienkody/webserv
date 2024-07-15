@@ -6,11 +6,13 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/24 15:04:51 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/10 18:01:09 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/15 13:43:47 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Poll.hpp"
+#include <cstring>
+#include <sys/poll.h>
 
 Poll::Poll(void)
 {
@@ -25,13 +27,14 @@ void	Poll::add_to_poll(int new_fd)
 	if (this->_count >= 256) // 255 nan vu qu'on commence a 0 ?? renommer en index vs count ??
 		throw std::out_of_range("Error: Not enough space in poll_fds");
 	_fds[_count].fd = new_fd;
-	_fds[_count].events = POLLOUT | POLLIN;
+	_fds[_count].events = POLLIN;
 	this->_count += 1;
 }
 
 void	Poll::remove_to_poll(int i)
 {
-	_fds[i] = _fds[_count - 1];
+	_fds[i] = _fds[_count - 1]; // count commence pas a 0? // si mais mon dernier fd est a l'index count - 1
+	memset(&_fds[i], 0, sizeof(struct pollfd));
 	_count--;
 }
 
@@ -56,6 +59,11 @@ void	Poll::setFds(int i, int new_fd, short event)
 	this->_fds[i].fd = new_fd;
 	this->_fds[i].fd = event;
 	_count++;
+}
+
+void	Poll::setEvent(int i, short event)
+{
+	this->_fds[i].events = event;
 }
 
 void	Poll::setCount(int count)

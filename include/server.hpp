@@ -36,7 +36,7 @@
 int 	create_socket_server(const char *port);
 std::string	read_recv_data(int i, Poll *poll_fds);
 int		function(std::string buff, Poll *poll_fds, int i, ConfigFile config);
-void	send_response(__attribute__((unused))struct client &co, __attribute__((unused))ConfigFile config);
+int	send_response(struct client &co, __attribute__((unused))ConfigFile config);
 int	accept_new_connection(int server_fd, Poll *poll_fds);
 int		check_serv_socket(int fd, unsigned int *serv_fds, int size);
 

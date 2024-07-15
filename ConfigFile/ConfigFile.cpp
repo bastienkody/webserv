@@ -79,6 +79,12 @@ void	ConfigFile::readAllInfos()
 //	Config specific getters
 std::string const & ConfigFile::getRawData() const {return (_rawData);}
 std::vector<Server> const & ConfigFile::getServers() const {return (_servers);}
+int	ConfigFile::getServerFromFd(int fd) {return (_fd_to_server_nb[fd]);}
+//	Config specific setter
+void	ConfigFile::setServerFd(int fd, int server_nb)
+{
+	_fd_to_server_nb[fd] = server_nb;
+}
 
 //	Getters for children
 std::string const & ConfigFile::getRoot() const {return _root;}
