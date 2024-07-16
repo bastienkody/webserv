@@ -59,23 +59,40 @@ std::string read_recv_data(int i, Poll *poll_fds)
 		return (perror("recv"), "error recv");
 	else if (nb_bytes == 0)
 		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, "connection closed");
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << std::endl;
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff  << std::endl;
 	return (buff);
 }
 
 int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 {
-	std::cout << "send response to fd " << co.fd << std::endl;
+	int	code;
+
+	//std::cout << "RAW:" << co.rq.getRaw() << std::endl;
 	co.rq.parse();
-	co.rq.print();
+	co.rq.print(); 
+
+	//First check syntax, verb, version, host header present and headerfield syntax
+	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)
+		std::cout << "check basics error" << std::endl; //return (exec_rq_error(co.rq, config, code), 0);
+	//If post method, check if chunked (getMaxbodysize to be corrected)
+	if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, "")) != 1) // config.getMaxBodySize()))
+	{
+		if (code == 413 || code == 0) // maybe 0 must become a 400 
+			std::cout << "header post error" << std::endl; //return (exec_rq_error(rq, config, code), 0);
+		if (code == 2)
+			std::cout << "post rq chunk to be treated" << std::endl;//co.rq.unchunk(co.fd);
+	}
+
+	
 
 
 	
+	std::cout << "send response to fd " << co.fd << std::endl;
 	return send(co.fd, rep.c_str(), rep.size(), 0);// si erreur de send => virer le client sans re essayer de lui repondre.
 }
 
 
-int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, ConfigFile config)
+int	function(__attribute__((unused))std::string buff, __attribute__((unused))Poll *poll_fds, __attribute__((unused))int i, ConfigFile config)
 {
 	Request rq;
 	int	code;
@@ -88,8 +105,7 @@ int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, Con
 	{
 		if (code == 413 || code == 0) // maybe 0 must become a 400 
 			return (exec_rq_error(rq, config, code), 0);
-		if (code == 2)
-			rq.unchunk(poll_fds->getFds(i).fd);
+		//if (code == 2)
 	}
 	exec_rq(rq, config);
 	std::cout << "in function after rq" << std::endl;

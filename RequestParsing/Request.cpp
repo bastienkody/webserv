@@ -40,8 +40,8 @@ void	Request::parse()
 {
 	_rql = RequestLine(_raw.substr(0, _raw.find("\r\n")));
 	_raw.erase(0, _raw.find("\r\n") + 2);
-	std::string	hTmp(_raw.substr(0, _raw.find("\n\n")));
-	_raw.erase(0, _raw.find("\n\n"));
+	std::string	hTmp(_raw.substr(0, _raw.find("\r\n\r\n")));
+	_raw.erase(0, _raw.find("\r\n\r\n") + 4);
 
 	while (hTmp.find('\n') != std::string::npos)
 	{
@@ -62,23 +62,14 @@ void	Request::parse()
 void	Request::appendRaw(std::string data) 
 {
 	//_raw.reserve(_raw.size() + data.size());
+	// chumk must be parsed specifically
 	_raw += data;
 }
 
- // normalement pas besoin ?
-void	Request::unchunk(int fd)
+ // 
+void	Request::unchunkBody()
 {
-	char		buf[1024];
-	std::string	firstline, chunk;
+	
 
-	memset(buf, 0, 1024);
-	while(firstline.compare("0"))
-	{
-		if (recv(fd, &buf, 1023, 0) < 0)
-			throw std::runtime_error("recv error while unchunking");
-		chunk = buf;
-		firstline = chunk.substr(0, chunk.find("\r\n"));
-		_body += chunk.substr(chunk.find("\r\n"), chunk.size() - 1);
-	}
 	
 }

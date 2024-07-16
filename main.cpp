@@ -76,7 +76,6 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			return (perror("poll"));
 		else if (status == 0)
 			continue;
-		std::cout << "status:" << status << " fds nb:" << poll_fds.getCount() << std::endl;
 		for (int i = 0; i < poll_fds.getCount(); i++)
 		{
 			if (poll_fds.getFds(i).revents & POLLIN)
