@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 18:54:42 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/16 17:31:24 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,26 +75,26 @@ int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 }
 
 
-int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, ConfigFile config)
-{
-	Request rq;
-	int	code;
+// int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, ConfigFile config)
+// {
+// 	Request rq;
+// 	int	code;
 
-	//First check syntax, verb, version, host header present and headerfield syntax
-	if ((code = RequestChecking::CheckBasics(rq)) != 0)
-		return (exec_rq_error(rq, config, code), 0);
-	//If post method, check if chunked (getMaxbodysize to be corrected)
-	if (rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(rq, config.getMaxBodySize())) != 1)
-	{
-		if (code == 413 || code == 0) // maybe 0 must become a 400 
-			return (exec_rq_error(rq, config, code), 0);
-		if (code == 2)
-			rq.unchunk(poll_fds->getFds(i).fd);
-	}
-	exec_rq(rq, config);
-	std::cout << "in function after rq" << std::endl;
-	return (0);
-}
+// 	//First check syntax, verb, version, host header present and headerfield syntax
+// 	if ((code = RequestChecking::CheckBasics(rq)) != 0)
+// 		return (exec_rq_error(rq, config, code), 0);
+// 	//If post method, check if chunked (getMaxbodysize to be corrected)
+// 	if (rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(rq, config.getMaxBodySize())) != 1)
+// 	{
+// 		if (code == 413 || code == 0) // maybe 0 must become a 400 
+// 			return (exec_rq_error(rq, config, code), 0);
+// 		if (code == 2)
+// 			rq.unchunk(poll_fds->getFds(i).fd);
+// 	}
+// 	exec_rq(rq, config);
+// 	std::cout << "in function after rq" << std::endl;
+// 	return (0);
+// }
 
 /*	attention a exit !! ca free bien? ca pose peut poser pb pour co. pe passer par des exceptions?	*/
 int	accept_new_connection(int server_fd, Poll *poll_fds)

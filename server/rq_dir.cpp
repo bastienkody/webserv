@@ -6,7 +6,14 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/06/14 23:03:21 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/16 17:26:25 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../include/server.hpp"
+
+void	rq_dir(Response *rp, Request rq)
+{
+	(void) rp;
+	(void) rq;
+}
