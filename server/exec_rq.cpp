@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/16 17:24:52 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/16 19:20:19 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,35 +18,20 @@
 
 /*ajouter Location obj pour check methods allows*/
 
-int	check_cgi_ext(std::string path, Server serv)
+int	check_cgi_ext(Server serv, int index_location)
 {
 	std::string ext;
 
-	for (size_t i = 0; i < path.size(); i++)
+	ext = path.rfind('.');
+	for (size_t i = 0; i < serv.getLocations()[index_location].getCgiExt().size(); i++)
 	{
-		if (path[i] == '.')
-			ext = &path[i];
+		if (ext == serv.getLocations()[i].getCgiExt()[i])
+			return (1);
 	}
-	for (size_t i = 0; i < serv.getLocations().size(); i++)
+	for (size_t i = 0; i < serv.getCgiExt().size(); i++)
 	{
-		if (path == serv.getLocations()[i].getPath())
-		{
-			for (size_t y = 0; y < serv.getLocations()[i].getCgiExt().size(); y++)
-			{
-				if (ext == serv.getLocations()[i].getCgiExt()[y])
-					return (1);
-			}
-			return (0);
-		}
-		else
-		{
-			for (size_t y = 0; y < serv.getCgiExt().size(); y++)
-			{
-				if (ext == serv.getCgiExt()[y])
-					return (1);
-			}
-			return (0);
-		}
+		if (ext == serv.getCgiExt()[i])
+			return (1);
 	}
 	return (0);
 }
@@ -54,13 +39,14 @@ int	check_cgi_ext(std::string path, Server serv)
 Response	exec_rq(Request rq, ConfigFile config, int index_serv)
 {
 	Response rp;
-	std::string path = config.getServers()[index_serv].getLocations()[find_location(rq.getRql().getUrl().getPath(), config.getServers()[index_serv])].getPath();
+	int index_location = find_location(rq.getRql().getUrl().getPath(), config.getServers()[index_serv]);
+	std::string path = config.getServers()[index_serv].getLocations()[index_location].getPath();
 
 	try{
-		if (check_cgi_ext(path, config.getServers()[index_serv]) == 1)
+		if (check_cgi_ext(config.getServers()[index_serv], index_location) == 1)
 				CGI cgi(&rp, rq);
 		else if (path[path.size() - 1] == '/')
-			rq_dir(&rp, rq);
+			rq_dir(&rp, rq, path, config.getServers()[index_serv], index_location);
 		else
 			rq_html(&rp, rq);
 	}

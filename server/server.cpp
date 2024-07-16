@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/16 17:31:24 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/16 17:38:02 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 	
 	return send(co.fd, rep.c_str(), rep.size(), 0);// si erreur de send => virer le client sans re essayer de lui repondre.
 }
-
 
 // int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, ConfigFile config)
 // {
