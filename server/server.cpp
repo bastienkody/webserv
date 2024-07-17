@@ -66,8 +66,9 @@ std::string read_recv_data(int i, Poll *poll_fds)
 int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 {
 	int	code;
+	int serv_nb = config.getServerFromFd(co.server_fd);
 
-	//std::cout << "RAW:" << co.rq.getRaw() << std::endl;
+	(void)serv_nb;
 	co.rq.parse();
 	co.rq.print(); 
 
@@ -92,7 +93,7 @@ int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 }
 
 
-int	function(__attribute__((unused))std::string buff, __attribute__((unused))Poll *poll_fds, __attribute__((unused))int i, ConfigFile config)
+/*int	function(__attribute__((unused))std::string buff, __attribute__((unused))Poll *poll_fds, __attribute__((unused))int i, ConfigFile config)
 {
 	Request rq;
 	int	code;
@@ -110,7 +111,7 @@ int	function(__attribute__((unused))std::string buff, __attribute__((unused))Pol
 	exec_rq(rq, config);
 	std::cout << "in function after rq" << std::endl;
 	return (0);
-}
+}*/
 
 /*	attention a exit !! ca free bien? ca pose peut poser pb pour co. pe passer par des exceptions?	*/
 int	accept_new_connection(int server_fd, Poll *poll_fds)

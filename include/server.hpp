@@ -50,7 +50,7 @@ void	rq_dir(Response *rp, Request rq, std::string path, Server serv, int index_l
 
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);
-Response	exec_rq(Request rq, ConfigFile config);
+Response	exec_rq(Request rq, ConfigFile config, int index_serv);
 Response	exec_rq_error(Request rq, ConfigFile config, int code);
 
 /*utils.cpp*/

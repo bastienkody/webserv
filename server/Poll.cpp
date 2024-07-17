@@ -24,7 +24,7 @@ Poll::~Poll(void)
 
 void	Poll::add_to_poll(int new_fd)
 {
-	if (this->_count >= 256) // 255 nan vu qu'on commence a 0 ?? renommer en index vs count ??
+	if (this->_count >= 256) 
 		throw std::out_of_range("Error: Not enough space in poll_fds");
 	_fds[_count].fd = new_fd;
 	_fds[_count].events = POLLIN;
@@ -33,8 +33,13 @@ void	Poll::add_to_poll(int new_fd)
 
 void	Poll::remove_to_poll(int i)
 {
-	_fds[i] = _fds[_count - 1]; // count commence pas a 0? // si mais mon dernier fd est a l'index count - 1
-	memset(&_fds[i], 0, sizeof(struct pollfd));
+	if (_count > 1)
+	{
+		_fds[i] = _fds[_count - 1];
+		memset(&_fds[_count - 1], 0, sizeof(struct pollfd));
+	}
+	else
+		memset(&_fds[i], 0, sizeof(struct pollfd));
 	_count--;
 }
 
