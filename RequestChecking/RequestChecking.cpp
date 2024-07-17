@@ -39,13 +39,13 @@ int	RequestChecking::CheckHeaderKey(const Request & rq)
 int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max_body_size)
 {
 	bool		content_lenght = false;
-	std::string	lenght = 0;
+	std::string	lenght = "0";
 	std::multimap<std::string, std::string>::const_iterator it = rq.getHeader().begin();
 	std::multimap<std::string, std::string>::const_iterator ite = rq.getHeader().end();
 
 	for (; it!=ite; ++it)
 	{
-		if (it->first.compare("Transfer-Encoding") && it->second.find("chunked") != std::string::npos)
+		if (it->first.compare("Transfer-Encoding") == 0 && it->second.find("chunked") != std::string::npos)
 			return 2;
 		if (it->first.compare("Content-Length"))
 		{
@@ -57,6 +57,8 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 	if (content_lenght == false)
 		return 0;
 
+	if (max_body_size.size() == 0)
+		return 1;
 	std::stringstream	str(max_body_size), str2(lenght);
 	unsigned int		i, j;
 	str >> i;

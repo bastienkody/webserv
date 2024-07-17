@@ -54,46 +54,70 @@ std::string read_recv_data(int i, Poll *poll_fds)
 	
 	memset(&buff, 0, sizeof(buff));
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 1023, 0);
-	// si nb_bytes == 0 ou < 0 => virer le client sans lui repondre
+	// si nb_bytes == 0 (deco) ou < 0 (error recv) => virer le client sans lui repondre
 	if (nb_bytes < 0)
-		return (perror("recv"), "error recv");
+	{
+		perror("recv");
+		throw std::runtime_error("error recv");
+	}
 	else if (nb_bytes == 0)
-		return (poll_fds->remove_to_poll(i), std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl, "connection closed");
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << std::endl;
+	{
+		std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl;
+		throw std::runtime_error("connection closed");
+	}
+	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff  << std::endl;
 	return (buff);
 }
 
 int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 {
-	std::cout << "send response to fd " << co.fd << std::endl;
+	int	code;
+	int serv_nb = config.getServerFromFd(co.server_fd);
+
+	(void)serv_nb;
 	co.rq.parse();
-	co.rq.print();
+	//co.rq.print();
+
+	//First check syntax, verb, version, host header present and headerfield syntax
+	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)
+		std::cout << "check basics error" << std::endl; //return (exec_rq_error(co.rq, config, code), 0);
+	//If post method, check if chunked (getMaxbodysize to be corrected)
+	if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, "")) != 1) // config.getMaxBodySize()))
+	{
+		if (code == 413 || code == 0) // maybe 0 must become a 400 
+			std::cout << "header post error" << std::endl; //return (exec_rq_error(rq, config, code), 0);
+		if (code == 2)
+			std::cout << "post rq chunk to be treated" << std::endl;//co.rq.unchunk(co.fd);
+	}
+
+	
 
 
 	
-	return send(co.fd, rep.c_str(), rep.size(), 0);// si erreur de send => virer le client sans re essayer de lui repondre.
+	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
+	return send(co.fd, rep.c_str(), rep.size(), 0) < 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
 
-// int	function(__attribute__((unused))std::string buff, Poll *poll_fds, int i, ConfigFile config)
-// {
-// 	Request rq;
-// 	int	code;
 
-// 	//First check syntax, verb, version, host header present and headerfield syntax
-// 	if ((code = RequestChecking::CheckBasics(rq)) != 0)
-// 		return (exec_rq_error(rq, config, code), 0);
-// 	//If post method, check if chunked (getMaxbodysize to be corrected)
-// 	if (rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(rq, config.getMaxBodySize())) != 1)
-// 	{
-// 		if (code == 413 || code == 0) // maybe 0 must become a 400 
-// 			return (exec_rq_error(rq, config, code), 0);
-// 		if (code == 2)
-// 			rq.unchunk(poll_fds->getFds(i).fd);
-// 	}
-// 	exec_rq(rq, config);
-// 	std::cout << "in function after rq" << std::endl;
-// 	return (0);
-// }
+/*int	function(__attribute__((unused))std::string buff, __attribute__((unused))Poll *poll_fds, __attribute__((unused))int i, ConfigFile config)
+{
+	Request rq;
+	int	code;
+
+	//First check syntax, verb, version, host header present and headerfield syntax
+	if ((code = RequestChecking::CheckBasics(rq)) != 0)
+		return (exec_rq_error(rq, config, code), 0);
+	//If post method, check if chunked (getMaxbodysize to be corrected)
+	if (rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(rq, config.getMaxBodySize())) != 1)
+	{
+		if (code == 413 || code == 0) // maybe 0 must become a 400 
+			return (exec_rq_error(rq, config, code), 0);
+		//if (code == 2)
+	}
+	exec_rq(rq, config);
+	std::cout << "in function after rq" << std::endl;
+	return (0);
+}*/
 
 /*	attention a exit !! ca free bien? ca pose peut poser pb pour co. pe passer par des exceptions?	*/
 int	accept_new_connection(int server_fd, Poll *poll_fds)

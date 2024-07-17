@@ -68,6 +68,8 @@ void launch_server(ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd = list_server_fd(poll_fds);
 	std::vector<struct client> clients;
+	std::string buff;
+	int	pos;
 
 	while (true)
 	{
@@ -76,7 +78,6 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			return (perror("poll"));
 		else if (status == 0)
 			continue;
-		std::cout << "status:" << status << " fds nb:" << poll_fds.getCount() << std::endl;
 		for (int i = 0; i < poll_fds.getCount(); i++)
 		{
 			if (poll_fds.getFds(i).revents & POLLIN)
@@ -87,27 +88,31 @@ void launch_server(ConfigFile config, Poll poll_fds)
 					struct client cli;
 					cli.fd = accept_new_connection(server_fd[status], &poll_fds);
 					cli.server_fd = poll_fds.getFds(i).fd;
+					cli.await_response = false;
 					clients.push_back(cli);
 				}
 				// data to read from the client request
 				else
 				{
-					std::string buff = read_recv_data(i, &poll_fds);
-					if (buff == "error recv")
-						return; // faut pas return mais just remove le client de pollfds et de clients (via deco_client?)
-					else if (buff == "connection closed") 
-						{std::cout << "deco" << std::endl; continue;} // a rassembler avec error recv en vrai
-					int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
-					if (pos != -1)
+					try {
+						buff = read_recv_data(i, &poll_fds);
+						if ((pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)) == -1) 
+							std::cout << "pos == -1 in pollin read recv" << std::endl; // should never happen, to be removed later
 						clients[pos].rq.appendRaw(buff);
-					poll_fds.setEvent(i, POLLIN | POLLOUT);
+						clients[pos].await_response = true;
+					}
+					catch (const std::exception & e) {
+						deco_client(clients, &poll_fds, i);
+					}
 				}
 			}
 			// responding
-			else if (clients.size() > 0 && poll_fds.getFds(i).revents & POLLOUT)
+			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].await_response == true)
 			{
-				send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)], config);
-				deco_client(clients, &poll_fds, i);
+				if (send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)], config) < 0)
+					deco_client(clients, &poll_fds, i); // pb de read/write --> deco client
+				else
+					clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].await_response = false;
 			}
 		}
 	}

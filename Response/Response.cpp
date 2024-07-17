@@ -24,7 +24,7 @@ std::string const & Response::getBody(void) const {return (_body);}
 std::string Response::getWholeResponse(void) const
 {
 	// attention si final \n in header ajouter que un seul ici avant body
-	return _lineState + "\r\n" + _header + "\n\n" + _body; 
+	return _lineState + "\r\n" + _header + "\r\n\r\n" + _body; 
 }
 
 //	setters

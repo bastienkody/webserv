@@ -31,7 +31,7 @@ class Request
 
 		void	parse();
 		void	appendRaw(std::string data);
-		void	unchunk(int fd);
+		void	unchunkBody();
 		void	print() const;
 
 	private:
