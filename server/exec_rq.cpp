@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/16 19:20:19 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/17 15:10:24 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 /*ajouter Location obj pour check methods allows*/
 
-int	check_cgi_ext(Server serv, int index_location)
+int	check_cgi_ext(Server serv, std::string path, int index_location)
 {
 	std::string ext;
 
@@ -43,7 +43,7 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv)
 	std::string path = config.getServers()[index_serv].getLocations()[index_location].getPath();
 
 	try{
-		if (check_cgi_ext(config.getServers()[index_serv], index_location) == 1)
+		if (check_cgi_ext(config.getServers()[index_serv], path, index_location) == 1)
 				CGI cgi(&rp, rq);
 		else if (path[path.size() - 1] == '/')
 			rq_dir(&rp, rq, path, config.getServers()[index_serv], index_location);
