@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/16 18:15:16 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/17 15:10:58 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	delete_html(Response *rp, Request rq);
 void	rq_html(Response *rp, Request rq);
 
 /*rq_dir.cpp*/
-void	rq_dir(Response *rp, Request rq, std::string path);
+void	rq_dir(Response *rp, Request rq, std::string path, Server serv, int index_location);
 
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);
