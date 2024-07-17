@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/16 17:29:31 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/17 19:06:26 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,3 +51,12 @@ int find_location(std::string path, Server serv)
 	}
 	return (index);
 }
+
+/*template ?*/
+// void	find_data(Server serv, void *data, std::string to_find)
+// {
+// 	for (size_t i = 0; i < serv.getLocations().size(); i++)
+// 	{
+// 		if ()
+// 	}
+// }

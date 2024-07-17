@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/17 15:10:58 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/17 15:31:52 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	rq_dir(Response *rp, Request rq, std::string path, Server serv, int index_l
 
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);
-Response	exec_rq(Request rq, ConfigFile config);
+Response	exec_rq(Request rq, ConfigFile config, int index_serv);
 Response	exec_rq_error(Request rq, ConfigFile config, int code);
 
 /*utils.cpp*/
