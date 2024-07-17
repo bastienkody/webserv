@@ -6,43 +6,16 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 15:24:06 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/16 17:29:31 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../RequestParsing/Request.hpp"
 #include "../include/server.hpp"
+#include "../ConfigFile/Server.hpp"
 
 
 /*creer check dir -> return 0 si pas un dir*/
-
-char	**create_av(Request rq)
-{
-	char **av;
-
-	av = (char **) malloc(sizeof(char *) * 2);
-	if (!av)
-		return (NULL);
-	std::string name = rq.getRql().getUrl().getPath();
-	av[0] = strdup(&(name.c_str())[1]);
-	av[1] = NULL;
-	return (av);
-}
-
-char	**create_env(Request rq)
-{
-	char **env = new char *[rq.getHeader().size() + 1];
-	int i = 0;
-	for (std::map<std::string, std::string>::const_iterator it = rq.getHeader().begin(); it != rq.getHeader().end(); it++)
-	{
-		std::string tmp;
-		tmp.append(it->first + "=" + it->second);
-		env[i] = strdup(tmp.c_str());
-		i++;
-	}
-	env[i] = NULL;
-	return (env);
-}
 
 int	check_file(Request rq, std::string dir, int mode)
 {
@@ -54,4 +27,27 @@ int	check_file(Request rq, std::string dir, int mode)
 	if (mode == 2 && access(path.c_str(), X_OK) == -1)
 		return (2);
 	return (0);
+}
+
+int find_location(std::string path, Server serv)
+{
+	size_t size = 0;
+	int index = -1;
+	for(size_t i = 0; i < serv.getLocations().size(); i++)
+	{
+		if (path == serv.getLocations()[i].getPath())
+			return (i);
+		if (serv.getLocations()[i].getIsPathAbsolute() == false)
+		{
+			for (size_t y = 0; y < serv.getLocations()[i].getPath().size(); y++)
+			{
+				if (serv.getLocations()[i].getPath()[y] != path[y] && y > size)
+				{
+					index = i;
+					size = y;
+				}
+			}
+		}
+	}
+	return (index);
 }

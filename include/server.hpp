@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 18:33:19 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/16 18:15:16 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@
 /*server.cpp*/
 int 	create_socket_server(const char *port);
 std::string	read_recv_data(int i, Poll *poll_fds);
-int		function(std::string buff, Poll *poll_fds, int i, ConfigFile config);
 int	send_response(struct client &co, __attribute__((unused))ConfigFile config);
 int	accept_new_connection(int server_fd, Poll *poll_fds);
 int		check_serv_socket(int fd, unsigned int *serv_fds, int size);
@@ -46,15 +45,17 @@ void	post_html(Response *rp, Request rq);
 void	delete_html(Response *rp, Request rq);
 void	rq_html(Response *rp, Request rq);
 
+/*rq_dir.cpp*/
+void	rq_dir(Response *rp, Request rq, std::string path);
+
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);
 Response	exec_rq(Request rq, ConfigFile config);
 Response	exec_rq_error(Request rq, ConfigFile config, int code);
 
 /*utils.cpp*/
-char		**create_av(Request rq);
-char		**create_env(Request rq);
 int			check_file(Request rq, std::string dir, int mode);
+int 		find_location(std::string path, Server serv);
 
 
 #endif

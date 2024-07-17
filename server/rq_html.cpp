@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 15:22:17 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:09:56 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,37 +41,31 @@ void	get_html(Response *rp, Request rq)
 
 void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
 {
-	(void) rp;
-	(void) rq;
+	std::string path = "www" + rq.getRql().getUrl().getPath();
+
+	/*a utiliser si permet pas de post un fichier avec le meme nom qu'un deja existant*/
+	// status = check_file(rq, "www", 0);
+	// if (status == 0)
+	// 	return ;
+	std::ofstream my_html(path.c_str());
+	if (!my_html)
+		return (rp->setBody("Error"));
+	my_html << rq.getBody();
 }
 
 void	delete_html(Response *rp, Request rq)
 {
 	std::string path = rq.getRql().getUrl().getPath();
-	int pipe_fd[2];
 	int status;
 
 	/*check dir -> return 0 si pas un dir*/
-	status = check_file(rq, "www", 2);
+	status = check_file(rq, "www", 1);
 	if (status > 0)
 		return (rp->setBody("Error"));
-	status = pipe(pipe_fd);
-	if (status == -1)
+	path = "www" + path;
+	status = remove(path.c_str());
+	if (status != 0)
 		return (rp->setBody("Error"));
-	status = fork();
-	if (status == -1)
-		return (rp->setBody("Error"));
-	else if (status == 0)
-	{
-		char **env = create_env(rq);
-		std::string tmp = "rm";
-		char **av = create_av(rq);
-		execve("/bin/rm", av, env);
-		rp->setBody("Error");
-		perror("Execve");
-		exit(1);
-	}
-	wait(NULL);
 }
 
 void	rq_html(Response *rp, Request rq)
