@@ -9,6 +9,7 @@ struct client
 {
 	int fd;
 	int	server_fd;
+	bool	await_response;
 	Request rq;
 	Response rp;
 };
