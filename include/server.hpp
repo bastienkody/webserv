@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/17 15:31:52 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/23 15:57:57 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fstream>
+#include <map>
 
 /*server.cpp*/
 int 	create_socket_server(const char *port);
@@ -56,6 +57,8 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code);
 /*utils.cpp*/
 int			check_file(Request rq, std::string dir, int mode);
 int 		find_location(std::string path, Server serv);
+template <typename T>
+T	find_data(Server serv, int index_location, std::string to_find);
 
 
 #endif

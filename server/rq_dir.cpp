@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/17 19:07:13 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/23 13:05:32 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,10 @@ void	rq_dir(Response *rp, Request rq, std::string path, Server serv, int index_l
 		return (rp->setBody(read_index(serv.getLocations()[index_location].getIndex())));
 	else if (serv.getIndex().size() != 0)
 		return (rp->setBody(read_index(serv.getIndex())));
-// 	else if (auto_index == true)
-// 		/*create index*/
-// 	else
-// 		/*403*/
+	// else if (auto_index == true)
+	// 	/*create index*/
+	// else
+	// 	/*403*/
 	(void) auto_index;
 	(void) rp;
 	(void) rq;
