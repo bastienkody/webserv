@@ -14,7 +14,7 @@
 #include "../include/server.hpp"
 #include "../Clients/Clients.hpp"
 
-static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\npipi\n");
+static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nabcd\n");
 
 int create_socket_server(const char *port)
 {
@@ -76,7 +76,7 @@ int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 
 	(void)serv_nb;
 	co.rq.parse();
-	//co.rq.print();
+	co.rq.print();
 
 	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)

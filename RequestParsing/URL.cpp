@@ -110,10 +110,11 @@ void	URL::originFormParser(std::string url)
 		{
 			if (qTmp[0] == '&')
 				qTmp.erase(0, 1);
+			int end_pos = (qTmp.find('&') != std::string::npos ? qTmp.find('&') - 1 : qTmp.size());
 			std::string	key(qTmp.substr(0, qTmp.find('=')));
-			std::string	value(qTmp.substr(qTmp.find('=') + 1, (qTmp.find('&') != std::string::npos ? qTmp.find('&') - 2:qTmp.size())));
+			std::string	value(qTmp.substr(qTmp.find('=') + 1, end_pos - qTmp.find('=')));
 			_queries.insert(std::pair<std::string, std::string>(key, value));
-			qTmp.erase(0, qTmp.find('&') != std::string::npos ? qTmp.find('&') : qTmp.size());
+			qTmp.erase(0, end_pos + 1);
 
 		} while (qTmp.find('&') != std::string::npos);
 	}
