@@ -42,6 +42,10 @@ void	Response::setHeader(__attribute__((unused))Request rq, __attribute__((unuse
 	_header += hcreateTimeStr() + "\n"; // date
 	_header += hcreateServer() + "\n"; // server
 	// connection
+	std::string connection = hcreateConnection(rq);
+	if (connection.size())
+		_header += connection + "\n";
+	// connection
 	// etag
 	// host ?
 	// allow methods (on le et toujours comme ca on est tranquille)
@@ -60,7 +64,7 @@ std::string	Response::hcreateTimeStr() const
 {
 	// date: Thu, 04 Jul 2024 12:24:32 GMT
 	std::time_t s_epoch = std::time(0);
-	std::string res("date: ");
+	std::string res("Date: ");
 	char	timeSTR[200];
 
 	std::strftime(timeSTR, sizeof(timeSTR), "%a, %d %b %Y %T %Z", std::localtime(&s_epoch));
@@ -68,6 +72,22 @@ std::string	Response::hcreateTimeStr() const
 
 	return res;
 }
+
+std::string	Response::hcreateConnection(const Request & rq) const
+{
+	std::multimap<std::string, std::string>::const_iterator it = rq.getHeader().begin();
+	std::multimap<std::string, std::string>::const_iterator ite = rq.getHeader().end();
+
+	for (; it!=ite; ++it)
+	{
+		if (ParserUtils::compCaseInsensitive(it->first, "Connection") && ParserUtils::compCaseInsensitive(it->second, "Keep-Alive"))
+			return "Connection: Keep-Alive";
+		if (ParserUtils::compCaseInsensitive(it->first, "Connection") && ParserUtils::compCaseInsensitive(it->second, "Close"))
+			return "Connection: Close";
+	}
+	return "";
+}
+
 
 std::string	Response::hcreateServer() const
 {

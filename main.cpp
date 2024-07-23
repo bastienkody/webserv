@@ -109,10 +109,11 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			// responding
 			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].await_response == true)
 			{
-				if (send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)], config) < 0)
-					deco_client(clients, &poll_fds, i); // pb de read/write --> deco client
+				int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
+				if (send_response(clients[pos], config) < 0 || RequestChecking::isKeepAlive(clients[pos].rq) == false)
+					deco_client(clients, &poll_fds, i); // pb de read/write ou no keepalive --> deco client
 				else
-					clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].await_response = false;
+					clients[pos].await_response = false;
 			}
 		}
 	}

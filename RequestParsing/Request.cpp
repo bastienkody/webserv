@@ -66,10 +66,7 @@ void	Request::appendRaw(std::string data)
 	_raw += data;
 }
 
- // 
 void	Request::unchunkBody()
 {
-	
-
 	
 }

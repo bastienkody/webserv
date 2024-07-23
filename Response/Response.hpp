@@ -20,6 +20,7 @@
 #include "../StatusCode/StatusCode.hpp"
 #include "../RequestParsing/Request.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
+#include "../ParserUtils/ParserUtils.hpp"
 
 class Response
 {
@@ -40,6 +41,7 @@ class Response
 
 		//	utils header
 		std::string	hcreateTimeStr() const;
+		std::string	hcreateConnection(const Request & rq) const;
 		std::string	hcreateServer() const;
 		std::string	hcreateAllowMethods(ConfigFile config) const;
 

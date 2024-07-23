@@ -1,4 +1,5 @@
 #include"ParserUtils.hpp"
+#include <cctype>
 
 //	rm OWS (l and r)
 std::string	ParserUtils::trimOWS(std::string s)
@@ -75,6 +76,16 @@ bool	ParserUtils::isStrAlpha(const std::string & line)
 {
 	for (std::string::const_iterator it = line.begin(); it != line.end(); ++it)
 		if (isalpha(*it) == false)
+			return false;
+	return true;
+}
+
+bool	ParserUtils::compCaseInsensitive(const std::string & line, const std::string & ref)
+{
+	if (line.size() != ref.size())
+		return false;
+	for (unsigned int i = 0; i < line.size(); ++i)
+		if (toupper(line[i]) != toupper(ref[i]))
 			return false;
 	return true;
 }

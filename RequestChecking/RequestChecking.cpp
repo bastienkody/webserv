@@ -25,7 +25,7 @@ int	RequestChecking::CheckHeaderKey(const Request & rq)
 	{
 		if (it->first.size() == 0 || isspace(it->first[it->first.size() - 1]))
 			return 400;
-		if (it->first.compare("Host") == 0)
+		if (ParserUtils::compCaseInsensitive(it->first, "Host"))
 			isHostPresent = true;
 	}
 	return (isHostPresent ? 0 : 400);
@@ -45,9 +45,9 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 
 	for (; it!=ite; ++it)
 	{
-		if (it->first.compare("Transfer-Encoding") == 0 && it->second.find("chunked") != std::string::npos)
+		if (ParserUtils::compCaseInsensitive(it->first, "Transfer-Encoding") && ParserUtils::compCaseInsensitive(it->second, "chunked"))
 			return 2;
-		if (it->first.compare("Content-Length"))
+		if (ParserUtils::compCaseInsensitive(it->first, "Content-Length"))
 		{
 			// cant return here if ever a chunk happens later, content_l must be ignored
 			content_lenght = true;
@@ -64,4 +64,15 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 	str >> i;
 	str2 >> j;
 	return (i >= j ? 1 : 413);
+}
+
+bool	RequestChecking::isKeepAlive(const Request & rq)
+{
+	std::multimap<std::string, std::string>::const_iterator it = rq.getHeader().begin();
+	std::multimap<std::string, std::string>::const_iterator ite = rq.getHeader().end();
+
+	for (; it!=ite; ++it)
+		if (ParserUtils::compCaseInsensitive(it->first, "Connection") && ParserUtils::compCaseInsensitive(it->second, "Keep-Alive"))
+			return true;
+	return false;
 }
