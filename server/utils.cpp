@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/23 17:02:49 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/23 17:20:12 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,24 +54,24 @@ int find_location(std::string path, Server serv)
 }
 
 /*template ?*/
-// template <typename T, typename F>
-// T	find_data(Server serv, int index_location, std::string to_find)
-// {
-// 	std::map<std::string, F> lst_data = {{"root", &ConfigFile::getRoot}, {"index", &ConfigFile::getIndex}, {"auto_index", &ConfigFile::getAutoIndex}, {"body_size", &ConfigFile::getMaxBodySize}, {"redirection", &ConfigFile::getRedirection}, {"error_pages", &ConfigFile::getErrorPages}, {"allow_methods", &ConfigFile::getAllowMethods}, {"cgi_ext", &ConfigFile::getCgiExt}, {"cgi_pathes", &ConfigFile::getCgiPathes}};
-// 	std::map<std::string, F>::iterator it = lst_data.begin();
-// 	while (it != lst_data.end())
-// 	{
-// 		if (it.first == to_find)
-// 			break ;
-// 		it++;
-// 	}
-// 	/*mettre erreur si pas de corres entre to_find et it_first arrive ici*/
-// 	if (index_location >= 0)
-// 	{
-// 		if (serv.getLocations()[index_location].it.second.size() != 0)
-// 			return (serv.getLocations()[index_location].it.second);
-// 	}
-// 	if (serv.it.second.size() != 0)
-// 		return (serv.it.second);
-// 	return (NULL);
-// }
+template <typename T, typename F>
+T	find_data(Server serv, int index_location, std::string to_find)
+{
+	std::map<std::string, F> lst_data = {{"root", &ConfigFile::getRoot}, {"index", &ConfigFile::getIndex}, {"auto_index", &ConfigFile::getAutoIndex}, {"body_size", &ConfigFile::getMaxBodySize}, {"redirection", &ConfigFile::getRedirection}, {"error_pages", &ConfigFile::getErrorPages}, {"allow_methods", &ConfigFile::getAllowMethods}, {"cgi_ext", &ConfigFile::getCgiExt}, {"cgi_pathes", &ConfigFile::getCgiPathes}};
+	std::map<std::string, F>::iterator it = lst_data.begin();
+	while (it != lst_data.end())
+	{
+		if (it.first == to_find)
+			break ;
+		it++;
+	}
+	/*mettre erreur si pas de corres entre to_find et it_first arrive ici*/
+	if (index_location >= 0)
+	{
+		if (serv.getLocations()[index_location].it.second.size() != 0)
+			return (serv.getLocations()[index_location].it.second);
+	}
+	if (serv.it.second.size() != 0)
+		return (serv.it.second);
+	return (NULL);
+}
