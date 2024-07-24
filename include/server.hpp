@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/24 17:28:44 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/24 19:00:30 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 #include <sys/wait.h>
 #include <fstream>
 #include <map>
+#include <dirent.h>
 
 /*server.cpp*/
 int 	create_socket_server(const char *port);
