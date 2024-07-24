@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/17 15:10:24 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/17 15:23:22 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv)
 {
 	Response rp;
 	int index_location = find_location(rq.getRql().getUrl().getPath(), config.getServers()[index_serv]);
+	//if (index_location == -1)
+	//	return 404
 	std::string path = config.getServers()[index_serv].getLocations()[index_location].getPath();
 
 	try{

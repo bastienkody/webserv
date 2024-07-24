@@ -6,18 +6,19 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/17 15:10:58 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/24 17:28:44 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVERs_HPP
-#define SERVERs_HPP
+#ifndef SERVERS_HPP
+#define SERVERS_HPP
 
 #include "Poll.hpp"
 #include "../Response/Response.hpp"
 #include "../RequestParsing/Request.hpp"
 #include "../RequestChecking/RequestChecking.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
+#include "../ConfigFile/Server.hpp"
 
 #include <iostream>
 #include <sys/socket.h> /*socket, listen, bind, accept...*/
@@ -31,6 +32,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fstream>
+#include <map>
 
 /*server.cpp*/
 int 	create_socket_server(const char *port);
@@ -54,8 +56,10 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv);
 Response	exec_rq_error(Request rq, ConfigFile config, int code);
 
 /*utils.cpp*/
-int			check_file(Request rq, std::string dir, int mode);
-int 		find_location(std::string path, Server serv);
-
+int									check_file(Request rq, std::string dir, int mode);
+int									find_location(std::string path, Server serv);
+std::string							find_str_data(Server serv, int index_location, std::string to_find);
+std::map<std::string, std::string>	find_error_pages(Server serv, int index_location);
+std::vector<std::string>			find_vector_data(Server serv, int index_location, std::string to_find);
 
 #endif
