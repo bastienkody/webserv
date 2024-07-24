@@ -58,6 +58,7 @@ void	Response::setBody(std::string body, std::string type)
 	setContentLength(body.size());
 	setContentType(type);
 }
+
 /*
 	utils header for body
  */ 
@@ -127,6 +128,8 @@ std::string	Response::hcreateServer() const
 std::string	Response::hcreateAllowMethods(__attribute__((unused))ConfigFile config) const
 {
 	std::string res("allow: ");
+
+
 
 	return res;
 

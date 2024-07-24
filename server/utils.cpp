@@ -30,7 +30,7 @@ int	check_file(Request rq, std::string dir, int mode)
 }
 
 /*A modifier ?*/
-int find_location(std::string path, Server serv)
+int find_location(const std::string path, Server serv)
 {
 	size_t size = 0;
 	int index = -1;

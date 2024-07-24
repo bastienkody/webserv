@@ -72,13 +72,16 @@ std::string read_recv_data(int i, Poll *poll_fds)
 
 int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 {
-	int	code;
-	int serv_nb = config.getServerFromFd(co.server_fd);
-
-	// (void)serv_nb;
-	std::cout<< "serv_nb : " << serv_nb <<std::endl;
 	co.rq.parse();
 	co.rq.print();
+
+	int	code;
+	int serv_nb = config.getServerFromFd(co.server_fd);
+	int loc_nb = find_location(co.rq.getRql().getUrl().getPath(), config.getServers()[serv_nb]);
+
+	(void)serv_nb;
+	(void)loc_nb;
+	std::cout << "servnb:" << serv_nb << ", locnb:" << loc_nb << std::endl;
 
 	// std::vector<std::string> test = find_vector_data(config.getServers()[0], 0, "allow_methods");
 	// std::cout << "test : " << test[0]<<std::endl;

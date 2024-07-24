@@ -57,7 +57,7 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code);
 
 /*utils.cpp*/
 int									check_file(Request rq, std::string dir, int mode);
-int									find_location(std::string path, Server serv);
+int									find_location(const std::string path, Server serv);
 std::string							find_str_data(Server serv, int index_location, std::string to_find);
 std::map<std::string, std::string>	find_error_pages(Server serv, int index_location);
 std::vector<std::string>			find_vector_data(Server serv, int index_location, std::string to_find);
