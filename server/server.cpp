@@ -6,13 +6,14 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/16 17:38:02 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/24 14:35:52 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/server.hpp"
 #include "../Clients/Clients.hpp"
+#include "../ConfigFile/Server.hpp"
 
 static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\npipi\n");
 
@@ -74,10 +75,13 @@ int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 	int	code;
 	int serv_nb = config.getServerFromFd(co.server_fd);
 
-	(void)serv_nb;
+	// (void)serv_nb;
+	std::cout<< "serv_nb : " << serv_nb <<std::endl;
 	co.rq.parse();
 	//co.rq.print();
 
+	std::string test = find_data<std::string>(config.getServers()[serv_nb], 0, "root");
+	// std::cout << "test : " << test<<std::endl;
 	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)
 		std::cout << "check basics error" << std::endl; //return (exec_rq_error(co.rq, config, code), 0);

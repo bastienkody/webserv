@@ -6,12 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/23 15:57:57 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/24 14:29:58 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVERs_HPP
-#define SERVERs_HPP
+#ifndef SERVERS_HPP
+#define SERVERS_HPP
 
 #include "Poll.hpp"
 #include "../Response/Response.hpp"

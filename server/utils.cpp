@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/23 17:20:12 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/24 14:31:41 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,24 +54,72 @@ int find_location(std::string path, Server serv)
 }
 
 /*template ?*/
-template <typename T, typename F>
+template <typename T>
 T	find_data(Server serv, int index_location, std::string to_find)
 {
-	std::map<std::string, F> lst_data = {{"root", &ConfigFile::getRoot}, {"index", &ConfigFile::getIndex}, {"auto_index", &ConfigFile::getAutoIndex}, {"body_size", &ConfigFile::getMaxBodySize}, {"redirection", &ConfigFile::getRedirection}, {"error_pages", &ConfigFile::getErrorPages}, {"allow_methods", &ConfigFile::getAllowMethods}, {"cgi_ext", &ConfigFile::getCgiExt}, {"cgi_pathes", &ConfigFile::getCgiPathes}};
-	std::map<std::string, F>::iterator it = lst_data.begin();
-	while (it != lst_data.end())
+	std::string lst_data[9] = {"root", "index", "auto_index", "body_size", "redirection", "error_pages", "allow_methods", "cgi_ext", "cgi_pathes"};
+	for(size_t i = 0; i < lst_data->size(); i++)
 	{
-		if (it.first == to_find)
-			break ;
-		it++;
+		if (to_find == lst_data[i])
+		{
+			switch (i)
+			{
+				case 0: 
+					if (serv.getLocations()[index_location].getRoot().size() != 0)
+						return (serv.getLocations()[index_location].getRoot());
+					else if (serv.getRoot().size() != 0)
+						return (serv.getRoot());
+					break ;
+				case 1:
+					if (serv.getLocations()[index_location].getIndex().size() != 0)
+						return (serv.getLocations()[index_location].getIndex());
+					else if (serv.getIndex().size() != 0)
+						return (serv.getIndex());
+					break ;
+				case 2:
+					if (serv.getLocations()[index_location].getAutoIndex().size() != 0)
+						return (serv.getLocations()[index_location].getAutoIndex());
+					else if (serv.getAutoIndex().size() != 0)
+						return (serv.getAutoIndex());
+					break ;
+				case 3:
+					if (serv.getLocations()[index_location].getMaxBodySize().size() != 0)
+						return (serv.getLocations()[index_location].getMaxBodySize());
+					else if (serv.getMaxBodySize().size() != 0)
+						return (serv.getMaxBodySize());
+					break ;
+				case 4:
+					if (serv.getLocations()[index_location].getRedirection().size() != 0)
+						return (serv.getLocations()[index_location].getRedirection());
+					else if (serv.getRedirection().size() != 0)
+						return (serv.getRedirection());
+					break ;
+				case 5:
+					if (serv.getLocations()[index_location].getErrorPages().size() != 0)
+						return (serv.getLocations()[index_location].getErrorPages());
+					else if (serv.getErrorPages().size() != 0)
+						return (serv.getErrorPages());
+					break ;
+				case 6:
+					if (serv.getLocations()[index_location].getAllowMethods().size() != 0)
+						return (serv.getLocations()[index_location].getAllowMethods());
+					else if (serv.getAllowMethods().size() != 0)
+						return (serv.getAllowMethods());
+					break ;
+				case 7:
+					if (serv.getLocations()[index_location].getCgiExt().size() != 0)
+						return (serv.getLocations()[index_location].getCgiExt());
+					else if (serv.getCgiExt().size() != 0)
+						return (serv.getCgiExt());
+					break ;
+				case 8:
+					if (serv.getLocations()[index_location].getCgiPathes().size() != 0)
+						return (serv.getLocations()[index_location].getCgiPathes());
+					else if (serv.getCgiPathes().size() != 0)
+						return (serv.getCgiPathes());
+					break ;
+			}
+		}
 	}
-	/*mettre erreur si pas de corres entre to_find et it_first arrive ici*/
-	if (index_location >= 0)
-	{
-		if (serv.getLocations()[index_location].it.second.size() != 0)
-			return (serv.getLocations()[index_location].it.second);
-	}
-	if (serv.it.second.size() != 0)
-		return (serv.it.second);
 	return (NULL);
 }
