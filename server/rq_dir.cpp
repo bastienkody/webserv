@@ -35,9 +35,9 @@ void	rq_dir(Response *rp, Request rq, std::string path, Server serv, int index_l
 	bool auto_index = check_auto_index(serv, index_location);
 
 	if (serv.getLocations()[index_location].getIndex().size() != 0)
-		return (rp->setBody(read_index(serv.getLocations()[index_location].getIndex())));
+		return (rp->setBody(read_index(serv.getLocations()[index_location].getIndex()), "text/html"));
 	else if (serv.getIndex().size() != 0)
-		return (rp->setBody(read_index(serv.getIndex())));
+		return (rp->setBody(read_index(serv.getIndex()), "text/html"));
 	// else if (auto_index == true)
 	// 	/*create index*/
 	// else
