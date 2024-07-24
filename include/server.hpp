@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/24 14:29:58 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/24 16:23:02 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "../RequestParsing/Request.hpp"
 #include "../RequestChecking/RequestChecking.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
+#include "../ConfigFile/Server.hpp"
 
 #include <iostream>
 #include <sys/socket.h> /*socket, listen, bind, accept...*/
@@ -57,8 +58,7 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code);
 /*utils.cpp*/
 int			check_file(Request rq, std::string dir, int mode);
 int 		find_location(std::string path, Server serv);
-template <typename T>
-T	find_data(Server serv, int index_location, std::string to_find);
-
+// template <typename T>
+// T	find_data(Server serv, int index_location, std::string to_find);
 
 #endif

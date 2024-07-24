@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/24 14:35:52 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/24 16:24:27 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 	co.rq.parse();
 	//co.rq.print();
 
-	std::string test = find_data<std::string>(config.getServers()[serv_nb], 0, "root");
 	// std::cout << "test : " << test<<std::endl;
 	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)

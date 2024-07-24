@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/24 14:31:41 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/24 16:44:01 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,20 @@ int find_location(std::string path, Server serv)
 	for(size_t i = 0; i < serv.getLocations().size(); i++)
 	{
 		if (path == serv.getLocations()[i].getPath())
-			return (i);
+		{
+			if (serv.getLocations()[i].getIsPathAbsolute() == true)
+				return (i);
+			else
+			{
+				for (size_t y = i; y < serv.getLocations().size(); y++)
+				{
+					if (path == serv.getLocations()[i].getPath()
+						&& serv.getLocations()[i].getIsPathAbsolute() == true)
+						return (y);
+				}	
+				return (i)
+			}
+		}
 		if (serv.getLocations()[i].getIsPathAbsolute() == false)
 		{
 			for (size_t y = 0; y < serv.getLocations()[i].getPath().size(); y++)
@@ -51,75 +64,4 @@ int find_location(std::string path, Server serv)
 		}
 	}
 	return (index);
-}
-
-/*template ?*/
-template <typename T>
-T	find_data(Server serv, int index_location, std::string to_find)
-{
-	std::string lst_data[9] = {"root", "index", "auto_index", "body_size", "redirection", "error_pages", "allow_methods", "cgi_ext", "cgi_pathes"};
-	for(size_t i = 0; i < lst_data->size(); i++)
-	{
-		if (to_find == lst_data[i])
-		{
-			switch (i)
-			{
-				case 0: 
-					if (serv.getLocations()[index_location].getRoot().size() != 0)
-						return (serv.getLocations()[index_location].getRoot());
-					else if (serv.getRoot().size() != 0)
-						return (serv.getRoot());
-					break ;
-				case 1:
-					if (serv.getLocations()[index_location].getIndex().size() != 0)
-						return (serv.getLocations()[index_location].getIndex());
-					else if (serv.getIndex().size() != 0)
-						return (serv.getIndex());
-					break ;
-				case 2:
-					if (serv.getLocations()[index_location].getAutoIndex().size() != 0)
-						return (serv.getLocations()[index_location].getAutoIndex());
-					else if (serv.getAutoIndex().size() != 0)
-						return (serv.getAutoIndex());
-					break ;
-				case 3:
-					if (serv.getLocations()[index_location].getMaxBodySize().size() != 0)
-						return (serv.getLocations()[index_location].getMaxBodySize());
-					else if (serv.getMaxBodySize().size() != 0)
-						return (serv.getMaxBodySize());
-					break ;
-				case 4:
-					if (serv.getLocations()[index_location].getRedirection().size() != 0)
-						return (serv.getLocations()[index_location].getRedirection());
-					else if (serv.getRedirection().size() != 0)
-						return (serv.getRedirection());
-					break ;
-				case 5:
-					if (serv.getLocations()[index_location].getErrorPages().size() != 0)
-						return (serv.getLocations()[index_location].getErrorPages());
-					else if (serv.getErrorPages().size() != 0)
-						return (serv.getErrorPages());
-					break ;
-				case 6:
-					if (serv.getLocations()[index_location].getAllowMethods().size() != 0)
-						return (serv.getLocations()[index_location].getAllowMethods());
-					else if (serv.getAllowMethods().size() != 0)
-						return (serv.getAllowMethods());
-					break ;
-				case 7:
-					if (serv.getLocations()[index_location].getCgiExt().size() != 0)
-						return (serv.getLocations()[index_location].getCgiExt());
-					else if (serv.getCgiExt().size() != 0)
-						return (serv.getCgiExt());
-					break ;
-				case 8:
-					if (serv.getLocations()[index_location].getCgiPathes().size() != 0)
-						return (serv.getLocations()[index_location].getCgiPathes());
-					else if (serv.getCgiPathes().size() != 0)
-						return (serv.getCgiPathes());
-					break ;
-			}
-		}
-	}
-	return (NULL);
 }
