@@ -80,6 +80,15 @@ bool	ParserUtils::isStrAlpha(const std::string & line)
 	return true;
 }
 
+//	only print?
+bool	ParserUtils::isStrPrint(const std::string & line)
+{
+	for (std::string::const_iterator it = line.begin(); it != line.end(); ++it)
+		if (isprint(*it) == false)
+			return false;
+	return true;
+}
+
 bool	ParserUtils::compCaseInsensitive(const std::string & line, const std::string & ref)
 {
 	if (line.size() != ref.size())

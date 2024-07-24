@@ -29,14 +29,14 @@ void	get_html(Response *rp, Request rq)
 		return ;
 	std::ifstream my_html(path.c_str());
 	if (!my_html)
-		return (rp->setBody("Error"));
+		return (rp->setBody("Error", "text/plain"));
 	while (!my_html.eof())
 	{
 		std::string tmp;
 		my_html >> tmp;
 		buff += tmp + "\n";
 	}
-	rp->setBody(buff);
+	rp->setBody(buff, "html");
 }
 
 void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
@@ -49,7 +49,7 @@ void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
 	// 	return ;
 	std::ofstream my_html(path.c_str());
 	if (!my_html)
-		return (rp->setBody("Error"));
+		return (rp->setBody("Error", "text/plain"));
 	my_html << rq.getBody();
 }
 
@@ -61,11 +61,11 @@ void	delete_html(Response *rp, Request rq)
 	/*check dir -> return 0 si pas un dir*/
 	status = check_file(rq, "www", 1);
 	if (status > 0)
-		return (rp->setBody("Error"));
+		return (rp->setBody("Error", "text/plain"));
 	path = "www" + path;
 	status = remove(path.c_str());
 	if (status != 0)
-		return (rp->setBody("Error"));
+		return (rp->setBody("Error", "text/plain"));
 }
 
 void	rq_html(Response *rp, Request rq)

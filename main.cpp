@@ -58,6 +58,7 @@ unsigned int *list_server_fd(Poll poll_fds)
 void deco_client(std::vector<struct client> &clients, Poll *poll_fds, int i)
 {
 	int offset = find_co_by_fd_pos(clients, poll_fds->getFds(i).fd);
+	std::cout << "[Client" << poll_fds->getFds(i).fd << "] to be deco" << std::endl;
 	if (offset > -1)
 		clients.erase(clients.begin() + offset);
 	close(poll_fds->getFds(i).fd);
@@ -96,8 +97,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 				{
 					try {
 						buff = read_recv_data(i, &poll_fds);
-						if ((pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)) == -1) 
-							std::cout << "pos == -1 in pollin read recv" << std::endl; // should never happen, to be removed later
+						pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
 						clients[pos].rq.appendRaw(buff);
 						clients[pos].await_response = true;
 					}

@@ -37,8 +37,11 @@ class Response
 
 		void	setLineState(int code);
 		void	setHeader(Request rq, ConfigFile config);
-		void	setBody(std::string body);
+		void	setBody(std::string body, std::string type);
 
+		// utils header body
+		void	setContentLength(unsigned int body_size);
+		void	setContentType(std::string type);
 		//	utils header
 		std::string	hcreateTimeStr() const;
 		std::string	hcreateConnection(const Request & rq) const;

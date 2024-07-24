@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "./Response.hpp"
+#include <sstream>
 
 //	default
 Response::Response(void) {}
@@ -45,20 +46,49 @@ void	Response::setHeader(__attribute__((unused))Request rq, __attribute__((unuse
 	std::string connection = hcreateConnection(rq);
 	if (connection.size())
 		_header += connection + "\n";
-	// connection
-	// etag
 	// host ?
 	// allow methods (on le et toujours comme ca on est tranquille)
-	// si body (at least get and post, )
-		// content type
-		// content lenght
 }
 
-void	Response::setBody(std::string body)
-{_body = body;}
+
+
+void	Response::setBody(std::string body, std::string type)
+{
+	_body = body;
+	setContentLength(body.size());
+	setContentType(type);
+}
+/*
+	utils header for body
+ */ 
+void	Response::setContentLength(unsigned int body_size)
+{
+	std::stringstream	len;
+	len << body_size;
+	_header += "Content-Length: " + len.str() + "\n";
+}
+
+// file_ext to be given with no point
+void	Response::setContentType(std::string type)
+{
+	std::string e[5] = {"html", "css", "jpeg", "png", "webp"};
+	std::string t[5] = {"text/html", "text/css", "image/jpeg", "image/png", "image/webp"};
+	for(int i = 0; i < 5; ++i)
+	{
+		if (type.compare(e[i]) == 0)
+		{
+			_header += "Content-Type: " + t[i] + "\n";
+			return ;
+		}
+	}
+	if (ParserUtils::isStrPrint(_body) == true)
+		_header += "Content-type: text/plain\n";
+	else
+		_header += "Content-type: application/octet-stream\n";
+}
 
 /*
-	utils header
+	utils header (via setheader)
 */
 std::string	Response::hcreateTimeStr() const
 {
