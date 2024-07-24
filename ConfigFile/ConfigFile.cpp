@@ -13,6 +13,7 @@ ConfigFile & ConfigFile::operator=(const ConfigFile & rhs)
 		this->_filename = rhs._filename;
 		this->_rawData = rhs.getRawData();
 		this->_servers = rhs.getServers();
+		this->_fd_to_server_nb = rhs._fd_to_server_nb;
 	}
 	return (*this);
 }
