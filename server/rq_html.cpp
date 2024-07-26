@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/08 18:09:56 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/26 19:14:59 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	get_html(Response *rp, Request rq)
 		return ;
 	std::ifstream my_html(path.c_str());
 	if (!my_html)
-		return (rp->setBody("Error"));
+		return (rp->setBody("Error")); /*500*/
 	while (!my_html.eof())
 	{
 		std::string tmp;
@@ -49,7 +49,7 @@ void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
 	// 	return ;
 	std::ofstream my_html(path.c_str());
 	if (!my_html)
-		return (rp->setBody("Error"));
+		return (rp->setBody("Error")); /*500*/
 	my_html << rq.getBody();
 }
 
@@ -61,11 +61,11 @@ void	delete_html(Response *rp, Request rq)
 	/*check dir -> return 0 si pas un dir*/
 	status = check_file(rq, "www", 1);
 	if (status > 0)
-		return (rp->setBody("Error"));
+		return (rp->setBody("Error")); /*500*/
 	path = "www" + path;
 	status = remove(path.c_str());
 	if (status != 0)
-		return (rp->setBody("Error"));
+		return (rp->setBody("Error")); /*500*/
 }
 
 void	rq_html(Response *rp, Request rq)
