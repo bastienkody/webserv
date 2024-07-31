@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./Response.hpp"
+#include "Response.hpp"
+#include "../include/server.hpp"
 #include <sstream>
 
 //	default
@@ -38,19 +39,19 @@ void	Response::setLineState(int code)
 	_lineState = "HTTP/1.1 " + sstr.str() + " " + sc.getPhrase(code);
 }
 
-void	Response::setHeader(__attribute__((unused))Request rq, __attribute__((unused))ConfigFile config)
+void	Response::setHeader(Request rq, ConfigFile config, int serv_nb, int loc_nb)
 {
-	_header += hcreateTimeStr() + "\n"; // date
-	_header += hcreateServer() + "\n"; // server
+	std::string sep("\n");
+
+	_header += hcreateTimeStr() + sep; // date
+	_header += hcreateServer() + sep; // server
+	_header += hcreateAllowMethods(config, serv_nb, loc_nb) + sep; // allow_methods
 	// connection
 	std::string connection = hcreateConnection(rq);
 	if (connection.size())
-		_header += connection + "\n";
+		_header += connection + sep;
 	// host ?
-	// allow methods (on le et toujours comme ca on est tranquille)
 }
-
-
 
 void	Response::setBody(std::string body, std::string type)
 {
@@ -125,13 +126,20 @@ std::string	Response::hcreateServer() const
 	return "server: webserv 1.0";
 }
 
-std::string	Response::hcreateAllowMethods(__attribute__((unused))ConfigFile config) const
+std::string	Response::hcreateAllowMethods(__attribute__((unused))ConfigFile config, int serv_nb, int loc_nb) const
 {
-	std::string res("allow: ");
+	std::string key("allow: "), def("GET, POST, DELETE"), found;
 
-
-
-	return res;
+	std::vector<std::string> allow_config = find_vector_data(config.getServers()[serv_nb], loc_nb, "allow_methods");
+	if (allow_config.size() == 0)
+		return key + def;
+	for (unsigned int i = 0; i < allow_config.size(); ++i)
+	{
+		found += allow_config[i];
+		if (i != allow_config.size() - 1)
+			found += ", ";
+	}
+	return key + found;
 
 }
 

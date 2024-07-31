@@ -36,7 +36,7 @@ void	get_html(Response *rp, Request rq)
 		my_html >> tmp;
 		buff += tmp + "\n";
 	}
-	rp->setBody(buff, "html");
+	rp->setBody(buff, "text/html");
 }
 
 void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/

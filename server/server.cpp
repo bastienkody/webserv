@@ -70,7 +70,7 @@ std::string read_recv_data(int i, Poll *poll_fds)
 	return (buff);
 }
 
-int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
+int	send_response(struct client &co, ConfigFile config)
 {
 	co.rq.parse();
 	co.rq.print();
@@ -79,17 +79,12 @@ int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 	int serv_nb = config.getServerFromFd(co.server_fd);
 	int loc_nb = find_location(co.rq.getRql().getUrl().getPath(), config.getServers()[serv_nb]);
 
-	(void)serv_nb;
-	(void)loc_nb;
 	std::cout << "servnb:" << serv_nb << ", locnb:" << loc_nb << std::endl;
 
-	// std::vector<std::string> test = find_vector_data(config.getServers()[0], 0, "allow_methods");
-	// std::cout << "test : " << test[0]<<std::endl;
 	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)
 		std::cout << "check basics error" << std::endl; //return (exec_rq_error(co.rq, config, code), 0);
-	//If post method, check if chunked (getMaxbodysize to be corrected)
-	if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, "")) != 1) // config.getMaxBodySize()))
+	if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, find_str_data(config.getServers()[serv_nb], loc_nb, "body_size"))) != 1)
 	{
 		if (code == 413 || code == 0) // maybe 0 must become a 400 
 			std::cout << "header post error" << std::endl; //return (exec_rq_error(rq, config, code), 0);
@@ -97,12 +92,14 @@ int	send_response(struct client &co, __attribute__((unused))ConfigFile config)
 			std::cout << "post rq chunk to be treated" << std::endl;//co.rq.unchunk(co.fd);
 	}
 
-	
-
-
+	// to be done in exec_rq
+	co.rp.setLineState(200);
+	co.rp.setHeader(co.rq, config, serv_nb, loc_nb);
+	co.rp.setBody("this is the body response abcdefgh", "html");
+	std::cout << co.rp.getWholeResponse() << std::endl;
 	
 	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
-	return send(co.fd, rep.c_str(), rep.size(), 0) < 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
+	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) < 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
 
 

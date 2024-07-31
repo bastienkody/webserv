@@ -36,7 +36,7 @@ class Response
 		std::string getWholeResponse() const;
 
 		void	setLineState(int code);
-		void	setHeader(Request rq, ConfigFile config);
+		void	setHeader(Request rq, ConfigFile config, int serv_nb, int loc_nb);
 		void	setBody(std::string body, std::string type);
 
 		// utils header body
@@ -46,7 +46,7 @@ class Response
 		std::string	hcreateTimeStr() const;
 		std::string	hcreateConnection(const Request & rq) const;
 		std::string	hcreateServer() const;
-		std::string	hcreateAllowMethods(ConfigFile config) const;
+		std::string	hcreateAllowMethods(ConfigFile config, int serv_nb, int loc_nb) const;
 
 	private:
 

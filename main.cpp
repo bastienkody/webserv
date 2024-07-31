@@ -10,30 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-/*---------TO DO---------
-- : pas encore fait/en cours
-~ : fait mais pas sur que ce soit bien
-+ : fait
-
-
-
-RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
-
-        ~ finir mise en place serv test
-                ~ creer class poll pour faciliter manip (notamment l'update du
-pollfd) puis finir implementation
-                - creer class socket (je sais pas encore comment je vais m'en
-servir) ~ passer socket en non bloquant
-                + POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour
-chaque port ?) ~ gerer requete chunk
-        - METTRE EN PLACE CGI
-        - gerer ecriture sur fd via poll()
-        - utiliser "signal" pour catch ctrl c et terminer le programme
-        - mettre a la norme du projet (check fonction autorise et alternative
-pour fonctions C)
-        - gerer leaks et fds
--------------------------*/
-
 #include "Clients/Clients.hpp"
 #include "ConfigFile/ConfigFile.hpp"
 #include "ConfigFile/Location.hpp"
@@ -109,11 +85,14 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			// responding
 			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].await_response == true)
 			{
-				int pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
+				pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
 				if (send_response(clients[pos], config) < 0 || RequestChecking::isKeepAlive(clients[pos].rq) == false)
 					deco_client(clients, &poll_fds, i); // pb de read/write ou no keepalive --> deco client
 				else
+				{
 					clients[pos].await_response = false;
+					clients[pos].rp = Response();
+				}
 			}
 		}
 	}
@@ -135,8 +114,8 @@ int main(int ac, char **av)
 
 	ConfigFile config(ac == 2 ? av[1] : "ConfigFile/files/new.config");
 	try {
-	config.openReadFileToStr();
-	config.readAllInfos();
+		config.openReadFileToStr();
+		config.readAllInfos();
 	}
 	catch (const std::exception &e) {
 		return std::cerr << e.what() << std::endl, 1;

@@ -65,7 +65,7 @@ Response	exec_rq_error(__attribute__((unused))Request rq, __attribute__((unused)
 	// create status line
 	rp.setLineState(code);
 	// create header
-	rp.setHeader(rq, config);
+	rp.setHeader(rq, config, 0, 0);
 	
 	// check if error page exists in config file to fulfill body; if not no body?
 	
