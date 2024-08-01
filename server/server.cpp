@@ -76,15 +76,15 @@ int	send_response(struct client &co, ConfigFile config)
 	co.rq.print();
 
 	int	code;
-	int serv_nb = config.getServerFromFd(co.server_fd);
-	int loc_nb = find_location2(co.rq.getRql().getUrl().getPath(), config.getServers()[serv_nb]);
+	int	index_serv = config.getServerFromFd(co.server_fd);
+	int	index_loc = find_location2(co.rq.getRql().getUrl().getPath(), config.getServers()[index_serv]);
 
-	std::cout << "servnb:" << serv_nb << ", locnb:" << loc_nb << std::endl;
+	std::cout << "servnb:" << index_serv << ", locnb:" << index_loc << std::endl;
 
 	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)
 		std::cout << "check basics error" << std::endl; //return (exec_rq_error(co.rq, config, code), 0);
-	if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, find_str_data(config.getServers()[serv_nb], loc_nb, "body_size"))) != 1)
+	if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, find_str_data(config.getServers()[index_serv], index_loc, "body_size"))) != 1)
 	{
 		if (code == 413 || code == 0) // maybe 0 must become a 400 
 			std::cout << "header post error" << std::endl; //return (exec_rq_error(rq, config, code), 0);
@@ -93,35 +93,17 @@ int	send_response(struct client &co, ConfigFile config)
 	}
 
 	// to be done in exec_rq
-	co.rp.setLineState(200);
-	co.rp.setHeader(co.rq, config, serv_nb, loc_nb);
-	co.rp.setBody("this is the body response abcdefgh\n", "html");
-	std::cout << co.rp.getWholeResponse() << std::endl;
-	
+//	co.rp.setLineState(200);
+//	co.rp.setHeader(co.rq, config, index_serv, index_loc);
+//	co.rp.setBody("this is the body response abcdefgh\n", "html");
+	//std::cout << co.rp.getWholeResponse() << std::endl;
+
+	// test exec_rq_error
+	co.rp = exec_rq_error(co.rq, config, 404, index_serv, index_loc);
+
 	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
 	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) < 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
-
-
-/*int	function(__attribute__((unused))std::string buff, __attribute__((unused))Poll *poll_fds, __attribute__((unused))int i, ConfigFile config)
-{
-	Request rq;
-	int	code;
-
-	//First check syntax, verb, version, host header present and headerfield syntax
-	if ((code = RequestChecking::CheckBasics(rq)) != 0)
-		return (exec_rq_error(rq, config, code), 0);
-	//If post method, check if chunked (getMaxbodysize to be corrected)
-	if (rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(rq, config.getMaxBodySize())) != 1)
-	{
-		if (code == 413 || code == 0) // maybe 0 must become a 400 
-			return (exec_rq_error(rq, config, code), 0);
-		//if (code == 2)
-	}
-	exec_rq(rq, config);
-	std::cout << "in function after rq" << std::endl;
-	return (0);
-}*/
 
 /*	attention a exit !! ca free bien? ca pose peut poser pb pour co. pe passer par des exceptions?	*/
 int	accept_new_connection(int server_fd, Poll *poll_fds)

@@ -26,10 +26,10 @@ void	get_html(Response *rp, Request rq)
 	/*check dir -> return 0 si pas un dir*/
 	status = check_file(rq, "www", 1);
 	if (status > 0)
-		return ;
+		return ; // exec_rq_error aussi?
 	std::ifstream my_html(path.c_str());
 	if (!my_html)
-		return (rp->setBody("Error", "text/plain"));
+		return (rp->setBody("Error", "text/plain")); // plutot passer par un exec_rq_error (code 501?) pour set status line et header aussi
 	while (!my_html.eof())
 	{
 		std::string tmp;

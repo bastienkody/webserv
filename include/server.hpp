@@ -34,6 +34,12 @@
 #include <fstream>
 #include <map>
 
+/* Error default pages	*/
+#define DEFAULT_400 "www/400_error_default.html"
+#define DEFAULT_404 "www/404_error_default.html"
+#define DEFAULT_413 "www/413_error_default.html"
+#define DEFAULT_501 "www/501_error_default.html"
+
 /*server.cpp*/
 int 	create_socket_server(const char *port);
 std::string	read_recv_data(int i, Poll *poll_fds);
@@ -52,8 +58,8 @@ void	rq_dir(Response *rp, Request rq, std::string path, Server serv, int index_l
 
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);
-Response	exec_rq(Request rq, ConfigFile config, int index_serv);
-Response	exec_rq_error(Request rq, ConfigFile config, int code);
+Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc);
+Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, int index_loc);
 
 /*utils.cpp*/
 int									check_file(Request rq, std::string dir, int mode);

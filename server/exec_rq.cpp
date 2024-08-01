@@ -15,6 +15,7 @@
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
 #include "../include/Exception.hpp"
+#include <sstream>
 
 /*ajouter Location obj pour check methods allows*/
 
@@ -36,19 +37,19 @@ int	check_cgi_ext(Server serv, std::string path, int index_location)
 	return (0);
 }
 
-Response	exec_rq(Request rq, ConfigFile config, int index_serv)
+Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
+	if (index_loc == -1)
+		return exec_rq_error(rq, config, 404, index_serv, index_loc);
+
 	Response rp;
-	int index_location = find_location(rq.getRql().getUrl().getPath(), config.getServers()[index_serv]);
-	//if (index_location == -1)
-	//	return 404
-	std::string path = config.getServers()[index_serv].getLocations()[index_location].getPath();
+	std::string path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
 
 	try{
-		if (check_cgi_ext(config.getServers()[index_serv], path, index_location) == 1)
+		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 				CGI cgi(&rp, rq);
 		else if (path[path.size() - 1] == '/')
-			rq_dir(&rp, rq, path, config.getServers()[index_serv], index_location);
+			rq_dir(&rp, rq, path, config.getServers()[index_serv], index_loc);
 		else
 			rq_html(&rp, rq);
 	}
@@ -58,17 +59,45 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv)
 	return (rp);
 }
 
-Response	exec_rq_error(__attribute__((unused))Request rq, __attribute__((unused))ConfigFile config, int code)
+std::string	fetch_default_error_page(int code)
+{
+	switch (code)
+	{
+		case 400:
+			return DEFAULT_400;
+		case 404:
+			return DEFAULT_404;
+		case 413:
+			return DEFAULT_413;
+		case 501:
+			return DEFAULT_501;
+		default:
+			return "";
+	}
+}
+
+Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, int index_loc)
 {
 	Response		rp;
+	std::stringstream	sscode;
+	sscode << code;
 
-	// create status line
-	rp.setLineState(code);
-	// create header
-	rp.setHeader(rq, config, 0, 0);
-	
-	// check if error page exists in config file to fulfill body; if not no body?
-	
+	rp.setLineState(code);					// create status line
+	rp.setHeader(rq, config, index_serv, index_loc);	// create headers
+	// create body (via error pages in config file or default pages)
+	std::string				path;
+	std::map<std::string, std::string>	err_pages = find_error_pages(config.getServers()[index_serv], index_loc);
+	if (err_pages.size() != 0 && err_pages[sscode.str()].size() != 0)
+		path = err_pages[sscode.str()];
+	else
+		path = fetch_default_error_page(code);
+	if (path.size() > 0 && access(path.c_str(), R_OK) == 0)
+	{
+		std::ifstream		infile(path.c_str());
+		std::stringstream	sstr;
+		sstr << infile.rdbuf();
+		rp.setBody(sstr.str(), "html");
+	}
 	return (rp);
 }
 // int main(void)
