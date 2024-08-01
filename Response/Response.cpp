@@ -25,8 +25,7 @@ std::string const & Response::getBody(void) const {return (_body);}
 
 std::string Response::getWholeResponse(void) const
 {
-	// attention si final \n in header ajouter que un seul ici avant body
-	return _lineState + "\r\n" + _header + "\r\n\r\n" + _body; 
+	return _lineState + "\r\n" + _header + "\r\n" + _body;
 }
 
 //	setters
@@ -41,7 +40,7 @@ void	Response::setLineState(int code)
 
 void	Response::setHeader(Request rq, ConfigFile config, int serv_nb, int loc_nb)
 {
-	std::string sep("\n");
+	std::string sep("\r\n");
 
 	_header += hcreateTimeStr() + sep; // date
 	_header += hcreateServer() + sep; // server
@@ -67,7 +66,7 @@ void	Response::setContentLength(unsigned int body_size)
 {
 	std::stringstream	len;
 	len << body_size;
-	_header += "Content-Length: " + len.str() + "\n";
+	_header += "Content-Length: " + len.str() + "\r\n";
 }
 
 // file_ext to be given with no point
@@ -79,14 +78,14 @@ void	Response::setContentType(std::string type)
 	{
 		if (type.compare(e[i]) == 0)
 		{
-			_header += "Content-Type: " + t[i] + "\n";
+			_header += "Content-Type: " + t[i] + "\r\n";
 			return ;
 		}
 	}
 	if (ParserUtils::isStrPrint(_body) == true)
 		_header += "Content-type: text/plain\n";
 	else
-		_header += "Content-type: application/octet-stream\n";
+		_header += "Content-type: application/octet-stream\r\n";
 }
 
 /*

@@ -29,6 +29,45 @@ int	check_file(Request rq, std::string dir, int mode)
 	return (0);
 }
 
+// test absolute then non absolute + correct not perfect match
+int find_location2(const std::string path, Server serv)
+{
+	size_t size = 0;
+	int index = -1;
+
+	// absolute match
+	for(size_t i = 0; i < serv.getLocations().size(); i++)
+		if (serv.getLocations()[i].getIsPathAbsolute() == true && path == serv.getLocations()[i].getPath())
+				return i;
+	// non absolute : perfect or longest match
+	for(size_t i = 0; i < serv.getLocations().size(); i++)
+	{
+		std::string loc_path = serv.getLocations()[i].getPath();
+		std::cout << "locpath gen:" << loc_path << std::endl;
+		if (serv.getLocations()[i].getIsPathAbsolute() == true)
+			continue;
+		std::cout << "after is true" << loc_path << std::endl;
+		if (loc_path.size() > path.size())
+			continue;
+		std::cout << "after sizecheck" << loc_path << std::endl;
+		if (path == loc_path)
+			return i;
+		std::cout << "after perfect equality" << loc_path << std::endl;
+		for (size_t x = 0; x < loc_path.size(); ++x)
+		{
+			std::cout << "path:" << path[x] << " vs locpath:" << loc_path[x] << " for x=" << x << std::endl;
+			if (path[x] != loc_path[x])
+				break;
+			if (x > size)
+			{
+				size = x;
+				index = i;
+			}
+		}
+	}
+	return (index);
+}
+
 /*A modifier ?*/
 int find_location(const std::string path, Server serv)
 {

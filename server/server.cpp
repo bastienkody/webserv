@@ -77,7 +77,7 @@ int	send_response(struct client &co, ConfigFile config)
 
 	int	code;
 	int serv_nb = config.getServerFromFd(co.server_fd);
-	int loc_nb = find_location(co.rq.getRql().getUrl().getPath(), config.getServers()[serv_nb]);
+	int loc_nb = find_location2(co.rq.getRql().getUrl().getPath(), config.getServers()[serv_nb]);
 
 	std::cout << "servnb:" << serv_nb << ", locnb:" << loc_nb << std::endl;
 
@@ -95,7 +95,7 @@ int	send_response(struct client &co, ConfigFile config)
 	// to be done in exec_rq
 	co.rp.setLineState(200);
 	co.rp.setHeader(co.rq, config, serv_nb, loc_nb);
-	co.rp.setBody("this is the body response abcdefgh", "html");
+	co.rp.setBody("this is the body response abcdefgh\n", "html");
 	std::cout << co.rp.getWholeResponse() << std::endl;
 	
 	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
