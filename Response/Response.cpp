@@ -31,11 +31,10 @@ std::string Response::getWholeResponse(void) const
 //	setters
 void	Response::setLineState(int code)
 {
-	StatusCode		sc;
 	std::stringstream	sstr;
 
 	sstr << code;
-	_lineState = "HTTP/1.1 " + sstr.str() + " " + sc.getPhrase(code);
+	_lineState = "HTTP/1.1 " + sstr.str() + " " + StatusCode::getPhrase(code);
 }
 
 void	Response::setHeader(Request rq, ConfigFile config, int serv_nb, int loc_nb)

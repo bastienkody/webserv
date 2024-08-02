@@ -9,12 +9,10 @@
 class StatusCode
 {
 	public:
-		StatusCode();
-		~StatusCode();
-		std::string const & getPhrase(int code) const;
-		void printAll() const;
+		static std::string const & getPhrase(int code);
+		static void printAll();
 	private:
-		std::map<int,std::string> _data;
+		static const std::map<int,std::string> _data;
 };
 
 #endif
