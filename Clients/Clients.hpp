@@ -15,7 +15,6 @@ struct client
 };
 
 
-std::vector<struct client>::iterator find_co_by_fd_it(__attribute__((unused))std::vector<struct client> all_co, int fd);
-int find_co_by_fd_pos(__attribute__((unused))std::vector<struct client> all_co, int fd);
+int find_client(std::vector<struct client> all_co, int fd);
 
 #endif

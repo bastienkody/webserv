@@ -33,12 +33,21 @@ unsigned int *list_server_fd(Poll poll_fds)
 
 void deco_client(std::vector<struct client> &clients, Poll *poll_fds, int i)
 {
-	int offset = find_co_by_fd_pos(clients, poll_fds->getFds(i).fd);
+	int offset = find_client(clients, poll_fds->getFds(i).fd);
 	std::cout << "[Client" << poll_fds->getFds(i).fd << "] to be deco" << std::endl;
 	if (offset > -1)
 		clients.erase(clients.begin() + offset);
 	close(poll_fds->getFds(i).fd);
 	poll_fds->remove_to_poll(i);
+}
+
+struct client	create_client(int server_fd, Poll &poll_fds)
+{
+	struct client cli;
+	cli.fd = accept_new_connection(server_fd, &poll_fds);
+	cli.server_fd = server_fd;
+	cli.await_response = false;
+	return cli;
 }
 
 void launch_server(ConfigFile config, Poll poll_fds)
@@ -61,19 +70,13 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			{
 				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
-				{
-					struct client cli;
-					cli.fd = accept_new_connection(server_fd[status], &poll_fds);
-					cli.server_fd = poll_fds.getFds(i).fd;
-					cli.await_response = false;
-					clients.push_back(cli);
-				}
+					clients.push_back(create_client(server_fd[status], poll_fds));
 				// data to read from the client request
 				else
 				{
 					try {
 						buff = read_recv_data(i, &poll_fds);
-						pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
+						pos = find_client(clients, poll_fds.getFds(i).fd);
 						clients[pos].rq.appendRaw(buff);
 						clients[pos].await_response = true;
 					}
@@ -83,9 +86,9 @@ void launch_server(ConfigFile config, Poll poll_fds)
 				}
 			}
 			// responding
-			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].await_response == true)
+			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_client(clients, poll_fds.getFds(i).fd)].await_response == true)
 			{
-				pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd);
+				pos = find_client(clients, poll_fds.getFds(i).fd);
 				if (send_response(clients[pos], config) < 0 || RequestChecking::isKeepAlive(clients[pos].rq) == false)
 					deco_client(clients, &poll_fds, i); // pb de read/write ou no keepalive --> deco client
 				else
