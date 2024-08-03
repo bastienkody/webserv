@@ -84,6 +84,9 @@ int	send_response(struct client &co, ConfigFile config)
 	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)
 		std::cout << "check basics error" << std::endl; //return (exec_rq_error(co.rq, config, code), 0);
+
+	// check si le verb est autorise dans allow_method (si non 405) -> RequestChecking::CheckAllowMethod
+
 	if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, find_str_data(config.getServers()[index_serv], index_loc, "body_size"))) != 1)
 	{
 		if (code == 413 || code == 0) // maybe 0 must become a 400 

@@ -19,12 +19,12 @@
 
 /*ajouter Location obj pour check methods allows*/
 
-int	check_cgi_ext(Server serv, std::string path, int index_location)
+int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
 
 	ext = path.rfind('.');
-	for (size_t i = 0; i < serv.getLocations()[index_location].getCgiExt().size(); i++)
+	for (size_t i = 0; i < serv.getLocations()[index_loc].getCgiExt().size(); i++)
 	{
 		if (ext == serv.getLocations()[i].getCgiExt()[i])
 			return (1);
@@ -59,6 +59,7 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	return (rp);
 }
 
+// used by exeq_rq_error if no error pages set in configfile
 std::string	fetch_default_error_page(int code)
 {
 	switch (code)

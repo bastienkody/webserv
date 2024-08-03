@@ -7,13 +7,12 @@
 
 struct client
 {
-	int fd;
-	int	server_fd;
-	bool	await_response;
-	Request rq;
-	Response rp;
+	int			fd;
+	int			server_fd;
+	bool		await_response;
+	Request		rq;
+	Response	rp;
 };
-
 
 int find_client(std::vector<struct client> all_co, int fd);
 

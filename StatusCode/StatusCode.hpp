@@ -12,6 +12,7 @@ class StatusCode
 		static std::string const & getPhrase(int code);
 		static void printAll();
 	private:
+		static std::map<int, std::string> initMap(void);
 		static const std::map<int,std::string> _data;
 };
 

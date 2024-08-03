@@ -3,7 +3,7 @@ import time
 
 url1 = "http://127.0.0.1:8080/truc"
 url2 = "http://127.0.0.1:8081/machin"
-for i in range(0, 200):
+for i in range(0, 2000):
     url = url2
     if i % 2:
         url = url1
