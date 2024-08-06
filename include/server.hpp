@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/24 17:28:44 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/26 14:47:17 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 #include <sys/wait.h>
 #include <fstream>
 #include <map>
+#include <dirent.h>
 
 /*server.cpp*/
 int 	create_socket_server(const char *port);
@@ -48,7 +49,7 @@ void	delete_html(Response *rp, Request rq);
 void	rq_html(Response *rp, Request rq);
 
 /*rq_dir.cpp*/
-void	rq_dir(Response *rp, Request rq, std::string path, Server serv, int index_location);
+void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_location);
 
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);

@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/17 15:23:22 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/07/26 14:48:12 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv)
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_location) == 1)
 				CGI cgi(&rp, rq);
 		else if (path[path.size() - 1] == '/')
-			rq_dir(&rp, rq, path, config.getServers()[index_serv], index_location);
+			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_location);
 		else
 			rq_html(&rp, rq);
 	}
