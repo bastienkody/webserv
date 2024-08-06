@@ -8,7 +8,7 @@ int RequestChecking::CheckBasics(const Request & rq)
 		return 505;
 	std::string	verb(rq.getRql().getVerb());
 	if (verb.compare("GET") && verb.compare("POST") && verb.compare("DELETE")) // method not implemented --> 501 (server connait que get, post and delete. 405 sera envoye si on connait la methode mais ne lautorise pas via configfile)
-		return 401;
+		return 501;
 	return CheckHeaderKey(rq);
 }
 

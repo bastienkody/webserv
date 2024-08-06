@@ -48,7 +48,6 @@ void	Response::setHeader(Request rq, ConfigFile config, int serv_nb, int loc_nb)
 	std::string connection = hcreateConnection(rq);
 	if (connection.size())
 		_header += connection + sep;
-	// host ?
 }
 
 void	Response::setBody(std::string body, std::string type)
@@ -124,7 +123,7 @@ std::string	Response::hcreateServer() const
 	return "server: webserv 1.0";
 }
 
-std::string	Response::hcreateAllowMethods(__attribute__((unused))ConfigFile config, int serv_nb, int loc_nb) const
+std::string	Response::hcreateAllowMethods(ConfigFile config, int serv_nb, int loc_nb) const
 {
 	std::string key("allow: "), def("GET, POST, DELETE"), found;
 
@@ -141,4 +140,11 @@ std::string	Response::hcreateAllowMethods(__attribute__((unused))ConfigFile conf
 
 }
 
+/*
+	header for a post : content-location
+*/
+void	Response::setLocation(std::string uri)
+{
+	_header += "Location: " + uri + "\r\n";
+}
 

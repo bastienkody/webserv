@@ -37,8 +37,11 @@
 /* Error default pages	*/
 #define DEFAULT_400 "www/400_error_default.html"
 #define DEFAULT_404 "www/404_error_default.html"
+#define DEFAULT_405 "www/405_error_default.html"
 #define DEFAULT_413 "www/413_error_default.html"
+#define DEFAULT_500 "www/500_error_default.html"
 #define DEFAULT_501 "www/501_error_default.html"
+#define DEFAULT_505 "www/505_error_default.html"
 
 /*server.cpp*/
 int 	create_socket_server(const char *port);

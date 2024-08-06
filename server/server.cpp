@@ -102,7 +102,7 @@ int	send_response(struct client &co, ConfigFile config)
 	//std::cout << co.rp.getWholeResponse() << std::endl;
 
 	// test exec_rq_error
-	//co.rp = exec_rq_error(co.rq, config, 404, index_serv, index_loc);
+//	co.rp = exec_rq_error(co.rq, config, 404, index_serv, index_loc);
 
 	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
 	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) < 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.

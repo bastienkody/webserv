@@ -3,7 +3,7 @@ import time
 
 url1 = "http://127.0.0.1:8080/truc"
 url2 = "http://127.0.0.1:8081/machin"
-for i in range(0, 2000):
+for i in range(0, 20000):
     url = url2
     if i % 2:
         url = url1
@@ -12,5 +12,5 @@ for i in range(0, 2000):
     print(f"Response headers: {r.headers}")
     print("Response body:")
     print(r.text)
-    print("###################################")
+    print(f"{i}###################################")
     #time.sleep(0.2)

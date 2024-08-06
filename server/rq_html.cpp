@@ -36,7 +36,7 @@ void	get_html(Response *rp, Request rq)
 		my_html >> tmp;
 		buff += tmp + "\n";
 	}
-	rp->setBody(buff, "text/html");
+	rp->setBody(buff, path.substr(path.find('.') + 1, path.size() - 1)); // to get the real extension
 }
 
 void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/

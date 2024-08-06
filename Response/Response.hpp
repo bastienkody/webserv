@@ -42,11 +42,13 @@ class Response
 		// utils header body
 		void	setContentLength(unsigned int body_size);
 		void	setContentType(std::string type);
-		//	utils header
+		//	utils header used by setHeader
 		std::string	hcreateTimeStr() const;
 		std::string	hcreateConnection(const Request & rq) const;
 		std::string	hcreateServer() const;
 		std::string	hcreateAllowMethods(ConfigFile config, int serv_nb, int loc_nb) const;
+		// other header
+		void	setLocation(std::string uri);
 
 	private:
 

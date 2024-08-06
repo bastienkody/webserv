@@ -68,10 +68,16 @@ std::string	fetch_default_error_page(int code)
 			return DEFAULT_400;
 		case 404:
 			return DEFAULT_404;
+		case 405:
+			return DEFAULT_405;
 		case 413:
 			return DEFAULT_413;
+		case 500:
+			return DEFAULT_500;
 		case 501:
 			return DEFAULT_501;
+		case 505:
+			return DEFAULT_505;
 		default:
 			return "";
 	}
