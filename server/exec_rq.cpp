@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/26 14:48:12 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/06 17:35:43 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,16 @@
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
 #include "../include/Exception.hpp"
+#include <sstream>
 
 /*ajouter Location obj pour check methods allows*/
 
-int	check_cgi_ext(Server serv, std::string path, int index_location)
+int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
 
 	ext = path.rfind('.');
-	for (size_t i = 0; i < serv.getLocations()[index_location].getCgiExt().size(); i++)
+	for (size_t i = 0; i < serv.getLocations()[index_loc].getCgiExt().size(); i++)
 	{
 		if (ext == serv.getLocations()[i].getCgiExt()[i])
 			return (1);
@@ -36,21 +37,22 @@ int	check_cgi_ext(Server serv, std::string path, int index_location)
 	return (0);
 }
 
-Response	exec_rq(Request rq, ConfigFile config, int index_serv)
+Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
-	Response rp;
-	int index_location = find_location(rq.getRql().getUrl().getPath(), config.getServers()[index_serv]);
-	//if (index_location == -1)
-	//	return 404
-	std::string path = config.getServers()[index_serv].getLocations()[index_location].getPath();
+	std::cerr<< "BLABLA 1"<<std::endl;
+	if (index_loc == -1)
+		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 
+	Response rp;
+	std::string path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
+	std::cerr<< "BLABLA 2"<<std::endl;
 	try{
-		if (check_cgi_ext(config.getServers()[index_serv], path, index_location) == 1)
-				CGI cgi(&rp, rq);
+		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
+				CGI cgi(&rp, rq, config, index_serv, index_loc);
 		else if (path[path.size() - 1] == '/')
-			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_location);
+			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		else
-			rq_html(&rp, rq);
+			rq_html(&rp, rq, config, index_serv, index_loc);
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << std::endl;
@@ -58,17 +60,46 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv)
 	return (rp);
 }
 
-Response	exec_rq_error(__attribute__((unused))Request rq, __attribute__((unused))ConfigFile config, int code)
+// used by exeq_rq_error if no error pages set in configfile
+std::string	fetch_default_error_page(int code)
+{
+	switch (code)
+	{
+		case 400:
+			return DEFAULT_400;
+		case 404:
+			return DEFAULT_404;
+		case 413:
+			return DEFAULT_413;
+		case 501:
+			return DEFAULT_501;
+		default:
+			return "";
+	}
+}
+
+Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, int index_loc)
 {
 	Response		rp;
+	std::stringstream	sscode;
+	sscode << code;
 
-	// create status line
-	rp.setLineState(code);
-	// create header
-	rp.setHeader(rq, config);
-	
-	// check if error page exists in config file to fulfill body; if not no body?
-	
+	rp.setLineState(code);					// create status line
+	rp.setHeader(rq, config, index_serv, index_loc);	// create headers
+	// create body (via error pages in config file or default pages)
+	std::string				path;
+	std::map<std::string, std::string>	err_pages = find_error_pages(config.getServers()[index_serv], index_loc);
+	if (err_pages.size() != 0 && err_pages[sscode.str()].size() != 0)
+		path = err_pages[sscode.str()];
+	else
+		path = fetch_default_error_page(code);
+	if (path.size() > 0 && access(path.c_str(), R_OK) == 0)
+	{
+		std::ifstream		infile(path.c_str());
+		std::stringstream	sstr;
+		sstr << infile.rdbuf();
+		rp.setBody(sstr.str(), "html");
+	}
 	return (rp);
 }
 // int main(void)

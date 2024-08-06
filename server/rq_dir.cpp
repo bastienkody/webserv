@@ -6,18 +6,18 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/06 12:24:18 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/06 17:42:36 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 #include "../ConfigFile/Server.hpp"
 
-// bool	check_auto_index(Server serv, int index_location)
+// bool	check_auto_index(Server serv, int index_loc)
 // {
-// 	if (serv.getLocations()[index_location].getAutoIndex() == "on")
+// 	if (serv.getLocations()[index_loc].getAutoIndex() == "on")
 // 		return (true);
-// 	else if (serv.getLocations()[index_location].getAutoIndex() == "off")
+// 	else if (serv.getLocations()[index_loc].getAutoIndex() == "off")
 // 		return (false);
 // 	if (serv.getAutoIndex() == "on")
 // 		return (true);
@@ -25,9 +25,12 @@
 // 		return (false);
 // }
 
-std::string read_index(Request rq, std::string index)
+std::string read_index(Server serv, Request rq, std::string index, int index_loc)
 {
-	int status = check_file(rq, "www", 1);
+	std::string root = find_str_data(serv, index_loc, "root");
+	if (root.size() == 0)
+		return ("Error");
+	int status = check_file(rq, root, 1);
 	if (status > 0)
 		return ("Error");
 	std::ifstream file(index.c_str());
@@ -43,14 +46,14 @@ std::string read_index(Request rq, std::string index)
 	return (buff);
 }
 
-std::string	create_index(Server serv, int index_location)
+std::string	create_index(Server serv, int index_loc)
 {
-	std::string root = find_str_data(serv, index_location, "root");
+	std::string root = find_str_data(serv, index_loc, "root");
 	if (root.size() == 0)
-		return ("Error"); /*500 ??*/
+		return ("Error");
 	DIR *my_dir = opendir(root.c_str());
 	if (!my_dir)
-		return ("Error"); /*500*/
+		return ("Error");
 	std::string buff;
 	struct dirent *dir_struct;
 	while (true)
@@ -62,21 +65,53 @@ std::string	create_index(Server serv, int index_location)
 		buff += "\n";
 	}
 	if (closedir(my_dir) == -1)
-		return ("Error"); /*500*/
+		return ("Error");
 	return (buff);
 }
 
-void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_location)
+void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_loc, int index_serv)
 {
-	std::string auto_index = find_str_data(serv, index_location, "auto_index");
+	std::cerr<< "BLABLA 4"<<std::endl;
+	std::string auto_index = find_str_data(serv, index_loc, "auto_index");
+	std::string buff;
 	if (auto_index.size() == 0)
-		return (rp->setBody("Error")); /*500 ??*/
-	if (serv.getLocations()[index_location].getIndex().size() != 0)
-		return (rp->setBody(read_index(rq, serv.getLocations()[index_location].getIndex())));
+	{
+		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+		return ;
+	}
+	if (serv.getLocations()[index_loc].getIndex().size() != 0)
+	{
+		std::cerr<< "BLABLA 5"<<std::endl;
+		buff = read_index(serv, rq, serv.getLocations()[index_loc].getIndex(), index_loc);
+		if (buff == "Error")
+		{
+			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+			return ;
+		}
+		return (rp->setBody(buff, "text/html"));
+	}
 	else if (serv.getIndex().size() != 0)
-		return (rp->setBody(read_index(rq, serv.getIndex())));
+	{
+		std::cerr<< "BLABLA 6"<<std::endl;
+		buff = read_index(serv, rq, serv.getLocations()[index_loc].getIndex(), index_loc);
+		if (buff == "Error")
+		{
+			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+			return ;
+		}
+		return (rp->setBody(buff, "text/html"));
+	}
 	else if (auto_index == "on")
-		return (rp->setBody(create_index(serv, index_location)));
+	{
+		std::cerr<< "BLABLA 7"<<std::endl;
+		buff = create_index(serv, index_loc);
+		if (buff == "Error")
+		{
+			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+			return ;
+		}
+		return (rp->setBody(buff, "text/html"));
+	}
 	else
-		exec_rq_error(rq, config, 403);
+		exec_rq_error(rq, config, 405, index_serv, index_loc);
 }
