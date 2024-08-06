@@ -27,6 +27,7 @@ class ConfigFile
 		int getServerFromFd(int fd);
 	// setter
 		void	setServerFd(int fd, int server_nb);
+		void	setCWD(char **env);
 	//	getters for children
 		std::string const & getRoot() const;
 		std::string const & getIndex() const;
@@ -56,6 +57,7 @@ class ConfigFile
 		std::string			_rawData;
 		std::vector<Server>	_servers;
 		std::map<int, int>	_fd_to_server_nb;
+		std::string			_cwd;
 	protected:
 		std::string	_root;
 		std::string	_index;

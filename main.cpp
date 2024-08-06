@@ -110,15 +110,17 @@ int verif_host(ConfigFile config, int i)
 	return (0);
 }
 
-int main(int ac, char **av)
+int main(int ac, char **av, char **env)
 {
 	if (ac > 2)
 		return std::cerr << "expected config file as single argument" << std::endl, 2;
 
 	ConfigFile config(ac == 2 ? av[1] : "ConfigFile/files/new.config");
 	try {
+		config.setCWD(env);
 		config.openReadFileToStr();
 		config.readAllInfos();
+		//config.printAll();
 	}
 	catch (const std::exception &e) {
 		return std::cerr << e.what() << std::endl, 1;

@@ -1,5 +1,6 @@
 #include"ConfigFile.hpp"
 #include"Server.hpp"
+#include <stdexcept>
 
 //	constructors + copy
 ConfigFile::ConfigFile() {}
@@ -22,6 +23,7 @@ ConfigFile & ConfigFile::operator=(const ConfigFile & rhs)
 void	ConfigFile::printAll() const
 {
 	std::cout << "#### Config printer (server nb:" << getServers().size() << ") ####" << std::endl;
+	std::cout << "CWD: " + _cwd << std::endl;
 	for (std::vector<Server>::const_iterator it = getServers().begin(); it != getServers().end(); ++it)
 		it->printAll();
 	std::cout << "#### end of config ####" << std::endl;
@@ -37,7 +39,6 @@ void	ConfigFile::openReadFileToStr()
 	// test size vs string.max (cf. cpp01/04)
 	_fs.seekg(0, std::ios_base::end);
 	unsigned long dataSize = static_cast<unsigned long>(_fs.tellg());
-	std::cout << "Size:" << dataSize << std::endl;
 	_fs.seekg(std::ios_base::beg);
 	std::string string = "test";
 	if (dataSize == 0 || dataSize >= string.max_size())
@@ -85,6 +86,21 @@ int	ConfigFile::getServerFromFd(int fd) {return (_fd_to_server_nb[fd]);}
 void	ConfigFile::setServerFd(int fd, int server_nb)
 {
 	_fd_to_server_nb[fd] = server_nb;
+}
+
+void	ConfigFile::setCWD(char **env)
+{
+	while (env && *env)
+	{
+		std::string s(*env);
+		if (s.size() > 3 && s[0] == 'P' && s[1] == 'W' && s[2] == 'D' && s[3] == '=')
+		{
+			_cwd = s.substr(s.find('=') + 1, s.size() - 1);
+			return ;
+		}
+		(*env)++;
+	}
+	throw std::invalid_argument("Could not retrieve CWD from env, needed to serve files");
 }
 
 //	Getters for children

@@ -31,6 +31,7 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 	int status;
 
 	/*check dir -> return 0 si pas un dir*/
+	std::cout << "searching with root:" << root << std::endl;
 	status = check_file(rq, root, 1);
 	if (status > 0)
 		return ; // exec_rq_error aussi?
@@ -46,6 +47,7 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 		my_html >> tmp;
 		buff += tmp + "\n";
 	}
+	rp->setLineState(200);
 	rp->setBody(buff, path.substr(path.find('.') + 1, path.size() - 1)); // to get the real extension
 }
 
@@ -103,7 +105,7 @@ int	check_allow(Server serv, int index_loc, std::string method)
 {
 	std::vector<std::string> allow = find_vector_data(serv, index_loc, "allow_methods");
 	if (allow.size() == 0)
-		return (0);
+		return (1);
 	for (std::vector<std::string>::iterator it = allow.begin(); it != allow.end(); it++)
 	{
 		if (method == *it)
