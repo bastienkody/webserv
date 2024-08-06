@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/24 17:39:42 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/06 14:55:15 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,11 +96,12 @@ int	send_response(struct client &co, ConfigFile config)
 	}
 
 	// to be done in exec_rq
-	co.rp.setLineState(200);
-	co.rp.setHeader(co.rq, config, index_serv, index_loc);
-	co.rp.setBody("this is the body response abcdefgh\n", "html");
+	// co.rp.setLineState(200);
+	// co.rp.setHeader(co.rq, config, index_serv, index_loc);
+	// co.rp.setBody("this is the body response abcdefgh\n", "html");
 	//std::cout << co.rp.getWholeResponse() << std::endl;
 
+	co.rp = exec_rq(co.rq, config, index_serv, index_loc);
 	// test exec_rq_error
 //	co.rp = exec_rq_error(co.rq, config, 404, index_serv, index_loc);
 

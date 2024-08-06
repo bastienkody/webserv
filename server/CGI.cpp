@@ -6,11 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/02 15:16:02 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/06 17:35:54 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/CGI.hpp"
+#include "../ConfigFile/ConfigFile.hpp"
 #include "../include/server.hpp"
 
 CGI::CGI(void){}
@@ -30,11 +31,14 @@ CGI & CGI::operator=(const CGI &obj)
 Response	*CGI::getRp()	const {return _rp;}
 Request		 CGI::getRq()	const {return _rq;}
 
-CGI::CGI(Response *rp, Request rq) : _rp(rp), _rq(rq)
+CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc) : _rp(rp), _rq(rq), _config(config), _index_serv(index_serv), _index_loc(index_loc)
 {
+	std::cerr<< "BLABLA 3"<<std::endl;
 	int status;
 	int pipe_fd[2];
 
+	(void) _index_serv;
+	(void) _index_loc;
 	/*check dir -> return 0 si pas un dir ???*/
 	status = check_file(this->_rq, "cgi-bin", 2);
 	if (status > 0)
