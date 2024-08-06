@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/06 17:35:43 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/06 18:34:23 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,11 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 
 Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
-	std::cerr<< "BLABLA 1"<<std::endl;
 	if (index_loc == -1)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 
 	Response rp;
 	std::string path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
-	std::cerr<< "BLABLA 2"<<std::endl;
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 				CGI cgi(&rp, rq, config, index_serv, index_loc);
