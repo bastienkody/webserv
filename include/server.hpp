@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/26 14:47:17 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/06 15:09:33 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,10 @@ int		check_serv_socket(int fd, unsigned int *serv_fds, int size);
 void	get_html(Response *rp, Request rq);
 void	post_html(Response *rp, Request rq);
 void	delete_html(Response *rp, Request rq);
-void	rq_html(Response *rp, Request rq);
+void	rq_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc);
 
 /*rq_dir.cpp*/
-void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_location);
+void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_loc, int index_serv);
 
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);
@@ -66,8 +66,8 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, 
 int									check_file(Request rq, std::string dir, int mode);
 int									find_location(const std::string path, Server serv);
 int									find_location2(const std::string path, Server serv);
-std::string							find_str_data(Server serv, int index_location, std::string to_find);
-std::map<std::string, std::string>	find_error_pages(Server serv, int index_location);
-std::vector<std::string>			find_vector_data(Server serv, int index_location, std::string to_find);
+std::string							find_str_data(Server serv, int index_loc, std::string to_find);
+std::map<std::string, std::string>	find_error_pages(Server serv, int index_loc);
+std::vector<std::string>			find_vector_data(Server serv, int index_loc, std::string to_find);
 
 #endif
