@@ -20,6 +20,7 @@
 #include "../StatusCode/StatusCode.hpp"
 #include "../RequestParsing/Request.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
+#include "../ParserUtils/ParserUtils.hpp"
 
 class Response
 {
@@ -35,13 +36,17 @@ class Response
 		std::string getWholeResponse() const;
 
 		void	setLineState(int code);
-		void	setHeader(Request rq, ConfigFile config);
-		void	setBody(std::string body);
+		void	setHeader(Request rq, ConfigFile config, int serv_nb, int loc_nb);
+		void	setBody(std::string body, std::string type);
 
+		// utils header body
+		void	setContentLength(unsigned int body_size);
+		void	setContentType(std::string type);
 		//	utils header
 		std::string	hcreateTimeStr() const;
+		std::string	hcreateConnection(const Request & rq) const;
 		std::string	hcreateServer() const;
-		std::string	hcreateAllowMethods(ConfigFile config) const;
+		std::string	hcreateAllowMethods(ConfigFile config, int serv_nb, int loc_nb) const;
 
 	private:
 

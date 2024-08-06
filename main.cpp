@@ -10,30 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-/*---------TO DO---------
-- : pas encore fait/en cours
-~ : fait mais pas sur que ce soit bien
-+ : fait
-
-
-
-RECOMMENCER MERGE (AJOUTER Poll A CONFIGFILE OBJ + refaire makefile)
-
-        ~ finir mise en place serv test
-                ~ creer class poll pour faciliter manip (notamment l'update du
-pollfd) puis finir implementation
-                - creer class socket (je sais pas encore comment je vais m'en
-servir) ~ passer socket en non bloquant
-                + POUVOIR ECOUTER SUR PLUSIEURS PORTS (creer socket server pour
-chaque port ?) ~ gerer requete chunk
-        - METTRE EN PLACE CGI
-        - gerer ecriture sur fd via poll()
-        - utiliser "signal" pour catch ctrl c et terminer le programme
-        - mettre a la norme du projet (check fonction autorise et alternative
-pour fonctions C)
-        - gerer leaks et fds
--------------------------*/
-
 #include "Clients/Clients.hpp"
 #include "ConfigFile/ConfigFile.hpp"
 #include "ConfigFile/Location.hpp"
@@ -57,11 +33,21 @@ unsigned int *list_server_fd(Poll poll_fds)
 
 void deco_client(std::vector<struct client> &clients, Poll *poll_fds, int i)
 {
-	int offset = find_co_by_fd_pos(clients, poll_fds->getFds(i).fd);
+	int offset = find_client(clients, poll_fds->getFds(i).fd);
+	std::cout << "[Client" << poll_fds->getFds(i).fd << "] to be deco" << std::endl;
 	if (offset > -1)
 		clients.erase(clients.begin() + offset);
 	close(poll_fds->getFds(i).fd);
 	poll_fds->remove_to_poll(i);
+}
+
+struct client	create_client(int server_fd, Poll &poll_fds)
+{
+	struct client cli;
+	cli.fd = accept_new_connection(server_fd, &poll_fds);
+	cli.server_fd = server_fd;
+	cli.await_response = false;
+	return cli;
 }
 
 void launch_server(ConfigFile config, Poll poll_fds)
@@ -84,20 +70,13 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			{
 				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
-				{
-					struct client cli;
-					cli.fd = accept_new_connection(server_fd[status], &poll_fds);
-					cli.server_fd = poll_fds.getFds(i).fd;
-					cli.await_response = false;
-					clients.push_back(cli);
-				}
+					clients.push_back(create_client(server_fd[status], poll_fds));
 				// data to read from the client request
 				else
 				{
 					try {
 						buff = read_recv_data(i, &poll_fds);
-						if ((pos = find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)) == -1) 
-							std::cout << "pos == -1 in pollin read recv" << std::endl; // should never happen, to be removed later
+						pos = find_client(clients, poll_fds.getFds(i).fd);
 						clients[pos].rq.appendRaw(buff);
 						clients[pos].await_response = true;
 					}
@@ -107,12 +86,16 @@ void launch_server(ConfigFile config, Poll poll_fds)
 				}
 			}
 			// responding
-			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].await_response == true)
+			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_client(clients, poll_fds.getFds(i).fd)].await_response == true)
 			{
-				if (send_response(clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)], config) < 0)
-					deco_client(clients, &poll_fds, i); // pb de read/write --> deco client
+				pos = find_client(clients, poll_fds.getFds(i).fd);
+				if (send_response(clients[pos], config) < 0 || RequestChecking::isKeepAlive(clients[pos].rq) == false)
+					deco_client(clients, &poll_fds, i); // pb de read/write ou no keepalive --> deco client
 				else
-					clients[find_co_by_fd_pos(clients, poll_fds.getFds(i).fd)].await_response = false;
+				{
+					clients[pos].await_response = false;
+					clients[pos].rp = Response();
+				}
 			}
 		}
 	}
@@ -134,8 +117,8 @@ int main(int ac, char **av)
 
 	ConfigFile config(ac == 2 ? av[1] : "ConfigFile/files/new.config");
 	try {
-	config.openReadFileToStr();
-	config.readAllInfos();
+		config.openReadFileToStr();
+		config.readAllInfos();
 	}
 	catch (const std::exception &e) {
 		return std::cerr << e.what() << std::endl, 1;

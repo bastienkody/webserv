@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/07/26 19:14:59 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/06 14:38:56 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,17 +26,17 @@ void	get_html(Response *rp, Request rq)
 	/*check dir -> return 0 si pas un dir*/
 	status = check_file(rq, "www", 1);
 	if (status > 0)
-		return ;
+		return ; // exec_rq_error aussi?
 	std::ifstream my_html(path.c_str());
 	if (!my_html)
-		return (rp->setBody("Error")); /*500*/
+		return (rp->setBody("Error", "text/plain")); // plutot passer par un exec_rq_error (code 501?) pour set status line et header aussi
 	while (!my_html.eof())
 	{
 		std::string tmp;
 		my_html >> tmp;
 		buff += tmp + "\n";
 	}
-	rp->setBody(buff);
+	rp->setBody(buff, "text/html");
 }
 
 void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
@@ -49,7 +49,7 @@ void	post_html(Response *rp, Request rq) /*je sais pas encore comment faire*/
 	// 	return ;
 	std::ofstream my_html(path.c_str());
 	if (!my_html)
-		return (rp->setBody("Error")); /*500*/
+		return (rp->setBody("Error", "text/plain"));
 	my_html << rq.getBody();
 }
 
@@ -61,11 +61,11 @@ void	delete_html(Response *rp, Request rq)
 	/*check dir -> return 0 si pas un dir*/
 	status = check_file(rq, "www", 1);
 	if (status > 0)
-		return (rp->setBody("Error")); /*500*/
+		return (rp->setBody("Error", "text/plain"));
 	path = "www" + path;
 	status = remove(path.c_str());
 	if (status != 0)
-		return (rp->setBody("Error")); /*500*/
+		return (rp->setBody("Error", "text/plain"));
 }
 
 void	rq_html(Response *rp, Request rq)

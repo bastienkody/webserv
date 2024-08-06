@@ -82,7 +82,7 @@ void	CGI::exec_father(int *pipe_fd)
 	status = read(pipe_fd[0], buff, 100);
 	if (status == -1)
 		return ;
-	this->getRp()->setBody(buff);
+	this->getRp()->setBody(buff, "html");
 	std::cout<< "buff : "<<this->getRp()->getBody();
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);

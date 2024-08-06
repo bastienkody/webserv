@@ -14,6 +14,8 @@ class ParserUtils
 		static bool			checkRmSemiColon(std::string & line);
 		static bool			isStrDigit(const std::string & line);
 		static bool			isStrAlpha(const std::string & line);
+		static bool			isStrPrint(const std::string & line);
+		static bool			compCaseInsensitive(const std::string & line, const std::string & ref);
 		static unsigned int	charCount(std::string & line, char c); // bc I dont want to include algorithm
 };
 

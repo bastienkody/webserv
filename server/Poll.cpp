@@ -26,6 +26,7 @@ void	Poll::add_to_poll(int new_fd)
 {
 	if (this->_count >= 256) 
 		throw std::out_of_range("Error: Not enough space in poll_fds");
+	memset(&_fds[_count], 0, sizeof(struct pollfd));
 	_fds[_count].fd = new_fd;
 	_fds[_count].events = POLLIN | POLLOUT;
 	this->_count += 1;

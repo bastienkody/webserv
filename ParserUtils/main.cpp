@@ -9,4 +9,5 @@ int	main(int ac, char **av)
 	//std::cout << ParserUtils::firstWsPos(av[1]) << std::endl;
 	//std::string line(av[1]); std::cout << ParserUtils::checkRmSemiColon(line) << "\tline: " + line <<std::endl;
 	//std::cout << ParserUtils::firstWsPos(av[1]) << std::endl;
+	//std::cout << ParserUtils::compCaseInsensitive(av[1], "Salut.") << std::endl;
 }

@@ -5,6 +5,7 @@
 #include<fstream>
 #include<string>
 #include "../RequestParsing/Request.hpp"
+#include "../ParserUtils/ParserUtils.hpp"
 
 #define	EXPECTED_VERSION "HTTP/1.1"
 #define GET "GET"
@@ -21,6 +22,7 @@ class RequestChecking
 		static int	CheckRequiredHeaderPOST(const Request & rq, std::string max_body_size);
 		static int	CheckRequiredHeaderDELETE(const Request & rq);
 		static int	CheckRequiredHeaderGET(const Request & rq);
+		static bool	isKeepAlive(const Request & rq);
 
 };
 

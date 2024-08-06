@@ -29,8 +29,37 @@ int	check_file(Request rq, std::string dir, int mode)
 	return (0);
 }
 
+// test absolute then non absolute + correct not perfect match
+int find_location2(const std::string path, Server serv)
+{
+	size_t size = 0, index = -1;
+
+	// absolute match
+	for(size_t i = 0; i < serv.getLocations().size(); i++)
+		if (serv.getLocations()[i].getIsPathAbsolute() == true && path == serv.getLocations()[i].getPath())
+				return i;
+	// non absolute : perfect or longest match
+	for(size_t i = 0; i < serv.getLocations().size(); i++)
+	{
+		std::string loc_path = serv.getLocations()[i].getPath();
+		if (serv.getLocations()[i].getIsPathAbsolute() == true || loc_path.size() > path.size())
+			continue;
+		if (path == loc_path)
+			return i;
+		for (size_t x = 0; x < loc_path.size() && path[x] == loc_path[x]; ++x)
+		{
+			if (x == loc_path.size() - 1 && x >= size)
+			{
+				size = x;
+				index = i;
+			}
+		}
+	}
+	return (index);
+}
+
 /*A modifier ?*/
-int find_location(std::string path, Server serv)
+int find_location(const std::string path, Server serv)
 {
 	size_t size = 0;
 	int index = -1;
@@ -76,31 +105,31 @@ std::string	find_str_data(Server serv, int index_location, std::string to_find)
 			switch (i)
 			{
 				case 0:
-					if (serv.getLocations()[index_location].getRoot().size() != 0)
+					if (index_location > -1 && serv.getLocations()[index_location].getRoot().size() != 0)
 						return (serv.getLocations()[index_location].getRoot());
 					else if (serv.getRoot().size() != 0)
 						return (serv.getRoot());
 					break ;
 				case 1:
-					if (serv.getLocations()[index_location].getIndex().size() != 0)
+					if (index_location > -1 && serv.getLocations()[index_location].getIndex().size() != 0)
 						return (serv.getLocations()[index_location].getIndex());
 					else if (serv.getIndex().size() != 0)
 						return (serv.getIndex());
 					break ;
 				case 2:
-					if (serv.getLocations()[index_location].getAutoIndex().size() != 0)
+					if (index_location > -1 && serv.getLocations()[index_location].getAutoIndex().size() != 0)
 						return (serv.getLocations()[index_location].getAutoIndex());
 					else if (serv.getAutoIndex().size() != 0)
 						return (serv.getAutoIndex());
 					break ;
 				case 3:
-					if (serv.getLocations()[index_location].getMaxBodySize().size() != 0)
+					if (index_location > -1 && serv.getLocations()[index_location].getMaxBodySize().size() != 0)
 						return (serv.getLocations()[index_location].getMaxBodySize());
 					else if (serv.getMaxBodySize().size() != 0)
 						return (serv.getMaxBodySize());
 					break ;
 				case 4:
-					if (serv.getLocations()[index_location].getRedirection().size() != 0)
+					if (index_location > -1 && serv.getLocations()[index_location].getRedirection().size() != 0)
 						return (serv.getLocations()[index_location].getRedirection());
 					else if (serv.getRedirection().size() != 0)
 						return (serv.getRedirection());
@@ -108,18 +137,16 @@ std::string	find_str_data(Server serv, int index_location, std::string to_find)
 			}
 		}
 	}
-	std::string blabla;
-	return (blabla);
+	return (std::string());
 }
 
 std::map<std::string, std::string> find_error_pages(Server serv, int index_location)
 {
-	if (serv.getLocations()[index_location].getErrorPages().size() != 0)
+	if (index_location > -1 && serv.getLocations()[index_location].getErrorPages().size() != 0)
 		return (serv.getLocations()[index_location].getErrorPages());
 	else if (serv.getErrorPages().size() != 0)
 		return (serv.getErrorPages());
-	std::map<std::string, std::string> blabla;
-	return (blabla);
+	return (std::map<std::string, std::string>());
 }
 
 std::vector<std::string> find_vector_data(Server serv, int index_location, std::string to_find)
@@ -132,19 +159,19 @@ std::vector<std::string> find_vector_data(Server serv, int index_location, std::
 			switch (i)
 			{
 				case 0:
-					if (serv.getLocations()[index_location].getAllowMethods().size() != 0)
+					if (index_location > -1 && serv.getLocations()[index_location].getAllowMethods().size() != 0)
 						return (serv.getLocations()[index_location].getAllowMethods());
 					else if (serv.getAllowMethods().size() != 0)
 						return (serv.getAllowMethods());
 					break ;
 				case 1:
-					if (serv.getLocations()[index_location].getCgiExt().size() != 0)
+					if (index_location > -1 && serv.getLocations()[index_location].getCgiExt().size() != 0)
 						return (serv.getLocations()[index_location].getCgiExt());
 					else if (serv.getCgiExt().size() != 0)
 						return (serv.getCgiExt());
 					break ;
 				case 2:
-					if (serv.getLocations()[index_location].getCgiPathes().size() != 0)
+					if (index_location > -1 && serv.getLocations()[index_location].getCgiPathes().size() != 0)
 						return (serv.getLocations()[index_location].getCgiPathes());
 					else if (serv.getCgiPathes().size() != 0)
 						return (serv.getCgiPathes());
@@ -153,6 +180,5 @@ std::vector<std::string> find_vector_data(Server serv, int index_location, std::
 			}
 		}
 	}
-	std::vector<std::string> blabla;
-	return (blabla);
+	return (std::vector<std::string>());
 }
