@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/06 17:35:54 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 14:16:25 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ Request		 CGI::getRq()	const {return _rq;}
 
 CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc) : _rp(rp), _rq(rq), _config(config), _index_serv(index_serv), _index_loc(index_loc)
 {
-	std::cerr<< "BLABLA 3"<<std::endl;
 	int status;
 	int pipe_fd[2];
 

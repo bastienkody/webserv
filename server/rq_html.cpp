@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/06 17:42:00 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 14:34:07 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
 {
 	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
+	std::cerr<< "root : " << root << std::endl;
 	if (root.size() == 0)
 	{
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
@@ -35,13 +36,14 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 	status = check_file(rq, root, 1);
 	if (status > 0)
 	{
+		std::cerr<< "status : " << status<<std::endl;
 		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
 		return ;
 	}
 	std::ifstream my_html(path.c_str());
 	if (!my_html)
 	{
-		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc); // plutot passer par un exec_rq_error (code 501?) pour set status line et header aussi
+		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
 	while (!my_html.eof())
@@ -52,6 +54,9 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 	}
 	rp->setLineState(200);
 	rp->setBody(buff, path.substr(path.find('.') + 1, path.size() - 1)); // to get the real extension
+	rp->setLineState(200);
+	rp->setHeader(rq, config, index_serv, index_loc);
+	rp->setBody(buff, "html");
 }
 
 void	post_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
@@ -93,7 +98,7 @@ void	delete_html(Response *rp, Request rq, ConfigFile config, int index_serv, in
 	status = check_file(rq, root, 1);
 	if (status > 0)
 	{
-		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
 		return ;
 	}
 	status = remove(path.c_str());
@@ -125,7 +130,6 @@ void	rq_html(Response *rp, Request rq, ConfigFile config, int index_serv, int in
 	{
 		if (rq.getRql().getVerb() == method[i])
 		{
-			/*check allow method*/
 			if (check_allow(config.getServers()[index_serv], index_loc, method[i]) == 0)
 				break ;
 			switch(i)

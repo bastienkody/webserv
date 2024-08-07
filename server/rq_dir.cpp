@@ -6,24 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/06 17:42:36 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 14:34:12 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 #include "../ConfigFile/Server.hpp"
-
-// bool	check_auto_index(Server serv, int index_loc)
-// {
-// 	if (serv.getLocations()[index_loc].getAutoIndex() == "on")
-// 		return (true);
-// 	else if (serv.getLocations()[index_loc].getAutoIndex() == "off")
-// 		return (false);
-// 	if (serv.getAutoIndex() == "on")
-// 		return (true);
-// 	else
-// 		return (false);
-// }
 
 std::string read_index(Server serv, Request rq, std::string index, int index_loc)
 {
@@ -71,7 +59,6 @@ std::string	create_index(Server serv, int index_loc)
 
 void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_loc, int index_serv)
 {
-	std::cerr<< "BLABLA 4"<<std::endl;
 	std::string auto_index = find_str_data(serv, index_loc, "auto_index");
 	std::string buff;
 	if (auto_index.size() == 0)
@@ -81,7 +68,6 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 	}
 	if (serv.getLocations()[index_loc].getIndex().size() != 0)
 	{
-		std::cerr<< "BLABLA 5"<<std::endl;
 		buff = read_index(serv, rq, serv.getLocations()[index_loc].getIndex(), index_loc);
 		if (buff == "Error")
 		{
@@ -92,7 +78,6 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 	}
 	else if (serv.getIndex().size() != 0)
 	{
-		std::cerr<< "BLABLA 6"<<std::endl;
 		buff = read_index(serv, rq, serv.getLocations()[index_loc].getIndex(), index_loc);
 		if (buff == "Error")
 		{
@@ -103,7 +88,6 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 	}
 	else if (auto_index == "on")
 	{
-		std::cerr<< "BLABLA 7"<<std::endl;
 		buff = create_index(serv, index_loc);
 		if (buff == "Error")
 		{
@@ -113,5 +97,5 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 		return (rp->setBody(buff, "text/html"));
 	}
 	else
-		exec_rq_error(rq, config, 405, index_serv, index_loc);
+		exec_rq_error(rq, config, 500, index_serv, index_loc);
 }
