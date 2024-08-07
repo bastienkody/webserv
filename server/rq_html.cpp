@@ -54,9 +54,7 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 	}
 	rp->setLineState(200);
 	rp->setBody(buff, path.substr(path.find('.') + 1, path.size() - 1)); // to get the real extension
-	rp->setLineState(200);
 	rp->setHeader(rq, config, index_serv, index_loc);
-	rp->setBody(buff, "html");
 }
 
 void	post_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
