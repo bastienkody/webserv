@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/06 18:34:23 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 14:16:58 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,14 @@
 int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
-
+	
 	ext = path.rfind('.');
-	for (size_t i = 0; i < serv.getLocations()[index_loc].getCgiExt().size(); i++)
+	std::vector<std::string> cgi_ext = find_vector_data(serv, index_loc, "cgi_ext");
+	if (cgi_ext.size() == 0)
+		return (0);
+	for (std::vector<std::string>::iterator it = cgi_ext.begin(); it != cgi_ext.end(); it++)
 	{
-		if (ext == serv.getLocations()[i].getCgiExt()[i])
-			return (1);
-	}
-	for (size_t i = 0; i < serv.getCgiExt().size(); i++)
-	{
-		if (ext == serv.getCgiExt()[i])
+		if (*it == ext)
 			return (1);
 	}
 	return (0);
@@ -41,12 +39,11 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
 	if (index_loc == -1)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
-
 	Response rp;
-	std::string path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
+	std::string path = rq.getRql().getUrl().getPath();
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
-				CGI cgi(&rp, rq, config, index_serv, index_loc);
+			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		else if (path[path.size() - 1] == '/')
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		else

@@ -6,24 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/06 18:42:41 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 12:29:16 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 #include "../ConfigFile/Server.hpp"
-
-// bool	check_auto_index(Server serv, int index_loc)
-// {
-// 	if (serv.getLocations()[index_loc].getAutoIndex() == "on")
-// 		return (true);
-// 	else if (serv.getLocations()[index_loc].getAutoIndex() == "off")
-// 		return (false);
-// 	if (serv.getAutoIndex() == "on")
-// 		return (true);
-// 	else
-// 		return (false);
-// }
 
 std::string read_index(Server serv, Request rq, std::string index, int index_loc)
 {
