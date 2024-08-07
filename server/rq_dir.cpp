@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 14:34:12 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:48:18 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,16 @@
 
 std::string read_index(Server serv, Request rq, std::string index, int index_loc)
 {
+	(void) rq;
 	std::string root = find_str_data(serv, index_loc, "root");
 	if (root.size() == 0)
 		return ("Error");
-	int status = check_file(rq, root, 1);
+	int status = check_file(root + index, 1);
 	if (status > 0)
+	{
+		std::cerr<< "status : "<< status<<std::endl;
 		return ("Error");
+	}
 	std::ifstream file(index.c_str());
 	if (!file)
 		return ("Error");
@@ -29,7 +33,7 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 	{
 		std::string tmp;
 		file >> tmp;
-		buff += tmp + "\n";
+		buff += tmp + "<br>";
 	}
 	return (buff);
 }
@@ -50,7 +54,7 @@ std::string	create_index(Server serv, int index_loc)
 		if (dir_struct == NULL)
 			break ;
 		buff += dir_struct->d_name;
-		buff += "\n";
+		buff += "<br>";
 	}
 	if (closedir(my_dir) == -1)
 		return ("Error");
@@ -74,7 +78,10 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
-		return (rp->setBody(buff, "text/html"));
+		rp->setLineState(200);
+		rp->setHeader(rq, config, index_serv, index_loc);
+		rp->setBody(buff, "html");
+		return ;
 	}
 	else if (serv.getIndex().size() != 0)
 	{
@@ -84,7 +91,10 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
-		return (rp->setBody(buff, "text/html"));
+		rp->setLineState(200);
+		rp->setHeader(rq, config, index_serv, index_loc);
+		rp->setBody(buff, "html");
+		return ;
 	}
 	else if (auto_index == "on")
 	{
@@ -94,7 +104,10 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
-		return (rp->setBody(buff, "text/html"));
+		rp->setLineState(200);
+		rp->setHeader(rq, config, index_serv, index_loc);
+		rp->setBody(buff, "html");
+		return ;
 	}
 	else
 		exec_rq_error(rq, config, 500, index_serv, index_loc);

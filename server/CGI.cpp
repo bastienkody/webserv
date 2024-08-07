@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 14:16:25 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:35:40 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	(void) _index_serv;
 	(void) _index_loc;
 	/*check dir -> return 0 si pas un dir ???*/
-	status = check_file(this->_rq, "cgi-bin", 2);
+	std::string path = "cgi-bin/" + this->_rq.getRql().getUrl().getPath();
+	status = check_file(path, 2);
 	if (status > 0)
 		throw Exception(1);
 	status = pipe(pipe_fd);
