@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 13:17:10 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:36:39 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
 
 /*creer check dir -> return 0 si pas un dir*/
 
-int	check_file(Request rq, std::string dir, int mode)
+int	check_file(std::string path, int mode)
 {
-	std::string path = dir + rq.getRql().getUrl().getPath();
+	// std::string path = dir + rq.getRql().getUrl().getPath();
 	std::cerr<< path<<std::endl;
 	if (access(path.c_str(), F_OK) == -1)
 		return (1);
@@ -106,7 +106,6 @@ std::string	find_str_data(Server serv, int index_loc, std::string to_find)
 			switch (i)
 			{
 				case 0:
-					std::cerr<< serv.getLocations()[index_loc].getRoot()<<std::endl;
 					if (index_loc > -1 && serv.getLocations()[index_loc].getRoot().size() != 0)
 					{
 						return (serv.getLocations()[index_loc].getRoot());
