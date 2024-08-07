@@ -21,15 +21,19 @@
 void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
 {
 	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
-	std::cerr<< "root : " << root << std::endl;
 	if (root.size() == 0)
 	{
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
+
+	int status;
 	std::string buff;
 	std::string path = root + rq.getRql().getUrl().getPath();
-	int status;
+	std::string loc_path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
+
+	path.erase(path.find(loc_path), loc_path.size());
+	std::cout << "PATH: " + path << std::endl;
 
 	/*check dir -> return 0 si pas un dir*/
 	std::cout << "searching with root:" << root << std::endl;
