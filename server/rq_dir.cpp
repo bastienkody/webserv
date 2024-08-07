@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:50:49 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 16:25:42 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 	{
 		std::string tmp;
 		file >> tmp;
-		buff += tmp + "<br>";
+		buff += tmp;
+		std::cerr<< buff<<std::endl;
 	}
 	return (buff);
 }
