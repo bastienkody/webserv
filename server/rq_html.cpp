@@ -34,7 +34,10 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 	std::cout << "searching with root:" << root << std::endl;
 	status = check_file(rq, root, 1);
 	if (status > 0)
-		return ; // exec_rq_error aussi?
+	{
+		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
+		return ;
+	}
 	std::ifstream my_html(path.c_str());
 	if (!my_html)
 	{
