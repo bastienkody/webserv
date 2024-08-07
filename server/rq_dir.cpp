@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:48:18 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:50:49 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 	std::string root = find_str_data(serv, index_loc, "root");
 	if (root.size() == 0)
 		return ("Error");
-	int status = check_file(root + index, 1);
+	index = root + index;
+	int status = check_file(index, 1);
 	if (status > 0)
 	{
 		std::cerr<< "status : "<< status<<std::endl;
