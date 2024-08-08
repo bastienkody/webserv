@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:35:21 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/08 07:06:13 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,10 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 		my_html >> tmp;
 		buff += tmp + "\n";
 	}
+	std::cerr<< "ext : " << path.substr(path.rfind('.') + 1, path.size() - 1) << std::endl;
 	rp->setLineState(200);
 	rp->setHeader(rq, config, index_serv, index_loc);
-	rp->setBody(buff, path.substr(path.find('.') + 1, path.size() - 1)); // to get the real extension
+	rp->setBody(buff, path.substr(path.rfind('.') + 1, path.size() - 1)); // to get the real extension
 }
 
 void	post_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
