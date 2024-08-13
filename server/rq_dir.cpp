@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 16:25:42 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 13:15:47 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,5 +112,5 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 		return ;
 	}
 	else
-		exec_rq_error(rq, config, 500, index_serv, index_loc);
+		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 }

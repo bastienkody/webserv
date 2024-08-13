@@ -6,7 +6,7 @@ SRC_DIR	=	./
 OBJ_DIR	=	obj/
 
 #Source
-FILES	=	main ConfigFile Location Server ParserUtils Request RequestLine \
+FILES	=	main ConfigFile Locatimakeon Server ParserUtils Request RequestLine \
 			URL CGI exec_rq Poll Response rq_dir rq_html server utils \
 			RequestChecking StatusCode Clients
 SRCS	=	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(FILES)))

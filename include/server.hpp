@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:34:50 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 17:00:53 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, 
 
 /*utils.cpp*/
 int									check_file(std::string path, int mode);
+std::string							concatenate_root_path(Request rq, ConfigFile config, int index_serv, int index_loc);
 int									find_location(const std::string path, Server serv);
 int									find_location2(const std::string path, Server serv);
 std::string							find_str_data(Server serv, int index_loc, std::string to_find);

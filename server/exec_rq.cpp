@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 14:16:58 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 16:55:03 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,14 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
 	
-	ext = path.rfind('.');
+	std::cerr<< "path check cgi : " + path<<std::endl;
+	ext = &path[path.rfind('.')];
 	std::vector<std::string> cgi_ext = find_vector_data(serv, index_loc, "cgi_ext");
 	if (cgi_ext.size() == 0)
 		return (0);
 	for (std::vector<std::string>::iterator it = cgi_ext.begin(); it != cgi_ext.end(); it++)
 	{
+		std::cerr<< "ext : " + ext<< " | it : " + *it<<std::endl;
 		if (*it == ext)
 			return (1);
 	}
@@ -40,11 +42,13 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	if (index_loc == -1)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 	Response rp;
-	std::string path = rq.getRql().getUrl().getPath();
+	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
+	if (path.size() == 0)
+		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
-		else if (path[path.size() - 1] == '/')
+		else if (path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL)
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		else
 			rq_html(&rp, rq, config, index_serv, index_loc);

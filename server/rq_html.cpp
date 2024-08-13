@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/08 07:06:13 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 16:33:29 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 	status = check_file(path, 1);
 	if (status > 0)
 	{
-		std::cerr<< "status : " << status<<std::endl;
 		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
 		return ;
 	}

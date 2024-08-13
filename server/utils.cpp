@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 16:43:59 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 16:54:22 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,17 @@ int find_location2(const std::string path, Server serv)
 		}
 	}
 	return (index);
+}
+
+std::string concatenate_root_path(Request rq, ConfigFile config, int index_serv, int index_loc)
+{
+	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
+	if (root.size() == 0)
+		return (std::string());
+	std::string path = root + rq.getRql().getUrl().getPath();
+	std::string loc_path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
+	path.erase(path.find(loc_path), loc_path.size());
+	return (path);
 }
 
 /*A modifier ?*/

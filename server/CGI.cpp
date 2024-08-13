@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:35:40 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 16:48:01 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,19 +36,19 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	int status;
 	int pipe_fd[2];
 
-	(void) _index_serv;
-	(void) _index_loc;
-	/*check dir -> return 0 si pas un dir ???*/
-	std::string path = "cgi-bin/" + this->_rq.getRql().getUrl().getPath();
+	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
+	if (root.size() == 0)
+		return *_rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+	std::string path = root + this->_rq.getRql().getUrl().getPath();
 	status = check_file(path, 2);
 	if (status > 0)
-		throw Exception(1);
+		return *_rp = exec_rq_error(_rq, _config, 404, _index_serv, _index_loc);
 	status = pipe(pipe_fd);
 	if (status == -1)
-		throw Exception(2);
+		return *_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 	status = fork();
 	if (status == -1)
-		throw Exception(3);
+		return *_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 	else if (status == 0)
 		this->exec_son(pipe_fd);
 	else
