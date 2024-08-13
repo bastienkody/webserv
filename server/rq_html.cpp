@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 17:58:08 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 18:13:22 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,6 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 		return ;
 	}
 	std::cout << "PATH: " + path << std::endl;
-
-	/*check dir -> return 0 si pas un dir*/
-	std::cout << "searching with root:" << root << std::endl;
 	status = check_file(path, 1);
 	if (status > 0)
 	{

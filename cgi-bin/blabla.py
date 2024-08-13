@@ -10,6 +10,4 @@ content += '<body>'
 content += '<h2>Hello World! This is my first CGI program</h2>'
 content += '</body>'
 content += '</html>'
-print ("Content-type: text/html\n")
-print ("Content-length: ", len(content), "\n\n")
 print (content)

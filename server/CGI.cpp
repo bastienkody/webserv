@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 17:54:09 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 18:13:35 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,19 +86,18 @@ void	CGI::exec_father(int *pipe_fd)
 	// wait(NULL);
 	int status;
 	char *buff;
-	buff = (char *) malloc(sizeof(char) * (100 + 1));
+	buff = (char *) malloc(sizeof(char) * (1000 + 1));
 	if (!buff)
 		return ;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 1000; i++)
 		buff[i] = '\0';
 	dup2(pipe_fd[0], STDIN_FILENO);
-	status = read(pipe_fd[0], buff, 100);
+	status = read(pipe_fd[0], buff, 1000);
 	if (status == -1)
 		return ;
 	this->getRp()->setLineState(200);
 	this->getRp()->setHeader(_rq, _config, _index_serv, _index_loc);
-	this->getRp()->setBody(buff, ".py");
-	// std::cout<< "buff : "<<this->getRp()->getBody();
+	this->getRp()->setBody(buff, "html");
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
 }

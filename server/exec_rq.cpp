@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 17:24:03 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 18:13:07 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,12 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
 	
-	std::cerr<< "path check cgi : " + path<<std::endl;
 	ext = &path[path.rfind('.')];
 	std::vector<std::string> cgi_ext = find_vector_data(serv, index_loc, "cgi_ext");
 	if (cgi_ext.size() == 0)
 		return (0);
 	for (std::vector<std::string>::iterator it = cgi_ext.begin(); it != cgi_ext.end(); it++)
 	{
-		std::cerr<< "ext : " + ext<< " | it : " + *it<<std::endl;
 		if (*it == ext)
 			return (1);
 	}
