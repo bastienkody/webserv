@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 16:55:03 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 17:24:03 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include "../ConfigFile/Server.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
-#include "../include/Exception.hpp"
 #include <sstream>
 
 /*ajouter Location obj pour check methods allows*/

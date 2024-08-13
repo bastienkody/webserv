@@ -6,13 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 16:33:29 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 17:58:08 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 #include "../RequestParsing/Request.hpp"
-#include "../include/Exception.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include <fstream>
 
@@ -20,19 +19,14 @@
 
 void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
 {
-	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
-	if (root.size() == 0)
+	int status;
+	std::string buff;
+	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
+	if (path.size() == 0)
 	{
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
-
-	int status;
-	std::string buff;
-	std::string path = root + rq.getRql().getUrl().getPath();
-	std::string loc_path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
-
-	path.erase(path.find(loc_path), loc_path.size());
 	std::cout << "PATH: " + path << std::endl;
 
 	/*check dir -> return 0 si pas un dir*/
