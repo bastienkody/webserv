@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 13:15:47 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 15:26:36 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 		std::string tmp;
 		file >> tmp;
 		buff += tmp;
-		std::cerr<< buff<<std::endl;
+		// std::cerr<< buff<<std::endl;
 	}
 	return (buff);
 }
@@ -69,6 +69,7 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 	std::string buff;
 	if (auto_index.size() == 0)
 	{
+		std::cerr<< "Blabla 3"<<std::endl;
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
@@ -77,6 +78,7 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 		buff = read_index(serv, rq, serv.getLocations()[index_loc].getIndex(), index_loc);
 		if (buff == "Error")
 		{
+			std::cerr<< "Blabla 4"<<std::endl;
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
@@ -90,6 +92,7 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 		buff = read_index(serv, rq, serv.getLocations()[index_loc].getIndex(), index_loc);
 		if (buff == "Error")
 		{
+			std::cerr<< "Blabla 5"<<std::endl;
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
@@ -103,6 +106,7 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 		buff = create_index(serv, index_loc);
 		if (buff == "Error")
 		{
+			std::cerr<< "Blabla 6"<<std::endl;
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
@@ -112,5 +116,8 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 		return ;
 	}
 	else
-		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+	{
+		std::cerr<< "Blabla 7"<<std::endl;
+		*rp = exec_rq_error(rq, config, 403, index_serv, index_loc);
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 18:13:07 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 14:41:01 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,15 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		else if (path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL)
+		{
+			std::cerr<< "Blabla 1"<<std::endl;
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
+		}
 		else
+		{
+			std::cerr<< "Blabla 2"<<std::endl;
 			rq_html(&rp, rq, config, index_serv, index_loc);
+		}
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << std::endl;
@@ -63,6 +69,8 @@ std::string	fetch_default_error_page(int code)
 	{
 		case 400:
 			return DEFAULT_400;
+		case 403:
+			return DEFAULT_403;
 		case 404:
 			return DEFAULT_404;
 		case 405:

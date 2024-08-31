@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 18:13:35 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 14:43:04 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	
 	char **env = create_env();
 	char **av = create_av();
+	// std::cerr<< "path : " << path.c_str()<<std::endl;
 	execve(path.c_str(), av, env);
 	delete [] env;
 	perror("Execve");

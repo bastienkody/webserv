@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 16:54:22 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 15:24:34 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@
 
 int	check_file(std::string path, int mode)
 {
-	// std::string path = dir + rq.getRql().getUrl().getPath();
-	std::cerr<< path<<std::endl;
 	if (access(path.c_str(), F_OK) == -1)
 		return (1);
 	if (mode == 1 && access(path.c_str(), R_OK) == -1)
@@ -47,7 +45,7 @@ int find_location2(const std::string path, Server serv)
 			continue;
 		if (path == loc_path)
 			return i;
-		for (size_t x = 0; x < loc_path.size() && path[x] == loc_path[x]; ++x)
+		for (size_t x = 0; x < loc_path.size() && path[x] == loc_path[x]; x++)
 		{
 			if (x == loc_path.size() - 1 && x >= size)
 			{

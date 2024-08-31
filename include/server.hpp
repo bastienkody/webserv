@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/13 17:00:53 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 14:33:38 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 
 /* Error default pages	*/
 #define DEFAULT_400 "www/400_error_default.html"
+#define DEFAULT_403 "www/403_error_default.html"
 #define DEFAULT_404 "www/404_error_default.html"
 #define DEFAULT_405 "www/405_error_default.html"
 #define DEFAULT_413 "www/413_error_default.html"
