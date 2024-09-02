@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/02 15:57:14 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/02 16:06:22 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,13 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 	std::ifstream file(index.c_str());
 	if (!file)
 		return ("Error");
-	std::string buff;
-	while (!file.eof())
+	std::string tmp, buff;
+	while(std::getline(file, tmp))
 	{
-		std::string tmp;
-		file >> tmp;
-		buff += tmp + "\n";
+		if (!file.eof())
+			buff.append(tmp + '\n');
+		else
+			buff.append(tmp);
 	}
 	return (buff);
 }

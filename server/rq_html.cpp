@@ -20,7 +20,7 @@
 void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
 {
 	int status;
-	std::string buff;
+	std::string tmp, buff;
 	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
 	if (path.size() == 0)
 	{
@@ -40,11 +40,12 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
-	while (!my_html.eof())
+	while (std::getline(my_html, tmp))
 	{
-		std::string tmp;
-		my_html >> tmp;
-		buff += tmp + "\n";
+		if(!my_html.eof())
+			buff.append(tmp + '\n');
+		else
+			buff.append(tmp);
 	}
 	std::cerr<< "ext : " << path.substr(path.rfind('.') + 1, path.size() - 1) << std::endl;
 	rp->setLineState(200);

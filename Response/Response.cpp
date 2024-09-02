@@ -70,8 +70,8 @@ void	Response::setContentLength(unsigned int body_size)
 // file_ext to be given with no point
 void	Response::setContentType(std::string type)
 {
-	std::string e[6] = {"html", "css", "jpeg", "png", "webp", "ico"};
-	std::string t[6] = {"text/html", "text/css", "image/jpeg", "image/png", "image/webp", "image/ico"};
+	std::string e[6] = {"html", "css", "jpg", "png", "webp", "ico"};
+	std::string t[6] = {"text/html", "text/css", "image/jpg", "image/png", "image/webp", "image/ico"};
 	for(int i = 0; i < 6; ++i)
 	{
 		if (type.compare(e[i]) == 0)
