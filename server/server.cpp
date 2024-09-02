@@ -73,7 +73,7 @@ std::string read_recv_data(int i, Poll *poll_fds)
 int	send_response(struct client &co, ConfigFile config)
 {
 	co.rq.parse();
-	co.rq.print();
+	//co.rq.print();
 
 	int	code;
 	int	index_serv = config.getServerFromFd(co.server_fd);
