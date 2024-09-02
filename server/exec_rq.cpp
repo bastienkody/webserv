@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/31 14:41:01 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/02 13:39:42 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,10 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
+		{
+			std::cerr<< "Blabla 0"<<std::endl;
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
+		}
 		else if (path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL)
 		{
 			std::cerr<< "Blabla 1"<<std::endl;

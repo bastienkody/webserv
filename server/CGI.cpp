@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/31 14:43:04 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/02 13:36:12 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	else if (status == 0)
 		this->exec_son(pipe_fd, path);
 	else
-		this->exec_father(pipe_fd);
+		this->exec_father(pipe_fd, path);
 }
 
 void	CGI::exec_son(int *pipe_fd, std::string path)
@@ -82,9 +82,10 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 }
 
 /*definir limite pour reponse body*/
-void	CGI::exec_father(int *pipe_fd)
+void	CGI::exec_father(int *pipe_fd, std::string path)
 {
 	// wait(NULL);
+	(void) path;
 	int status;
 	char *buff;
 	buff = (char *) malloc(sizeof(char) * (1000 + 1));
