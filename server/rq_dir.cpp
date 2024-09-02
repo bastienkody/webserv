@@ -29,13 +29,13 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 	std::ifstream file(index.c_str());
 	if (!file)
 		return ("Error");
-	std::string buff;
-	while (!file.eof())
+	std::string tmp, buff;
+	while(std::getline(file, tmp))
 	{
-		std::string tmp;
-		file >> tmp;
-		buff += tmp;
-		buff += "\n";
+		if (!file.eof())
+			buff.append(tmp + '\n');
+		else
+			buff.append(tmp);
 	}
 	return (buff);
 }
