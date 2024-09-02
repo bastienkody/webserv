@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/31 15:26:36 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/02 13:47:34 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 		std::string tmp;
 		file >> tmp;
 		buff += tmp;
-		// std::cerr<< buff<<std::endl;
+		buff += "\n";
 	}
 	return (buff);
 }
@@ -67,15 +67,16 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 {
 	std::string auto_index = find_str_data(serv, index_loc, "auto_index");
 	std::string buff;
+	std::string index = serv.getLocations()[index_loc].getIndex();
 	if (auto_index.size() == 0)
 	{
 		std::cerr<< "Blabla 3"<<std::endl;
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
-	if (serv.getLocations()[index_loc].getIndex().size() != 0)
+	if (index.size() != 0)
 	{
-		buff = read_index(serv, rq, serv.getLocations()[index_loc].getIndex(), index_loc);
+		buff = read_index(serv, rq, index, index_loc);
 		if (buff == "Error")
 		{
 			std::cerr<< "Blabla 4"<<std::endl;
@@ -84,12 +85,12 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 		}
 		rp->setLineState(200);
 		rp->setHeader(rq, config, index_serv, index_loc);
-		rp->setBody(buff, "html");
+		rp->setBody(buff, index.substr(index.rfind('.') + 1, index.size() - 1));
 		return ;
 	}
 	else if (serv.getIndex().size() != 0)
 	{
-		buff = read_index(serv, rq, serv.getLocations()[index_loc].getIndex(), index_loc);
+		buff = read_index(serv, rq, index, index_loc);
 		if (buff == "Error")
 		{
 			std::cerr<< "Blabla 5"<<std::endl;
