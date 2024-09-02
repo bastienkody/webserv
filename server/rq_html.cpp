@@ -6,13 +6,12 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:35:21 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/13 18:13:22 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 #include "../RequestParsing/Request.hpp"
-#include "../include/Exception.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include <fstream>
 
@@ -20,27 +19,18 @@
 
 void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
 {
-	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
-	if (root.size() == 0)
+	int status;
+	std::string buff;
+	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
+	if (path.size() == 0)
 	{
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
-
-	int status;
-	std::string buff;
-	std::string path = root + rq.getRql().getUrl().getPath();
-	std::string loc_path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
-
-	path.erase(path.find(loc_path), loc_path.size());
 	std::cout << "PATH: " + path << std::endl;
-
-	/*check dir -> return 0 si pas un dir*/
-	std::cout << "searching with root:" << root << std::endl;
 	status = check_file(path, 1);
 	if (status > 0)
 	{
-		std::cerr<< "status : " << status<<std::endl;
 		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
 		return ;
 	}
@@ -56,9 +46,10 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 		my_html >> tmp;
 		buff += tmp + "\n";
 	}
+	std::cerr<< "ext : " << path.substr(path.rfind('.') + 1, path.size() - 1) << std::endl;
 	rp->setLineState(200);
 	rp->setHeader(rq, config, index_serv, index_loc);
-	rp->setBody(buff, path.substr(path.find('.') + 1, path.size() - 1)); // to get the real extension
+	rp->setBody(buff, path.substr(path.rfind('.') + 1, path.size() - 1)); // to get the real extension
 }
 
 void	post_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)

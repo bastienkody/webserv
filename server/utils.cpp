@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:36:39 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 15:24:34 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@
 
 int	check_file(std::string path, int mode)
 {
-	// std::string path = dir + rq.getRql().getUrl().getPath();
-	std::cerr<< path<<std::endl;
 	if (access(path.c_str(), F_OK) == -1)
 		return (1);
 	if (mode == 1 && access(path.c_str(), R_OK) == -1)
@@ -47,7 +45,7 @@ int find_location2(const std::string path, Server serv)
 			continue;
 		if (path == loc_path)
 			return i;
-		for (size_t x = 0; x < loc_path.size() && path[x] == loc_path[x]; ++x)
+		for (size_t x = 0; x < loc_path.size() && path[x] == loc_path[x]; x++)
 		{
 			if (x == loc_path.size() - 1 && x >= size)
 			{
@@ -59,42 +57,53 @@ int find_location2(const std::string path, Server serv)
 	return (index);
 }
 
-/*A modifier ?*/
-int find_location(const std::string path, Server serv)
+std::string concatenate_root_path(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
-	size_t size = 0;
-	int index = -1;
-	for(size_t i = 0; i < serv.getLocations().size(); i++)
-	{
-		if (path == serv.getLocations()[i].getPath())
-		{
-			if (serv.getLocations()[i].getIsPathAbsolute() == true)
-				return (i);
-			else
-			{
-				for (size_t y = i; y < serv.getLocations().size(); y++)
-				{
-					if (path == serv.getLocations()[i].getPath()
-						&& serv.getLocations()[i].getIsPathAbsolute() == true)
-						return (y);
-				}	
-				return (i);
-			}
-		}
-		if (serv.getLocations()[i].getIsPathAbsolute() == false)
-		{
-			for (size_t y = 0; y < serv.getLocations()[i].getPath().size(); y++)
-			{
-				if (serv.getLocations()[i].getPath()[y] != path[y] && y > size)
-				{
-					index = i;
-					size = y;
-				}
-			}
-		}
-	}
-	return (index);
+	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
+	if (root.size() == 0)
+		return (std::string());
+	std::string path = root + rq.getRql().getUrl().getPath();
+	std::string loc_path = config.getServers()[index_serv].getLocations()[index_loc].getPath();
+	path.erase(path.find(loc_path), loc_path.size());
+	return (path);
 }
+
+/*A modifier ?*/
+// int find_location(const std::string path, Server serv)
+// {
+// 	size_t size = 0;
+// 	int index = -1;
+// 	for(size_t i = 0; i < serv.getLocations().size(); i++)
+// 	{
+// 		if (path == serv.getLocations()[i].getPath())
+// 		{
+// 			if (serv.getLocations()[i].getIsPathAbsolute() == true)
+// 				return (i);
+// 			else
+// 			{
+// 				for (size_t y = i; y < serv.getLocations().size(); y++)
+// 				{
+// 					if (path == serv.getLocations()[i].getPath()
+// 						&& serv.getLocations()[i].getIsPathAbsolute() == true)
+// 						return (y);
+// 				}	
+// 				return (i);
+// 			}
+// 		}
+// 		if (serv.getLocations()[i].getIsPathAbsolute() == false)
+// 		{
+// 			for (size_t y = 0; y < serv.getLocations()[i].getPath().size(); y++)
+// 			{
+// 				if (serv.getLocations()[i].getPath()[y] != path[y] && y > size)
+// 				{
+// 					index = i;
+// 					size = y;
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return (index);
+// }
 
 std::string	find_str_data(Server serv, int index_loc, std::string to_find)
 {

@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:35:40 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 14:43:04 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,36 +36,46 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	int status;
 	int pipe_fd[2];
 
-	(void) _index_serv;
-	(void) _index_loc;
-	/*check dir -> return 0 si pas un dir ???*/
-	std::string path = "cgi-bin/" + this->_rq.getRql().getUrl().getPath();
+	std::string path = concatenate_root_path(_rq, _config, _index_serv, _index_loc);
+	if (path.size() == 0)
+	{
+		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
+		return ;
+	}	
 	status = check_file(path, 2);
 	if (status > 0)
-		throw Exception(1);
+	{
+		*_rp = exec_rq_error(_rq, _config, 404, _index_serv, _index_loc);
+		return ;
+	}
 	status = pipe(pipe_fd);
 	if (status == -1)
-		throw Exception(2);
+	{
+		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
+		return ;
+	}
 	status = fork();
 	if (status == -1)
-		throw Exception(3);
+	{
+		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
+		return ;
+	}
 	else if (status == 0)
-		this->exec_son(pipe_fd);
+		this->exec_son(pipe_fd, path);
 	else
 		this->exec_father(pipe_fd);
 }
 
-void	CGI::exec_son(int *pipe_fd)
+void	CGI::exec_son(int *pipe_fd, std::string path)
 {
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	close(pipe_fd[1]);
 	close(pipe_fd[0]);
 	
-	std::string name = _rq.getRql().getUrl().getPath();
-	std::string pathname = "cgi-bin" + name;
 	char **env = create_env();
 	char **av = create_av();
-	execve(pathname.c_str(), av, env);
+	// std::cerr<< "path : " << path.c_str()<<std::endl;
+	execve(path.c_str(), av, env);
 	delete [] env;
 	perror("Execve");
 	exit(1);
@@ -77,17 +87,18 @@ void	CGI::exec_father(int *pipe_fd)
 	// wait(NULL);
 	int status;
 	char *buff;
-	buff = (char *) malloc(sizeof(char) * (100 + 1));
+	buff = (char *) malloc(sizeof(char) * (1000 + 1));
 	if (!buff)
 		return ;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 1000; i++)
 		buff[i] = '\0';
 	dup2(pipe_fd[0], STDIN_FILENO);
-	status = read(pipe_fd[0], buff, 100);
+	status = read(pipe_fd[0], buff, 1000);
 	if (status == -1)
 		return ;
+	this->getRp()->setLineState(200);
+	this->getRp()->setHeader(_rq, _config, _index_serv, _index_loc);
 	this->getRp()->setBody(buff, "html");
-	std::cout<< "buff : "<<this->getRp()->getBody();
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
 }

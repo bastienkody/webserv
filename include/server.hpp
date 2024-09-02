@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 15:34:50 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 14:33:38 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 
 /* Error default pages	*/
 #define DEFAULT_400 "www/400_error_default.html"
+#define DEFAULT_403 "www/403_error_default.html"
 #define DEFAULT_404 "www/404_error_default.html"
 #define DEFAULT_405 "www/405_error_default.html"
 #define DEFAULT_413 "www/413_error_default.html"
@@ -67,6 +68,7 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, 
 
 /*utils.cpp*/
 int									check_file(std::string path, int mode);
+std::string							concatenate_root_path(Request rq, ConfigFile config, int index_serv, int index_loc);
 int									find_location(const std::string path, Server serv);
 int									find_location2(const std::string path, Server serv);
 std::string							find_str_data(Server serv, int index_loc, std::string to_find);

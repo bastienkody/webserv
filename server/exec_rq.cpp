@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/07 14:16:58 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/08/31 14:41:01 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include "../ConfigFile/Server.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
-#include "../include/Exception.hpp"
 #include <sstream>
 
 /*ajouter Location obj pour check methods allows*/
@@ -23,7 +22,7 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
 	
-	ext = path.rfind('.');
+	ext = &path[path.rfind('.')];
 	std::vector<std::string> cgi_ext = find_vector_data(serv, index_loc, "cgi_ext");
 	if (cgi_ext.size() == 0)
 		return (0);
@@ -40,14 +39,22 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	if (index_loc == -1)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 	Response rp;
-	std::string path = rq.getRql().getUrl().getPath();
+	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
+	if (path.size() == 0)
+		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
-		else if (path[path.size() - 1] == '/')
+		else if (path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL)
+		{
+			std::cerr<< "Blabla 1"<<std::endl;
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
+		}
 		else
+		{
+			std::cerr<< "Blabla 2"<<std::endl;
 			rq_html(&rp, rq, config, index_serv, index_loc);
+		}
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << std::endl;
@@ -62,6 +69,8 @@ std::string	fetch_default_error_page(int code)
 	{
 		case 400:
 			return DEFAULT_400;
+		case 403:
+			return DEFAULT_403;
 		case 404:
 			return DEFAULT_404;
 		case 405:
