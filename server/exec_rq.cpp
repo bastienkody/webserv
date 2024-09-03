@@ -45,17 +45,17 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 		{
-			std::cerr<< "Blabla 0"<<std::endl;
+			std::cerr<< "Blabla 0 (cgi)"<<std::endl;
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		}
 		else if (path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL)
 		{
-			std::cerr<< "Blabla 1"<<std::endl;
+			std::cerr<< "Blabla 1 (rq_dir)"<<std::endl;
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		}
 		else
 		{
-			std::cerr<< "Blabla 2"<<std::endl;
+			std::cerr<< "Blabla 2 (rq_html)"<<std::endl;
 			rq_html(&rp, rq, config, index_serv, index_loc);
 		}
 	}

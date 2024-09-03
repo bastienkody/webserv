@@ -38,9 +38,10 @@ void	Request::print() const
 //	Parse into rq line, headers and body
 void	Request::parse()
 {
+	//std::cout << "RAW:\n" << _raw << std::endl;
 	_rql = RequestLine(_raw.substr(0, _raw.find("\r\n")));
 	_raw.erase(0, _raw.find("\r\n") + 2);
-	std::string	hTmp(_raw.substr(0, _raw.find("\r\n\r\n")));
+	std::string	hTmp(_raw.substr(0, _raw.find("\r\n\r\n") + 2));
 	_raw.erase(0, _raw.find("\r\n\r\n") + 4);
 
 	while (hTmp.find('\n') != std::string::npos)
@@ -61,12 +62,37 @@ void	Request::parse()
 
 void	Request::appendRaw(std::string data) 
 {
-	//_raw.reserve(_raw.size() + data.size());
-	// chumk must be parsed specifically
 	_raw += data;
 }
 
-void	Request::unchunkBody()
+bool	Request::unchunkBody()
 {
-	
+	std::string new_body, line;
+
+	while (_body.size())
+	{
+		unsigned int		nb;
+		std::stringstream	ss_nb(_body.substr(0, _body.find("\r\n")));
+		ss_nb >> std::hex >> nb;
+		if (ss_nb.fail() || !ss_nb.eof())
+		{
+			std::cout << "Illegal or missing hexadecimal sequence in chunked-encoding";
+			return false;
+		}
+
+		_body.erase(0, _body.find("\r\n") + 2);
+		line = _body.substr(0, _body.find("\r\n"));
+		_body.erase(0, _body.find("\r\n") + 2);
+
+		if (nb != line.size())
+		{
+			std::cout << "Wrong hexadecimal sequence in chunked-encoding with size of " << nb << " vs acutal data size " << line.size() << " for chunk data:" + line << std::endl; 
+			return false;
+		}
+
+		if (nb) // to skip the len zero terminating chunk
+			new_body.append(line);
+	}
+	_body = new_body;
+	return true;
 }

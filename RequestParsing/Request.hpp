@@ -3,6 +3,7 @@
 
 #include<iostream>
 #include<string>
+#include<sstream>
 #include<map>
 #include<algorithm>
 #include <sys/socket.h>
@@ -31,7 +32,7 @@ class Request
 
 		void	parse();
 		void	appendRaw(std::string data);
-		void	unchunkBody();
+		bool	unchunkBody();
 		void	print() const;
 
 	private:
