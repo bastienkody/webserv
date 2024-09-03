@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:30:22 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/02 13:22:51 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/03 16:15:33 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,19 @@ class CGI
 		char		**create_av();
 		void		  exec_son(int *pipe_fd, std::string path);
 		void		  exec_father(int *pipe_fd, std::string path);
+		void		  init_env();
 
-		Response	*getRp() const;
-		Request		 getRq() const;
+
+		Response							*getRp() const;
+		Request		 						 getRq() const;
+		std::map<std::string, std::string>	 getEnv() const;
 	private:
-		Response	*_rp;
-		Request		 _rq;
-		ConfigFile 	_config;
-		int			_index_serv;
-		int			_index_loc;
+		Response							*_rp;
+		Request								 _rq;
+		ConfigFile 							 _config;
+		std::map<std::string, std::string>	 _env;
+		int									 _index_serv;
+		int									 _index_loc;
 };
 
 #endif

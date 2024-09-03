@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/02 13:36:12 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/03 17:40:23 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ CGI & CGI::operator=(const CGI &obj)
 
 Response	*CGI::getRp()	const {return _rp;}
 Request		 CGI::getRq()	const {return _rq;}
+std::map<std::string, std::string> CGI::getEnv()	const {return _env;}
 
 CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc) : _rp(rp), _rq(rq), _config(config), _index_serv(index_serv), _index_loc(index_loc)
 {
@@ -104,9 +105,21 @@ void	CGI::exec_father(int *pipe_fd, std::string path)
 	close(pipe_fd[1]);
 }
 
+void	CGI::init_env()
+{
+	_env["QUERY_STRING"] = _rq.getRql().getUrl().getQuery();
+	_env["REQUEST_METHOD"] = _rq.getRql().getVerb();
+	if (_rq.getRql().getVerb() == "POST")
+	{
+		_env["CONTENT_TYPE"] = _rq.getHeader().find("Content-Type")->second;
+		_env["CONTENT_LENGTH"] = _rq.getHeader().find("Content-Length")->second;
+	}
+}
+
 char	**CGI::create_env()
 {
-	char **env = new char *[_rq.getHeader().size() + 1];
+	this->init_env();
+	char **env = new char *[(_rq.getHeader().size() + _env.size() + 1)];
 	int i = 0;
 	for (std::map<std::string, std::string>::const_iterator it = _rq.getHeader().begin(); it != _rq.getHeader().end(); it++)
 	{
@@ -115,7 +128,23 @@ char	**CGI::create_env()
 		env[i] = strdup(tmp.c_str());
 		i++;
 	}
+	for (std::map<std::string, std::string>::const_iterator it = _env.begin(); it != _env.end(); it++)
+	{
+		std::string tmp;
+		tmp.append(it->first + "=" + it->second);
+		env[i] = strdup(tmp.c_str());
+		i++;
+	}
 	env[i] = NULL;
+	
+	std::cerr<< "env :"<<std::endl;
+	i = 0;
+	while (env[i] != NULL)
+	{
+		std::cerr<< "\t" << env[i]<<std::endl;
+		i++;
+	}
+	std::cerr<< "\n";
 	return (env);
 }
 
