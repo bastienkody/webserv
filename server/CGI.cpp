@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/03 17:40:23 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/05 17:03:52 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	status = check_file(path, 2);
 	if (status > 0)
 	{
+		std::cerr<< "ofhsqeofisehfoieshf"<<std::endl;
 		*_rp = exec_rq_error(_rq, _config, 404, _index_serv, _index_loc);
 		return ;
 	}
@@ -76,6 +77,8 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	char **env = create_env();
 	char **av = create_av();
 	// std::cerr<< "path : " << path.c_str()<<std::endl;
+	// (void) path;
+	// (void) av;
 	execve(path.c_str(), av, env);
 	delete [] env;
 	perror("Execve");
@@ -85,7 +88,9 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 /*definir limite pour reponse body*/
 void	CGI::exec_father(int *pipe_fd, std::string path)
 {
-	// wait(NULL);
+
+	std::cerr<< "test 1"<<std::endl;
+	wait(NULL);
 	(void) path;
 	int status;
 	char *buff;
@@ -96,6 +101,7 @@ void	CGI::exec_father(int *pipe_fd, std::string path)
 		buff[i] = '\0';
 	dup2(pipe_fd[0], STDIN_FILENO);
 	status = read(pipe_fd[0], buff, 1000);
+	std::cerr<< "test 2"<<std::endl;
 	if (status == -1)
 		return ;
 	this->getRp()->setLineState(200);
@@ -107,13 +113,14 @@ void	CGI::exec_father(int *pipe_fd, std::string path)
 
 void	CGI::init_env()
 {
-	_env["QUERY_STRING"] = _rq.getRql().getUrl().getQuery();
 	_env["REQUEST_METHOD"] = _rq.getRql().getVerb();
 	if (_rq.getRql().getVerb() == "POST")
 	{
 		_env["CONTENT_TYPE"] = _rq.getHeader().find("Content-Type")->second;
 		_env["CONTENT_LENGTH"] = _rq.getHeader().find("Content-Length")->second;
 	}
+	else if (_rq.getRql().getVerb() == "GET")
+	_env["QUERY_STRING"] = _rq.getRql().getUrl().getQuery();
 }
 
 char	**CGI::create_env()

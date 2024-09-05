@@ -12,7 +12,7 @@ import cgi, cgitb
 # Create instance of FieldStorage
 form = cgi.FieldStorage()
 
-# # Afficher toutes les clés et valeurs contenues dans 'form'
+# Afficher toutes les clés et valeurs contenues dans 'form'
 # print("<html><body>")
 # print("<h1>Donnees recues</h1>")
 # print("<ul>")
