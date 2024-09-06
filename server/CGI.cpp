@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/05 17:03:52 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/06 16:27:20 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	status = check_file(path, 2);
 	if (status > 0)
 	{
-		std::cerr<< "ofhsqeofisehfoieshf"<<std::endl;
 		*_rp = exec_rq_error(_rq, _config, 404, _index_serv, _index_loc);
 		return ;
 	}
@@ -116,10 +115,12 @@ void	CGI::init_env()
 	_env["REQUEST_METHOD"] = _rq.getRql().getVerb();
 	if (_rq.getRql().getVerb() == "POST")
 	{
+		std::cerr<< "epoifdugepfs"<<std::endl;
+		std::stringstream out;
+		out << _rq.getBody();
 		_env["CONTENT_TYPE"] = _rq.getHeader().find("Content-Type")->second;
 		_env["CONTENT_LENGTH"] = _rq.getHeader().find("Content-Length")->second;
 	}
-	else if (_rq.getRql().getVerb() == "GET")
 	_env["QUERY_STRING"] = _rq.getRql().getUrl().getQuery();
 }
 
@@ -159,11 +160,13 @@ char	**CGI::create_av()
 {
 	char **av;
 
-	av = (char **) malloc(sizeof(char *) * 2);
+	av = (char **) malloc(sizeof(char *) * 3);
 	if (!av)
 		return (NULL);
 	std::string name = _rq.getRql().getUrl().getPath();
-	av[0] = strdup(&(name.c_str())[1]);
-	av[1] = NULL;
+	std::string ext_path = find_vector_data(_config.getServers()[_index_serv], _index_loc, "cgi_pathes")[0];
+	av[0] = strdup(ext_path.c_str());
+	av[1] = strdup(&(name.c_str())[1]);
+	av[2] = NULL;
 	return (av);
 }

@@ -31,5 +31,5 @@ if content_length:
 else:
     # Si la requête POST ne contient pas de données
     print("<html><body><h1>Erreur</h1>")
-    print("<p>Aucune donnée reçue.</p>")
+    print("<p>Aucune donnee recue.</p>")
     print("</body></html>")

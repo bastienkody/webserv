@@ -4,7 +4,7 @@
 import cgi, cgitb
 
 
-# import os
+import os
 # print("Content-type: text/plain\n")
 # print(os.environ)
 
@@ -13,18 +13,18 @@ import cgi, cgitb
 form = cgi.FieldStorage()
 
 # Afficher toutes les clés et valeurs contenues dans 'form'
-# print("<html><body>")
-# print("<h1>Donnees recues</h1>")
-# print("<ul>")
+print("<html><body>")
+print("<h1>Donnees recues</h1>")
+print("<ul>")
 
-# # Parcourir toutes les clés et afficher les valeurs associées
-# for key in form.keys():
-#     value = form.getvalue(key)
-#     print("<p>test</p>")
-#     print(f"<li><strong>{key}</strong>: {value}</li>")
+# Parcourir toutes les clés et afficher les valeurs associées
+for key in form.keys():
+    value = form.getvalue(key)
+    print("<p>test</p>")
+    print(f"<li><strong>{key}</strong>: {value}</li>")
 
-# print("</ul>")
-# print("</body></html>")
+print("</ul>")
+print("</body></html>")
 
 # Get data from fields
 calcul = form.getvalue('calcul')
