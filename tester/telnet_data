@@ -1,5 +1,5 @@
 POST /exemple.txt HTTP/1.1
-Host: exemple
+Host: 127.0.0.1:8080
 Transfer-Encoding: chunked
 
 4
