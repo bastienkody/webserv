@@ -16,7 +16,21 @@ if content_length:
     post_data = sys.stdin.read(content_length)
 
     # Utiliser le module cgi pour extraire les données en tant que paires clé-valeur
-    form = cgi.FieldStorage(fp=sys.stdin, environ=os.environ, keep_blank_values=True)
+    form = cgi.FieldStorage()
+
+    # Afficher toutes les clés et valeurs contenues dans 'form'
+    print("<html><body>")
+    print("<h1>Donnees recues</h1>")
+    print("<ul>")
+
+    # Parcourir toutes les clés et afficher les valeurs associées
+    for key in form.keys():
+        value = form.getvalue(key)
+        print("<p>test</p>")
+        print(f"<li><strong>{key}</strong>: {value}</li>")
+
+    print("</ul>")
+    print("</body></html>")
 
     # Récupérer les valeurs des champs du formulaire
     name = form.getvalue('name')

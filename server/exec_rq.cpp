@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/02 15:26:16 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/07 13:48:39 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,17 +46,17 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 		{
-			std::cerr<< "Blabla 0 (cgi)"<<std::endl;
+			std::cerr<< "Enter CGI :"<<std::endl;
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		}
-		else if (path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL)
+		else if ((path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL) && rq.getRql().getVerb() == "GET")
 		{
-			std::cerr<< "Blabla 1 (rq_dir)"<<std::endl;
+			std::cerr<< "Enter rq_dir :"<<std::endl;
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		}
 		else
 		{
-			std::cerr<< "Blabla 2 (rq_html)"<<std::endl;
+			std::cerr<< "Enter rq_html :"<<std::endl;
 			rq_html(&rp, rq, config, index_serv, index_loc);
 		}
 	}
