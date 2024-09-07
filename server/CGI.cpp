@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/06 16:27:20 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/07 14:33:06 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 void	CGI::exec_son(int *pipe_fd, std::string path)
 {
 	dup2(pipe_fd[1], STDOUT_FILENO);
+	dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[1]);
 	close(pipe_fd[0]);
 	
@@ -88,7 +89,7 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 void	CGI::exec_father(int *pipe_fd, std::string path)
 {
 
-	std::cerr<< "test 1"<<std::endl;
+	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
 	wait(NULL);
 	(void) path;
 	int status;
@@ -100,7 +101,6 @@ void	CGI::exec_father(int *pipe_fd, std::string path)
 		buff[i] = '\0';
 	dup2(pipe_fd[0], STDIN_FILENO);
 	status = read(pipe_fd[0], buff, 1000);
-	std::cerr<< "test 2"<<std::endl;
 	if (status == -1)
 		return ;
 	this->getRp()->setLineState(200);
@@ -115,9 +115,6 @@ void	CGI::init_env()
 	_env["REQUEST_METHOD"] = _rq.getRql().getVerb();
 	if (_rq.getRql().getVerb() == "POST")
 	{
-		std::cerr<< "epoifdugepfs"<<std::endl;
-		std::stringstream out;
-		out << _rq.getBody();
 		_env["CONTENT_TYPE"] = _rq.getHeader().find("Content-Type")->second;
 		_env["CONTENT_LENGTH"] = _rq.getHeader().find("Content-Length")->second;
 	}
