@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CGI</title>
+</head>
+<body>
+    <h3>CGI get :</h3>
+    <form action = "calc.py" method ="GET">
+		Calcul : <input type = "text" name = "calcul" minlength="3"
+        pattern="[\-]{0,1}[0-9]{1,10}[\-+*/]{1}[\-]{0,1}[0-9]{1,10}">
+		<input type = "submit" value = "Submit" />
+	 </form>
+    <br> <br>
+    <h3>CGI post :</h3>
+    <form action = "formulaire.py" method ="POST">
+		Nom : <input type = "text" name = "name">
+        Age : <input type = "text" name = "age">
+		<input type = "submit" value = "Submit" />
+	 </form>
+</body>
+</html>
