@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/02 13:47:34 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/02 16:16:36 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 	if (root.size() == 0)
 		return ("Error");
 	index = root + index;
+	std::cerr<< "index : " << index<<std::endl;
 	int status = check_file(index, 1);
 	if (status > 0)
 	{
@@ -67,40 +68,32 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 {
 	std::string auto_index = find_str_data(serv, index_loc, "auto_index");
 	std::string buff;
-	std::string index = serv.getLocations()[index_loc].getIndex();
+	std::string loc_index = serv.getLocations()[index_loc].getIndex();
 	if (auto_index.size() == 0)
 	{
 		std::cerr<< "Blabla 3"<<std::endl;
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
-	if (index.size() != 0)
+	if (loc_index.size() != 0)
 	{
-		buff = read_index(serv, rq, index, index_loc);
+		buff = read_index(serv, rq, loc_index, index_loc);
 		if (buff == "Error")
 		{
 			std::cerr<< "Blabla 4"<<std::endl;
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
-		rp->setLineState(200);
-		rp->setHeader(rq, config, index_serv, index_loc);
-		rp->setBody(buff, index.substr(index.rfind('.') + 1, index.size() - 1));
-		return ;
 	}
 	else if (serv.getIndex().size() != 0)
 	{
-		buff = read_index(serv, rq, index, index_loc);
+		buff = read_index(serv, rq, serv.getIndex(), index_loc);
 		if (buff == "Error")
 		{
 			std::cerr<< "Blabla 5"<<std::endl;
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
-		rp->setLineState(200);
-		rp->setHeader(rq, config, index_serv, index_loc);
-		rp->setBody(buff, "html");
-		return ;
 	}
 	else if (auto_index == "on")
 	{
@@ -111,14 +104,14 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 			return ;
 		}
-		rp->setLineState(200);
-		rp->setHeader(rq, config, index_serv, index_loc);
-		rp->setBody(buff, "html");
-		return ;
 	}
 	else
 	{
 		std::cerr<< "Blabla 7"<<std::endl;
 		*rp = exec_rq_error(rq, config, 403, index_serv, index_loc);
 	}
+	rp->setLineState(200);
+	rp->setHeader(rq, config, index_serv, index_loc);
+	rp->setBody(buff, "html");
+	return ;
 }

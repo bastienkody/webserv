@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/02 13:39:42 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/02 15:26:16 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
 	if (path.size() == 0)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
+	// std::cerr<< "PATH EXEC_RQ : "<< path<<std::endl;
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 		{
