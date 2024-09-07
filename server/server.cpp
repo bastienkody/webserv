@@ -72,6 +72,7 @@ std::string read_recv_data(int i, Poll *poll_fds)
 
 int	send_response(struct client &co, ConfigFile config)
 {
+	//std::cout << "-----------------RAWDEBUT----------------\n" + co.rq.getRaw() + "-----------------ENDOFRAW----------------"<< std::endl;
 	co.rq.parse();
 	co.rq.print();
 
