@@ -51,7 +51,7 @@ int create_socket_server(const char *port)
 std::string read_recv_data(int i, Poll *poll_fds)
 {
 	int nb_bytes;
-	char buff[1024];
+	char buff[4096];
 	
 	memset(&buff, 0, sizeof(buff));
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 1023, 0);
