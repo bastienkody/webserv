@@ -79,6 +79,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 						pos = find_client(clients, poll_fds.getFds(i).fd);
 						clients[pos].rq.appendRaw(buff);
 						clients[pos].await_response = true;
+						usleep(200);
 					}
 					catch (const std::exception & e) {
 						deco_client(clients, &poll_fds, i);
