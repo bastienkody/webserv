@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/07 14:33:06 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/07 18:01:14 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,11 +76,10 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	
 	char **env = create_env();
 	char **av = create_av();
-	// std::cerr<< "path : " << path.c_str()<<std::endl;
-	// (void) path;
-	// (void) av;
+	/*check premiere ligne script ???*/
 	execve(path.c_str(), av, env);
 	delete [] env;
+	delete [] av;
 	perror("Execve");
 	exit(1);
 }
@@ -88,7 +87,7 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 /*definir limite pour reponse body*/
 void	CGI::exec_father(int *pipe_fd, std::string path)
 {
-
+	std::cerr<< "stdin body : " << _rq.getBody().c_str()<<std::endl;
 	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
 	wait(NULL);
 	(void) path;
