@@ -25,7 +25,7 @@ std::string const & Response::getBody(void) const {return (_body);}
 
 std::string Response::getWholeResponse(void) const
 {
-	return _lineState + "\r\n" + _header + "\r\n" + _body;
+  return _lineState + "\r\n" + _header + "\r\n" + _body;
 }
 
 //	setters

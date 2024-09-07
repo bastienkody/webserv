@@ -29,6 +29,7 @@ URL				const & RequestLine::getUrl() const {return _Url;}
 RequestLine::RequestLine(std::string rql)
 {
 	_fullRequestLine = rql;
+	std::cout << "Full rql:" << rql << std::endl;
 
 	_verb = rql.substr(0, rql.find(" "));
 	rql.erase(0, rql.find(" ") + 1);

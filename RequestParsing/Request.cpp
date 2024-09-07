@@ -58,9 +58,10 @@ void	Request::parse()
 		_header.insert(std::pair<std::string, std::string>(key, value));
 	}
 	_body = _raw;
+	_raw.clear();
 }
 
-void	Request::appendRaw(std::string data) 
+void	Request::appendRaw(std::string data)
 {
 	_raw += data;
 }

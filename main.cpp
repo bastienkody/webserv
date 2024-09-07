@@ -95,7 +95,8 @@ void launch_server(ConfigFile config, Poll poll_fds)
 				{
 					clients[pos].await_response = false;
 					clients[pos].rp = Response();
-				}
+					//clients[pos].rq = Request();
+			        }
 			}
 		}
 	}
