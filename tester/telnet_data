@@ -1,0 +1,14 @@
+POST /exemple.txt HTTP/1.1
+Host: 127.0.0.1:8080
+Transfer-Encoding: chunked
+
+4
+ceci
+3
+est
+2
+un
+4
+test
+0
+
