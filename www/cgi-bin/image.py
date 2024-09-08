@@ -4,7 +4,7 @@ import cgi
 import os
 
 # Définir le dossier où les fichiers seront stockés
-UPLOAD_FOLDER = '/tmp/'
+UPLOAD_FOLDER = '/mnt/nfs/homes/mmuesser/Cursus42/webserv/www/cgi-bin/tmp'
 
 # Activer la gestion des erreurs CGI (utile pour le développement)
 import cgitb
@@ -16,7 +16,6 @@ def save_uploaded_file():
 
     # Vérifier si le champ 'file' est présent dans le formulaire
     if 'file' not in form:
-        # print("Content-Type: text/html\n")
         print("<h1>Error</h1>")
         print("<p>No file field found in the form!</p>")
         return
@@ -26,7 +25,6 @@ def save_uploaded_file():
 
     # Vérifier si un fichier a été sélectionné
     if not fileitem.filename:
-        # print("Content-Type: text/html\n")
         print("<h1>Error</h1>")
         print("<p>No file was selected for upload!</p>")
         return
@@ -36,16 +34,14 @@ def save_uploaded_file():
 
     # Définir le chemin complet du fichier à sauvegarder
     filepath = os.path.join(UPLOAD_FOLDER, filename)
-
     # Sauvegarder le fichier
     try:
+        file_data = fileitem.file.read()
         with open(filepath, 'wb') as f:
-            f.write(fileitem.file.read())
-        # print("Content-Type: text/html\n")
+            f.write(file_data)
         print("<h1>Success</h1>")
         print(f"<p>File '{filename}' successfully uploaded to {UPLOAD_FOLDER}.</p>")
     except Exception as e:
-        # print("Content-Type: text/html\n")
         print("<h1>Error</h1>")
         print(f"<p>Failed to upload file: {str(e)}</p>")
 
