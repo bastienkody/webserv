@@ -25,7 +25,6 @@ class Location: public ConfigFile
 		bool		const & getIsPathAbsolute() const;
 	//	specific setters
 		void	setPath(std::string line);
-		void	setRedirection(std::string line);
 
 		void	readInfos(std::string & raw); //throw
 		bool	isValidElementLabel(std::string line);
@@ -33,8 +32,6 @@ class Location: public ConfigFile
 	private:
 		std::string	_path;
 		bool		_isPathAbsolute;
-
-		
 };
 
 #endif

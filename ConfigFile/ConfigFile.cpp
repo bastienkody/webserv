@@ -92,7 +92,7 @@ std::string const & ConfigFile::getRoot() const {return _root;}
 std::string const & ConfigFile::getIndex() const {return _index;}
 std::string const & ConfigFile::getAutoIndex() const {return _autoindex;}
 std::string const & ConfigFile::getMaxBodySize() const {return _maxBodysize;}
-std::string const & ConfigFile::getRedirection() const {return _redirection;}
+std::map<std::string, struct rewrite>const & ConfigFile::getRedirection() const {return _redirection;}
 std::map<std::string, std::string> const & ConfigFile::getErrorPages() const {return _errorPages;}
 std::vector<std::string> const & ConfigFile::getAllowMethods() const {return _allowMethods;}
 std::vector<std::string> const & ConfigFile::getCgiPathes() const {return _cgiPathes;}
@@ -156,6 +156,37 @@ void	ConfigFile::setMaxBodySize(std::string line)
 		throw std::invalid_argument("Bad config line (maxbodysize vs unsigned int):" + line);
 	_maxBodysize = element;
 }
+
+// "rewrite og_url dest_url rewrite/permanent"
+void	ConfigFile::setRedirections(std::string line)
+{
+	struct rewrite rw;
+
+	int	ows_pos = ParserUtils::firstWsPos(line);
+	if (ows_pos == -1)
+		throw std::invalid_argument("Bad config line (exepected whitespaces): " + line);
+	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1))); // "og_url dest_url rew/perm"
+
+	if ((ows_pos = ParserUtils::firstWsPos(element)) == -1)
+		throw std::invalid_argument("Bad config line (redirections needs 3 items: og_url, dest_url and type): " + line);
+	std::string	og_url(ParserUtils::trimOWS(element.substr(0, ows_pos)));
+	element.erase(0, ows_pos + 1); // "dest_url rew/perm"
+
+	if ((ows_pos = ParserUtils::firstWsPos(element)) == -1)
+		throw std::invalid_argument("Bad config line (redirections needs 3 items: og_url, dest_url and type): " + line);
+	rw.redirect_url = ParserUtils::trimOWS(element.substr(0, ows_pos));
+	element.erase(0, ows_pos + 1); // "rew/perm"
+
+	if (ParserUtils::trimOWS(element) == "rewrite")
+		rw.type = 302;
+	else if (ParserUtils::trimOWS(element) == "permanent")
+		rw.type = 301;
+	else
+		throw std::invalid_argument("Bad config line (redirections must ends with rewrite or permanent): " + line);
+
+	_redirection[og_url] = rw;
+}
+
 
 void	ConfigFile::setErrorPages(std::string line)
 {

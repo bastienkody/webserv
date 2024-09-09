@@ -17,6 +17,7 @@ Server & Server::operator=(const Server & rhs)
 		_index = rhs.getIndex();
 		_autoindex = rhs.getAutoIndex();
 		_maxBodysize = rhs.getMaxBodySize();
+		_redirection = rhs.getRedirection();
 		_errorPages = rhs.getErrorPages();
 		_allowMethods = rhs.getAllowMethods();
 		_cgiPathes = rhs.getCgiExt();
@@ -39,6 +40,8 @@ void	Server::printAll() const
 	std::cout << "Index:\t" + getIndex() << std::endl;
 	std::cout << "Autoindex:\t" + getAutoIndex() << std::endl;
 	std::cout << "Maxbodysize:\t" + getMaxBodySize() << std::endl;
+	for (std::map<std::string,struct rewrite>::const_iterator it = getRedirection().begin(); it != getRedirection().end(); ++it)
+		std::cout << "redir:\t" + it->first + "-->" + it->second.redirect_url + " type:" << it->second.type << std::endl;
 	for (std::map<std::string,std::string>::const_iterator it = getErrorPages().begin(); it != getErrorPages().end(); ++it)
 		std::cout << "errPages:\t" + it->first + "-->" + it->second << std::endl;
 	for (std::vector<std::string>::const_iterator it = getAllowMethods().begin(); it != getAllowMethods().end(); ++it)
@@ -195,14 +198,14 @@ bool	Server::isValidElementLabel(std::string line)
 	if (ows_pos == -1)
 		throw std::invalid_argument("Bad config line (label) (no ws):" + line);
 	std::string	label = line.substr(0, ows_pos);
-	std::string valid[10] = {"server_name", "listen", "root", "index", "autoindex","max_body_size", "error_page", "allow_methods", "cgi", "cgi_ext"};
-	void (Server::*ptrFct[10])(std::string) = { &Server::setNames, &Server::setIpPort,
-												&ConfigFile::setRoot, &ConfigFile::setIndex,
+	std::string valid[11] = {"server_name", "listen", "root", "rewrite", "index", "autoindex","max_body_size", "error_page", "allow_methods", "cgi", "cgi_ext"};
+	void (Server::*ptrFct[11])(std::string) = { &Server::setNames, &Server::setIpPort,
+												&ConfigFile::setRoot, &ConfigFile::setRedirections, &ConfigFile::setIndex,
 												&ConfigFile::setAutoIndex, &ConfigFile::setMaxBodySize,
 												&ConfigFile::setErrorPages, &ConfigFile::setAllowMethods,
 												&ConfigFile::setCgiPathes, &ConfigFile::setCgiExt};
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 11; ++i)
 	{
 		if (label.compare(valid[i]) == 0)
 		{

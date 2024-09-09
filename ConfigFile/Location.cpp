@@ -34,7 +34,8 @@ void	Location::printAll() const
 	std::cout << "Index:\t" + getIndex() << std::endl;
 	std::cout << "Autoindex:\t" + getAutoIndex() << std::endl;
 	std::cout << "Maxbodysize:\t" + getMaxBodySize() << std::endl;
-	std::cout << "Redirection:\t" + getRedirection() << std::endl;
+	for (std::map<std::string,struct rewrite>::const_iterator it = getRedirection().begin(); it != getRedirection().end(); ++it)
+		std::cout << "redir:\t" + it->first + "-->" + it->second.redirect_url + " type:" << it->second.type << std::endl;
 	for (std::map<std::string,std::string>::const_iterator it = getErrorPages().begin(); it != getErrorPages().end(); ++it)
 		std::cout << "errPages:\t" + it->first + "-->" + it->second << std::endl;
 	for (std::vector<std::string>::const_iterator it = getAllowMethods().begin(); it != getAllowMethods().end(); ++it)
@@ -72,19 +73,6 @@ void	Location::setPath(std::string ogline)	// actually called in server part
 	_path = line;
 }
 
-void	Location::setRedirection(std::string line)
-{
-	int	ows_pos = ParserUtils::firstWsPos(line);
-	if (ows_pos == -1)
-		throw std::invalid_argument("Bad config line (no ws): " + line);
-	std::string	element(ParserUtils::trimOWS(line.substr(ows_pos + 1, line.size() -1)));
-	if (ParserUtils::firstWsPos(element) != -1)
-		throw std::invalid_argument("Bad config line (extra ws):" + line);
-	if (element.size() == 0)
-		throw std::invalid_argument("Bad config line (empty val): " + line);
-	_redirection = element;
-}
-
 /*
 	reads all location info
 */
@@ -118,11 +106,11 @@ bool	Location::isValidElementLabel(std::string line)
 	if (ows_pos == -1)
 		throw std::invalid_argument("Bad config line (label) (no ws):" + line);
 	std::string	label = line.substr(0, ows_pos);
-	std::string valid[9] = {"root", "index", "autoindex", "max_body_size", "redirection",
+	std::string valid[9] = {"root", "index", "autoindex", "max_body_size", "rewrite",
 							"error_page", "allow_methods", "cgi", "cgi_ext"};
 	void (Location::*ptrFct[9])(std::string) = { &ConfigFile::setRoot, &ConfigFile::setIndex,
 								&ConfigFile::setAutoIndex, &ConfigFile::setMaxBodySize,
-								&Location::setRedirection, &ConfigFile::setErrorPages,
+								&ConfigFile::setRedirections, &ConfigFile::setErrorPages,
 								&ConfigFile::setAllowMethods, &ConfigFile::setCgiPathes,
 								&ConfigFile::setCgiExt};
 

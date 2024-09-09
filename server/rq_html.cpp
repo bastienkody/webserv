@@ -17,17 +17,19 @@
 
 /*gerer directory (comment ??)*/
 
-void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
+// redirect: on sert le fichier redirige ce qui est inutil
+// on pourrait passer par un booleen pour savoir si on doit servir ou non
+void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc, bool is_redirect)
 {
-	int status;
-	std::string tmp, buff;
-	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
-	if (path.size() == 0)
+	if (is_redirect)
 	{
-		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+		rp->setHeader(rq, config, index_serv, index_loc);
 		return ;
 	}
-	std::cout << "PATH: " + path << std::endl;
+
+	std::cout << "from rq_html path: " + path << std::endl;
+	int status;
+	std::string tmp, buff;
 	status = check_file(path, 1);
 	if (status > 0)
 	{
@@ -53,16 +55,9 @@ void	get_html(Response *rp, Request rq, ConfigFile config, int index_serv, int i
 	rp->setBody(buff, path.substr(path.rfind('.') + 1, path.size() - 1)); // to get the real extension
 }
 
-void	post_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
+// nsp si post vers url redirige sans nouvelle requete (on part sur ca) ou si nvle requete avec url modifie par le nav?
+void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
-	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
-	if (root.size() == 0)
-	{
-		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
-		return ;
-	}
-	std::string path = root + rq.getRql().getUrl().getPath();
-
 	/*a utiliser si permet pas de post un fichier avec le meme nom qu'un deja existant*/
 	// status = check_file(rq, root, 0);
 	// if (status == 0)
@@ -78,16 +73,10 @@ void	post_html(Response *rp, Request rq, ConfigFile config, int index_serv, int 
 	rp->setHeader(rq, config, index_serv, index_loc);
 }
 
-void	delete_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
+// idem redirect post
+void	delete_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
 	int status;
-	std::string root = find_str_data(config.getServers()[index_serv], index_loc, "root");
-	if (root.size() == 0)
-	{
-		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
-		return ;
-	}
-	std::string path = root + rq.getRql().getUrl().getPath();
 	/*check dir -> return 0 si pas un dir*/
 	status = check_file(path, 1);
 	if (status > 0)
@@ -116,7 +105,7 @@ int	check_allow(Server serv, int index_loc, std::string method)
 	return (0);
 }
 
-void	rq_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc)
+void	rq_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc, bool is_redirect)
 {
 	std::string method[3] = {"GET", "POST", "DELETE"};
 
@@ -128,9 +117,9 @@ void	rq_html(Response *rp, Request rq, ConfigFile config, int index_serv, int in
 				break ;
 			switch(i)
 			{
-				case 0: get_html(rp, rq, config, index_serv, index_loc); break;
-				case 1: post_html(rp, rq, config, index_serv, index_loc); break;
-				case 2: delete_html(rp, rq, config, index_serv, index_loc); break;
+				case 0: get_html(rp, rq, path, config, index_serv, index_loc, is_redirect); break;
+				case 1: post_html(rp, rq, path, config, index_serv, index_loc); break;
+				case 2: delete_html(rp, rq, path, config, index_serv, index_loc); break;
 			}
 			return ;
 		}

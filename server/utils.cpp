@@ -28,6 +28,22 @@ int	check_file(std::string path, int mode)
 	return (0);
 }
 
+// mod dest_url to real URL (og, or redirected) and returns 0 if not redirected, else 301/302
+int	is_url_redirected(const std::string og_url, std::string &dest_url, Server serv, int index_loc)
+{
+	std::map<std::string, struct rewrite> redirections = find_redirections(serv, index_loc);
+	for (std::map<std::string,struct rewrite>::const_iterator it = redirections.begin(); it != redirections.end(); ++it)
+	{
+		if (og_url == it->first)
+		{
+			dest_url = it->second.redirect_url;
+			return it->second.type;
+		}
+	}
+	//dest_url = og_url;
+	return 0;
+}
+
 // test absolute then non absolute + correct not perfect match
 int find_location2(const std::string path, Server serv)
 {
@@ -107,8 +123,8 @@ std::string concatenate_root_path(Request rq, ConfigFile config, int index_serv,
 
 std::string	find_str_data(Server serv, int index_loc, std::string to_find)
 {
-	std::string lst_data[5] = {"root", "index", "auto_index", "body_size", "redirection"};
-	for (int i = 0; i < 5; i++)
+	std::string lst_data[4] = {"root", "index", "auto_index", "body_size"};
+	for (int i = 0; i < 4; i++)
 	{
 		if (to_find == lst_data[i])
 		{
@@ -140,16 +156,19 @@ std::string	find_str_data(Server serv, int index_loc, std::string to_find)
 					else if (serv.getMaxBodySize().size() != 0)
 						return (serv.getMaxBodySize());
 					break ;
-				case 4:
-					if (index_loc > -1 && serv.getLocations()[index_loc].getRedirection().size() != 0)
-						return (serv.getLocations()[index_loc].getRedirection());
-					else if (serv.getRedirection().size() != 0)
-						return (serv.getRedirection());
-					break ;
 			}
 		}
 	}
 	return (std::string());
+}
+
+std::map<std::string, struct rewrite> find_redirections(Server serv, int index_loc)
+{
+	if (index_loc > -1 && serv.getLocations()[index_loc].getRedirection().size() != 0)
+		return (serv.getLocations()[index_loc].getRedirection());
+	else if (serv.getRedirection().size() != 0)
+		return (serv.getRedirection());
+	return (std::map<std::string, struct rewrite>());
 }
 
 std::map<std::string, std::string> find_error_pages(Server serv, int index_loc)
