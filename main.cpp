@@ -54,7 +54,6 @@ void launch_server(ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd = list_server_fd(poll_fds);
 	std::vector<struct client> clients;
-	std::string buff;
 	int	pos;
 
 	while (true)
@@ -76,11 +75,10 @@ void launch_server(ConfigFile config, Poll poll_fds)
 				else
 				{
 					try {
-						buff = read_recv_data(i, &poll_fds);
 						pos = find_client(clients, poll_fds.getFds(i).fd);
-						clients[pos].rq.appendRaw(buff);
+						read_recv_data(i, &poll_fds, clients[pos]);
 						clients[pos].await_response = true;
-						//usleep(200);
+						usleep(20);
 					}
 					catch (const std::exception & e) {
 						deco_client(clients, &poll_fds, i);

@@ -31,7 +31,7 @@ class Request
 		std::string				const & getRaw() const;
 
 		void	parse();
-		void	appendRaw(std::string data);
+		void	appendRaw(char* buff, size_t bytes);
 		bool	unchunkBody();
 		void	print() const;
 

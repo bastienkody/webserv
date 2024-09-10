@@ -48,13 +48,13 @@ int create_socket_server(const char *port)
 	return (server_fd);
 }
 
-std::string read_recv_data(int i, Poll *poll_fds)
+void read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct client &co)
 {
-	int nb_bytes;
-	char buff[4096];
+	size_t nb_bytes;
+	char buff [4096];
 	
 	memset(&buff, 0, sizeof(buff));
-	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 1023, 0);
+	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 4095, 0);
 	// si nb_bytes == 0 (deco) ou < 0 (error recv) => virer le client sans lui repondre
 	if (nb_bytes < 0)
 	{
@@ -67,7 +67,8 @@ std::string read_recv_data(int i, Poll *poll_fds)
 		throw std::runtime_error("connection closed");
 	}
 	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff  << std::endl;
-	return (buff);
+
+	co.rq.appendRaw(buff, nb_bytes);
 }
 
 int	send_response(struct client &co, ConfigFile config)

@@ -42,7 +42,7 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 	
 	Response rp;
-	std::string path =concatenate_root_path(rq, config, index_serv, index_loc);
+	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
 
 	int	redirect_code = is_url_redirected(rq.getRql().getUrl().getPath(), path, config.getServers()[index_serv], index_loc);
 
