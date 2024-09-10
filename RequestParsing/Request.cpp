@@ -64,7 +64,6 @@ void	Request::parse()
 void	Request::appendRaw(std::string data)
 {
 	_raw += data;
-	std::cerr<< "size rq : " << _raw.size()<<std::endl;
 }
 
 bool	Request::unchunkBody()

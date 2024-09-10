@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/08 16:36:23 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/10 15:33:42 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ std::string read_recv_data(int i, Poll *poll_fds)
 	
 	memset(&buff, 0, sizeof(buff));
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 1023, 0);
+	// std::cerr<< "nb_bytes recus : "<< nb_bytes<<std::endl;
 	// si nb_bytes == 0 (deco) ou < 0 (error recv) => virer le client sans lui repondre
 	if (nb_bytes < 0)
 	{
