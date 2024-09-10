@@ -47,16 +47,16 @@
 
 /*server.cpp*/
 int 	create_socket_server(const char *port);
-std::string	read_recv_data(int i, Poll *poll_fds);
+void	read_recv_data(int i, Poll *poll_fds, struct client &co);
 int	send_response(struct client &co, __attribute__((unused))ConfigFile config);
 int	accept_new_connection(int server_fd, Poll *poll_fds);
 int		check_serv_socket(int fd, unsigned int *serv_fds, int size);
 
 /*rq_html.cpp*/
-void	get_html(Response *rp, Request rq);
-void	post_html(Response *rp, Request rq);
-void	delete_html(Response *rp, Request rq);
-void	rq_html(Response *rp, Request rq, ConfigFile config, int index_serv, int index_loc);
+void	get_html(Response *rp, Request rq, std::string path, bool is_redirect);
+void	post_html(Response *rp, Request rq, std::string path);
+void	delete_html(Response *rp, Request rq, std::string path);
+void	rq_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc, bool is_redirect);
 
 /*rq_dir.cpp*/
 void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_loc, int index_serv);
@@ -71,7 +71,9 @@ int									check_file(std::string path, int mode);
 std::string							concatenate_root_path(Request rq, ConfigFile config, int index_serv, int index_loc);
 int									find_location(const std::string path, Server serv);
 int									find_location2(const std::string path, Server serv);
+int	is_url_redirected(const std::string og_url, std::string &dest_url, Server serv, int index_loc);
 std::string							find_str_data(Server serv, int index_loc, std::string to_find);
+std::map<std::string, struct rewrite> find_redirections(Server serv, int index_loc);
 std::map<std::string, std::string>	find_error_pages(Server serv, int index_loc);
 std::vector<std::string>			find_vector_data(Server serv, int index_loc, std::string to_find);
 

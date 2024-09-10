@@ -39,7 +39,7 @@ std::map<int, std::string> StatusCode::initMap(void)
 	m[410] = "Gone";
 	m[411] = "Length Required";
 	m[412] = "Precondition Failed";
-	m[413] = "Request Entity Too Large";
+	m[413] = "Payload Too Large";
 	m[414] = "Request-URI Too Long";
 	m[415] = "Unsupported Media Type";
 	m[416] = "Requested Range Not Satisfiable";

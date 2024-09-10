@@ -61,9 +61,11 @@ void	Request::parse()
 	_raw.clear();
 }
 
-void	Request::appendRaw(std::string data)
+void	Request::appendRaw(char* buff, __attribute__((unused))size_t bytes)
 {
-	_raw += data;
+	std::cerr << "bytes to append: " << bytes << std::endl;
+	std::cerr << "real size: " << strlen(buff) << std::endl;
+	_raw.append(buff, bytes);
 }
 
 bool	Request::unchunkBody()

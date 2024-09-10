@@ -54,7 +54,6 @@ void launch_server(ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd = list_server_fd(poll_fds);
 	std::vector<struct client> clients;
-	std::string buff;
 	int	pos;
 
 	while (true)
@@ -68,6 +67,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 		{
 			if (poll_fds.getFds(i).revents & POLLIN)
 			{
+				std::cout << "pi_" << std::endl;
 				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
 					clients.push_back(create_client(server_fd[status], poll_fds));
@@ -75,10 +75,10 @@ void launch_server(ConfigFile config, Poll poll_fds)
 				else
 				{
 					try {
-						buff = read_recv_data(i, &poll_fds);
 						pos = find_client(clients, poll_fds.getFds(i).fd);
-						clients[pos].rq.appendRaw(buff);
+						read_recv_data(i, &poll_fds, clients[pos]);
 						clients[pos].await_response = true;
+						usleep(20);
 					}
 					catch (const std::exception & e) {
 						deco_client(clients, &poll_fds, i);
@@ -89,15 +89,16 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			// responding
 			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_client(clients, poll_fds.getFds(i).fd)].await_response == true)
 			{
+				std::cout << "po_" << std::endl;
 				pos = find_client(clients, poll_fds.getFds(i).fd);
 				if (send_response(clients[pos], config) < 0 || RequestChecking::isKeepAlive(clients[pos].rq) == false)
-					deco_client(clients, &poll_fds, i); // pb de read/write ou no keepalive --> deco client
+					deco_client(clients, &poll_fds, i); // pb de read/write ou no keepalive  --> deco client
 				else
 				{
 					clients[pos].await_response = false;
 					clients[pos].rp = Response();
 					clients[pos].rq = Request();
-			        }
+			    }
 			}
 		}
 	}

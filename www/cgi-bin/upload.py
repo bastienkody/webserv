@@ -4,7 +4,7 @@ import cgi
 import os
 
 # Définir le dossier où les fichiers seront stockés
-UPLOAD_FOLDER = '/mnt/nfs/homes/mmuesser/Cursus42/webserv/www/cgi-bin/tmp'
+UPLOAD_FOLDER = "./"
 
 # Activer la gestion des erreurs CGI (utile pour le développement)
 import cgitb
