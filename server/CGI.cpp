@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/07 18:01:14 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/08 16:49:09 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,19 +87,19 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 /*definir limite pour reponse body*/
 void	CGI::exec_father(int *pipe_fd, std::string path)
 {
-	std::cerr<< "stdin body : " << _rq.getBody().c_str()<<std::endl;
+	// std::cerr<< "stdin body : " << _rq.getBody().c_str()<<std::endl;
 	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
 	wait(NULL);
 	(void) path;
 	int status;
 	char *buff;
-	buff = (char *) malloc(sizeof(char) * (1000 + 1));
+	buff = (char *) malloc(sizeof(char) * (1000000 + 1));
 	if (!buff)
 		return ;
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 1000000; i++)
 		buff[i] = '\0';
 	dup2(pipe_fd[0], STDIN_FILENO);
-	status = read(pipe_fd[0], buff, 1000);
+	status = read(pipe_fd[0], buff, 1000000);
 	if (status == -1)
 		return ;
 	this->getRp()->setLineState(200);
