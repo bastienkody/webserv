@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/07 14:53:29 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/10 14:33:27 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 					catch (const std::exception & e) {
 						deco_client(clients, &poll_fds, i);
 					}
+					usleep(200);
 				}
 			}
 			// responding
