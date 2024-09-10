@@ -75,7 +75,7 @@ int	send_response(struct client &co, ConfigFile config)
 {
 	//std::cout << "-----------------RAWDEBUT----------------\n" + co.rq.getRaw() + "-----------------ENDOFRAW----------------"<< std::endl;
 	co.rq.parse();
-	// co.rq.print();
+	//co.rq.print();
 
 	int	code;
 	int	index_serv = config.getServerFromFd(co.server_fd);
@@ -113,7 +113,7 @@ int	send_response(struct client &co, ConfigFile config)
 	else
 		co.rp = exec_rq(co.rq, config, index_serv, index_loc);
 
-	// std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" <<std::endl;
+	 std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
 	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
 	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) < 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
