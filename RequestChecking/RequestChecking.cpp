@@ -57,7 +57,7 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 		}
 	}
 	if (content_lenght == false)
-		return 0;
+		return 400;
 
 	if (max_body_size.size() == 0)
 		return 1;
@@ -65,6 +65,8 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 	unsigned int		i, j;
 	str >> i;
 	str2 >> j;
+	if (j != rq.getBody().size())
+		return std::cerr << "content_len!=body.size()" << std::endl, 400;
 	return (i >= j ? 1 : 413);
 }
 

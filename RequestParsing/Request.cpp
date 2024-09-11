@@ -61,10 +61,8 @@ void	Request::parse()
 	_raw.clear();
 }
 
-void	Request::appendRaw(char* buff, __attribute__((unused))size_t bytes)
+void	Request::appendRaw(const char* buff, __attribute__((unused))size_t bytes)
 {
-	std::cerr << "bytes to append: " << bytes << std::endl;
-	std::cerr << "real size: " << strlen(buff) << std::endl;
 	_raw.append(buff, bytes);
 }
 

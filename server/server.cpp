@@ -48,7 +48,7 @@ int create_socket_server(const char *port)
 	return (server_fd);
 }
 
-void read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct client &co)
+size_t read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct client &co)
 {
 	size_t nb_bytes;
 	char buff [4096];
@@ -69,6 +69,7 @@ void read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct client 
 	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff  << std::endl;
 
 	co.rq.appendRaw(buff, nb_bytes);
+	return nb_bytes;
 }
 
 int	send_response(struct client &co, ConfigFile config)

@@ -44,6 +44,55 @@ int	is_url_redirected(const std::string og_url, std::string &dest_url, Server se
 	return 0;
 }
 
+// not case isensitive for header check
+bool	is_rq_finished(std::string raw)
+{
+	// fin des headers ?
+	if (raw.find("\r\n\r\n") == std::string::npos)
+		return std::cerr << "is_rq_finish: not yet CRLF+CRLF" << std::endl, false;
+
+	Request	rq;
+	rq.appendRaw(raw.data(), raw.size());
+	rq.parse();
+
+	std::multimap<std::string, std::string>::const_iterator it = rq.getHeader().begin();
+	std::multimap<std::string, std::string>::const_iterator ite = rq.getHeader().end();
+	if (it == ite)
+		std::cout << "is_rq_finish: NO header" << std::endl;
+	for (; it!=ite; ++it)
+	{
+		std::cout <<"header:" << it->first << "->" << it->second << std::endl;
+		if (ParserUtils::compCaseInsensitive(it->first, "Transfer-Encoding") && ParserUtils::compCaseInsensitive(it->second, "chunked"))
+		{
+			std::string end = raw.substr(raw.size() -5, raw.size());
+			char a = end[0];
+			char b = end[1];
+			char c = end[2];
+			char d = end[3];
+			char e = end[4];
+			if (end != "0\r\n\r\n")
+			{
+				std::cerr << "is_rq_finish: not last chunked, we have:"<< std::endl;
+				std::cerr << std::dec << static_cast<int>(a)<<"-"<<static_cast<int>(b)<<"-"<<static_cast<int>(c)<<"-"<<static_cast<int>(d)<<"-"<<static_cast<int>(e)<<std::endl;
+				return false;
+			}
+			else
+				std::cerr << "is_rq_finish: end of chunked" << std::endl;
+		}
+		else if (ParserUtils::compCaseInsensitive(it->first, "Content-Length"))
+		{
+			std::stringstream	sstr(it->second);
+			unsigned int		i;
+			sstr >> i;
+			if (i != rq.getBody().size())
+				return std::cerr << "is_rq_finish: content_len("<<i<< ") != body.size("<<rq.getBody().size()<<")" << std::endl, false;
+
+		}
+	}
+	return std::cerr << "is_rq_finish: YES" << std::endl, true;
+}
+
+
 // test absolute then non absolute + correct not perfect match
 int find_location2(const std::string path, Server serv)
 {

@@ -77,13 +77,13 @@ void launch_server(ConfigFile config, Poll poll_fds)
 					try {
 						pos = find_client(clients, poll_fds.getFds(i).fd);
 						read_recv_data(i, &poll_fds, clients[pos]);
-						clients[pos].await_response = true;
-						usleep(20);
+						if (is_rq_finished(clients[pos].rq.getRaw()))
+							clients[pos].await_response = true;
+						//usleep(20);
 					}
 					catch (const std::exception & e) {
 						deco_client(clients, &poll_fds, i);
 					}
-					usleep(200);
 				}
 			}
 			// responding
