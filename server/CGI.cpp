@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/09 17:06:14 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/11 18:44:51 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	else if (status == 0)
 		this->exec_son(pipe_fd, path);
 	else
-		this->exec_father(pipe_fd, path);
+		this->exec_father(pipe_fd, path, status);
 }
 
 void	CGI::exec_son(int *pipe_fd, std::string path)
@@ -81,31 +81,41 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	delete [] env;
 	delete [] av;
 	perror("Execve");
-	exit(1);
+	std::cerr<< "blabla test"<<std::endl;
+	exit(-1);
 }
 
 /*definir limite pour reponse body*/
-void	CGI::exec_father(int *pipe_fd, std::string path)
+void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 {
-	std::cerr<< "stdin body : " << _rq.getBody().c_str()<<std::endl;
-	// std::cerr<< "body size : " << _rq.getBody().size()<<std::endl;
 	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
-	wait(NULL);
-	(void) path;
 	int status;
+	waitpid(pid, &status, 0);
+	if (WEXITSTATUS(status) == -1)
+	{
+		std::cerr<< "qwertyuiop"<<std::endl;
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
+		return ;
+	}
+	// (void) path;
 	char *buff;
-	buff = (char *) malloc(sizeof(char) * (1000000 + 1));
+	buff = (char *) malloc(sizeof(char) * (4095 + 1));
 	if (!buff)
 		return ;
-	for (int i = 0; i < 1000000; i++)
+	for (int i = 0; i < 4095; i++)
 		buff[i] = '\0';
 	dup2(pipe_fd[0], STDIN_FILENO);
-	status = read(pipe_fd[0], buff, 1000000);
+	std::cerr<< "fohsoefhs[oefhsef]"<<std::endl;
+	status = read(pipe_fd[0], buff, 4095);
 	if (status == -1)
 		return ;
-	this->getRp()->setLineState(200);
+	this->getRp()->setLineState(201);
 	this->getRp()->setHeader(_rq, _config, _index_serv, _index_loc);
+	this->getRp()->setLocation(path);
 	this->getRp()->setBody(buff, "html");
+	free(buff);
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
 }

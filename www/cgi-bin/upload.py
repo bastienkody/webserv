@@ -46,7 +46,7 @@ def save_uploaded_file():
             bytes_written = f.write(file_data)
         # print(f"<p>Debug : Nombre d'octets ecrits : {bytes_written}</p>")
         print("<h1>Success</h1>")
-        print(f"<p>File '{filename}' successfully uploaded to {UPLOAD_FOLDER}.</p>")
+        print(f"<p>File '{filename}' successfully uploaded to {UPLOAD_FOLDER}</p>")
     except Exception as e:
         print("<h1>Error</h1>")
         print(f"<p>Failed to upload file: {str(e)}</p>")

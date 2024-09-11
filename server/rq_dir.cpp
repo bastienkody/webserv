@@ -6,30 +6,29 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 23:03:19 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/02 16:16:36 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/11 14:11:21 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 #include "../ConfigFile/Server.hpp"
 
-std::string read_index(Server serv, Request rq, std::string index, int index_loc)
+std::string read_index(Server serv, std::string index, int index_loc, int *code
+)
 {
-	(void) rq;
 	std::string root = find_str_data(serv, index_loc, "root");
 	if (root.size() == 0)
-		return ("Error");
+		return (*code = 500, "Error");
 	index = root + index;
-	std::cerr<< "index : " << index<<std::endl;
 	int status = check_file(index, 1);
 	if (status > 0)
 	{
 		std::cerr<< "status : "<< status<<std::endl;
-		return ("Error");
+		return (*code = 404, "Error");
 	}
 	std::ifstream file(index.c_str());
 	if (!file)
-		return ("Error");
+		return (*code = 500, "Error");
 	std::string tmp, buff;
 	while(std::getline(file, tmp))
 	{
@@ -41,14 +40,14 @@ std::string read_index(Server serv, Request rq, std::string index, int index_loc
 	return (buff);
 }
 
-std::string	create_index(Server serv, int index_loc)
+std::string	create_index(Server serv, int index_loc, int *code)
 {
 	std::string root = find_str_data(serv, index_loc, "root");
 	if (root.size() == 0)
-		return ("Error");
+		return (*code = 500, "Error");
 	DIR *my_dir = opendir(root.c_str());
 	if (!my_dir)
-		return ("Error");
+		return (*code = 403, "Error");
 	std::string buff;
 	struct dirent *dir_struct;
 	while (true)
@@ -60,7 +59,7 @@ std::string	create_index(Server serv, int index_loc)
 		buff += "<br>";
 	}
 	if (closedir(my_dir) == -1)
-		return ("Error");
+		return (*code = 500, "Error");
 	return (buff);
 }
 
@@ -69,46 +68,39 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_
 	std::string auto_index = find_str_data(serv, index_loc, "auto_index");
 	std::string buff;
 	std::string loc_index = serv.getLocations()[index_loc].getIndex();
-	if (auto_index.size() == 0)
-	{
-		std::cerr<< "Blabla 3"<<std::endl;
-		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
-		return ;
-	}
+	int code;
+
 	if (loc_index.size() != 0)
 	{
-		buff = read_index(serv, rq, loc_index, index_loc);
+		buff = read_index(serv, loc_index, index_loc, &code);
 		if (buff == "Error")
 		{
-			std::cerr<< "Blabla 4"<<std::endl;
-			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+			*rp = exec_rq_error(rq, config, code, index_serv, index_loc);
 			return ;
 		}
 	}
 	else if (serv.getIndex().size() != 0)
 	{
-		buff = read_index(serv, rq, serv.getIndex(), index_loc);
+		buff = read_index(serv, serv.getIndex(), index_loc, &code);
 		if (buff == "Error")
 		{
-			std::cerr<< "Blabla 5"<<std::endl;
-			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+			*rp = exec_rq_error(rq, config, code, index_serv, index_loc);
 			return ;
 		}
 	}
 	else if (auto_index == "on")
 	{
-		buff = create_index(serv, index_loc);
+		buff = create_index(serv, index_loc, &code);
 		if (buff == "Error")
 		{
-			std::cerr<< "Blabla 6"<<std::endl;
-			*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
+			*rp = exec_rq_error(rq, config, code, index_serv, index_loc);
 			return ;
 		}
 	}
 	else
 	{
-		std::cerr<< "Blabla 7"<<std::endl;
 		*rp = exec_rq_error(rq, config, 403, index_serv, index_loc);
+		return ;
 	}
 	rp->setLineState(200);
 	rp->setHeader(rq, config, index_serv, index_loc);
