@@ -70,6 +70,7 @@ void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, in
 	}
 	my_html << rq.getBody();
 	rp->setLineState(201);
+	rp->setLocation(path);
 	rp->setHeader(rq, config, index_serv, index_loc);
 }
 
