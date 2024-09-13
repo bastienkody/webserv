@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/08/31 14:33:38 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 15:49:31 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,10 @@
 #define DEFAULT_505 "www/505_error_default.html"
 
 /*server.cpp*/
-int 	create_socket_server(const char *port);
-size_t	read_recv_data(int i, Poll *poll_fds, struct client &co);
-int	send_response(struct client &co, __attribute__((unused))ConfigFile config);
-int	accept_new_connection(int server_fd, Poll *poll_fds);
+int 	create_socket_server(Server serv);
+void	read_recv_data(int i, Poll *poll_fds, struct client &co);
+int		send_response(struct client &co, __attribute__((unused))ConfigFile config);
+int		accept_new_connection(int server_fd, Poll *poll_fds);
 int		check_serv_socket(int fd, unsigned int *serv_fds, int size);
 
 /*rq_html.cpp*/

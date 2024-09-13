@@ -18,17 +18,36 @@ html = '''
 
 # Get data from fields
 calcul = form.getvalue('calcul')
-# print(calcul)
-# if len(calcul == 0) :
-# 	print (html)
 
+# while (1)
+# 	a = 1
 
+size = len(calcul)
+for i in range (1, size) :
+	if (calcul[i] == '+' or calcul[i] == '-' or calcul[i] == '*' or calcul[i] == '/') :
+		break
+operator = calcul[i]
+nb1 = int(calcul[0:i], base=10)
+nb2 = int(calcul[i + 1:size], base=10)
+
+if (operator == '+'):
+	res = nb1 + nb2
+elif (operator == '-'):
+	res = nb1 - nb2
+elif (operator == '*'):
+	res = nb1 * nb2
+elif (operator == '/'):
+	if (nb2 == 0):
+		print(html)
+		exit(1)
+	else:
+		res = nb1 / nb2
 
 print ("<html>")
 print ('<head>')
 print ("<title>Reponse Calcul</title>")
 print ('</head>')
 print ('<body>')
-print ("<h2>%s = ...</h2>" % (calcul))
+print ("<h2> " + calcul + " = %s </h2>" % (res))
 print ('</body>')
 print ('</html>')

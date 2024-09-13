@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/10 14:33:27 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 14:35:15 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 	{
 		if (verif_host(config, i) == 1)
 			continue;
-		int fd = create_socket_server(config.getServers()[i].getPortSTR().c_str());
+		int fd = create_socket_server(config.getServers()[i]);
 		if (fd == -1)
 			return 1;
 		try {

@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 15:20:43 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/02 16:21:22 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/10 18:24:17 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,6 @@ void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int
 // nsp si post vers url redirige sans nouvelle requete (on part sur ca) ou si nvle requete avec url modifie par le nav?
 void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
-	/*a utiliser si permet pas de post un fichier avec le meme nom qu'un deja existant*/
-	// status = check_file(rq, root, 0);
-	// if (status == 0)
-	// 	return ;
 	std::ofstream my_html(path.c_str());
 	if (!my_html)
 	{
@@ -78,7 +74,6 @@ void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, in
 void	delete_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
 	int status;
-	/*check dir -> return 0 si pas un dir*/
 	status = check_file(path, 1);
 	if (status > 0)
 	{
@@ -91,6 +86,8 @@ void	delete_html(Response *rp, Request rq, std::string path, ConfigFile config, 
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
+	rp->setLineState(204);
+	rp->setHeader(rq, config, index_serv, index_loc);
 }
 
 int	check_allow(Server serv, int index_loc, std::string method)
