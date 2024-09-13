@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 15:29:50 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/13 15:49:31 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 17:06:28 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@
 
 /*server.cpp*/
 int 	create_socket_server(Server serv);
-void	read_recv_data(int i, Poll *poll_fds, struct client &co);
+size_t	read_recv_data(int i, Poll *poll_fds, struct client &co);
 int		send_response(struct client &co, __attribute__((unused))ConfigFile config);
 int		accept_new_connection(int server_fd, Poll *poll_fds);
 int		check_serv_socket(int fd, unsigned int *serv_fds, int size);
@@ -70,12 +70,14 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, 
 int									check_file(std::string path, int mode);
 std::string							concatenate_root_path(Request rq, ConfigFile config, int index_serv, int index_loc);
 int									find_location(const std::string path, Server serv);
-int									find_location2(const std::string path, Server serv);
+int									find_location(const std::string path, Server serv);
 int	is_url_redirected(const std::string og_url, std::string &dest_url, Server serv, int index_loc);
 bool	is_rq_finished(std::string raw);
 std::string							find_str_data(Server serv, int index_loc, std::string to_find);
 std::map<std::string, struct rewrite> find_redirections(Server serv, int index_loc);
 std::map<std::string, std::string>	find_error_pages(Server serv, int index_loc);
 std::vector<std::string>			find_vector_data(Server serv, int index_loc, std::string to_find);
+void								free_tab(char **tab);
+
 
 #endif

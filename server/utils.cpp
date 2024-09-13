@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/05 17:39:40 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 17:05:55 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ bool	is_rq_finished(std::string raw)
 
 
 // test absolute then non absolute + correct not perfect match
-int find_location2(const std::string path, Server serv)
+int find_location(const std::string path, Server serv)
 {
 	size_t size = 0, index = -1;
 
@@ -132,43 +132,6 @@ std::string concatenate_root_path(Request rq, ConfigFile config, int index_serv,
 	path.erase(path.find(loc_path), loc_path.size());
 	return (path);
 }
-
-/*A modifier ?*/
-// int find_location(const std::string path, Server serv)
-// {
-// 	size_t size = 0;
-// 	int index = -1;
-// 	for(size_t i = 0; i < serv.getLocations().size(); i++)
-// 	{
-// 		if (path == serv.getLocations()[i].getPath())
-// 		{
-// 			if (serv.getLocations()[i].getIsPathAbsolute() == true)
-// 				return (i);
-// 			else
-// 			{
-// 				for (size_t y = i; y < serv.getLocations().size(); y++)
-// 				{
-// 					if (path == serv.getLocations()[i].getPath()
-// 						&& serv.getLocations()[i].getIsPathAbsolute() == true)
-// 						return (y);
-// 				}	
-// 				return (i);
-// 			}
-// 		}
-// 		if (serv.getLocations()[i].getIsPathAbsolute() == false)
-// 		{
-// 			for (size_t y = 0; y < serv.getLocations()[i].getPath().size(); y++)
-// 			{
-// 				if (serv.getLocations()[i].getPath()[y] != path[y] && y > size)
-// 				{
-// 					index = i;
-// 					size = y;
-// 				}
-// 			}
-// 		}
-// 	}
-// 	return (index);
-// }
 
 std::string	find_str_data(Server serv, int index_loc, std::string to_find)
 {
@@ -261,4 +224,13 @@ std::vector<std::string> find_vector_data(Server serv, int index_loc, std::strin
 		}
 	}
 	return (std::vector<std::string>());
+}
+
+
+void	free_tab(char **tab)
+{
+	int i = -1;
+	while (tab[++i])
+		free(tab[i]);
+	free(tab);
 }

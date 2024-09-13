@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:30:22 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/13 15:29:28 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 16:59:34 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ class CGI
 
 		char		**create_env();
 		char		**create_av();
-		void		  exec_son(int *pipe_fd, std::string path, char **env, char **av);
+		void		  exec_son(int *pipe_fd, std::string path);
 		void		  exec_father(int *pipe_fd, std::string path, int pid);
 		void		  init_env();
 
