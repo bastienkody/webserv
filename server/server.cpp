@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/10 17:38:04 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 15:05:44 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,34 +17,29 @@
 
 static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nabcd\n");
 
-int create_socket_server(const char *port)
+int create_socket_server(Server serv)
 {
-	struct addrinfo hints;
-	struct addrinfo *res;
+	struct sockaddr_in adress;
 	int server_fd;
 	int flag_true = 1;
 
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
+	adress.sin_family = AF_INET;
+	adress.sin_addr.s_addr = inet_addr(serv.getIp().c_str());
+	adress.sin_port = htons(serv.getPort());
 
-	if (getaddrinfo(NULL, port, &hints, &res) < 0)
-		return (perror("getaddrinfo"), -1);
 	// create the server socket
-	if ( (server_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
-		return (perror("socket"), freeaddrinfo(res), -1);
+	if ( (server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+		return (perror("socket"), -1);
 	// set options
 	fcntl(server_fd, F_SETFL, O_NONBLOCK); /*je vois pas encore de diff avec et sans*/
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &flag_true, sizeof(flag_true)) != 0)
 		return (perror("setsockopt"), -1);
 	// make it listen on port
-	if (bind(server_fd, res->ai_addr, res->ai_addrlen) < 0)
-		return (perror("bind"), freeaddrinfo(res), close(server_fd), -1);
-	freeaddrinfo(res);
+	if (bind(server_fd, (struct sockaddr *) &adress, sizeof(adress)) < 0)
+		return (perror("bind"), close(server_fd), -1);
 	if (listen(server_fd, 20) < 0)
 		return (perror("listen"), close(server_fd), -1);
-	std::cout<< "[Server] New server socket created and listening to port " << port<<std::endl;
+	std::cout<< "[Server] New server socket created and listening to port " << serv.getPortSTR().c_str()<<std::endl;
 	return (server_fd);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/11 18:44:51 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 15:45:04 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 		*_rp = exec_rq_error(_rq, _config, 404, _index_serv, _index_loc);
 		return ;
 	}
+	char **env = create_env();
+	char **av = create_av();
 	status = pipe(pipe_fd);
 	if (status == -1)
 	{
@@ -62,26 +64,23 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 		return ;
 	}
 	else if (status == 0)
-		this->exec_son(pipe_fd, path);
+		this->exec_son(pipe_fd, path, env, av);
 	else
 		this->exec_father(pipe_fd, path, status);
 }
 
-void	CGI::exec_son(int *pipe_fd, std::string path)
+void	CGI::exec_son(int *pipe_fd, std::string path, char **env, char **av)
 {
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[1]);
 	close(pipe_fd[0]);
 	
-	char **env = create_env();
-	char **av = create_av();
 	/*check premiere ligne script ???*/
 	execve(path.c_str(), av, env);
 	delete [] env;
 	delete [] av;
 	perror("Execve");
-	std::cerr<< "blabla test"<<std::endl;
 	exit(-1);
 }
 
@@ -90,16 +89,17 @@ void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 {
 	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
 	int status;
-	waitpid(pid, &status, 0);
-	if (WEXITSTATUS(status) == -1)
+	waitpid(pid, &status, WNOHANG);
+	if (WIFEXITED(status) == true && WEXITSTATUS(status) < 0)
 	{
+		std::cerr<< "status exec_father : " << status<<std::endl;
 		std::cerr<< "qwertyuiop"<<std::endl;
+		kill(pid, 9);
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 		return ;
 	}
-	// (void) path;
 	char *buff;
 	buff = (char *) malloc(sizeof(char) * (4095 + 1));
 	if (!buff)
@@ -107,7 +107,6 @@ void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 	for (int i = 0; i < 4095; i++)
 		buff[i] = '\0';
 	dup2(pipe_fd[0], STDIN_FILENO);
-	std::cerr<< "fohsoefhs[oefhsef]"<<std::endl;
 	status = read(pipe_fd[0], buff, 4095);
 	if (status == -1)
 		return ;
@@ -118,6 +117,7 @@ void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 	free(buff);
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
+	std::cerr<< "fohsoefhs[oefhsef]"<<std::endl;
 }
 
 void	CGI::init_env()
@@ -152,14 +152,14 @@ char	**CGI::create_env()
 	}
 	env[i] = NULL;
 	
-	std::cerr<< "env :"<<std::endl;
-	i = 0;
-	while (env[i] != NULL)
-	{
-		std::cerr<< "\t" << env[i]<<std::endl;
-		i++;
-	}
-	std::cerr<< "\n";
+	// std::cerr<< "env :"<<std::endl;
+	// i = 0;
+	// while (env[i] != NULL)
+	// {
+	// 	std::cerr<< "\t" << env[i]<<std::endl;
+	// 	i++;
+	// }
+	// std::cerr<< "\n";
 	return (env);
 }
 
