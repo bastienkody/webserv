@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/13 14:35:15 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 18:36:02 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 	unsigned int *server_fd = list_server_fd(poll_fds);
 	std::vector<struct client> clients;
 	int	pos;
+	int nb_serv = poll_fds.getCount();
 
 	while (true)
 	{
@@ -69,7 +70,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			{
 				std::cout << "pi_" << std::endl;
 				// new client requesting the server
-				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
+				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, nb_serv)) != -1)
 					clients.push_back(create_client(server_fd[status], poll_fds));
 				// data to read from the client request
 				else

@@ -6,13 +6,14 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/13 17:15:43 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 19:41:48 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/CGI.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/server.hpp"
+#include <errno.h>
 
 CGI::CGI(void){}
 CGI::~CGI(void){}
@@ -76,13 +77,21 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	
 	char **env = create_env();
 	char **av = create_av();
-	(void) path;
 	/*check premiere ligne script ???*/
-	// execve(path.c_str(), av, env);
+	std::cerr<< "\npath execve : " << path.c_str()<<std::endl;
+	int i = -1;
+	while (av[++i])
+		std::cerr<< "av : " << av[i]<<std::endl;
+	i = -1;
+	while (env[++i])
+		std::cerr<< "env : " << env[i]<<std::endl;
+	std::cerr<<std::endl;
+	execve(path.c_str(), av, env);
 	free_tab(env);
 	free_tab(av);
+	std::cerr<< "errno : " << errno<<std::endl;
 	perror("Execve");
-	exit(-1);
+	std::exit(-1);
 }
 
 int	wait_son(int *pipe_fd, int pid)
@@ -155,7 +164,7 @@ void	CGI::init_env()
 char	**CGI::create_env()
 {
 	this->init_env();
-	char **env = new char *[(_rq.getHeader().size() + _env.size() + 1)];
+	char **env = (char **)malloc(sizeof(char *) * (_rq.getHeader().size() + _env.size() + 1));
 	int i = 0;
 	for (std::map<std::string, std::string>::const_iterator it = _rq.getHeader().begin(); it != _rq.getHeader().end(); it++)
 	{

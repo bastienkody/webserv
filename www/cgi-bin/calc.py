@@ -19,7 +19,7 @@ html = '''
 # Get data from fields
 calcul = form.getvalue('calcul')
 
-# while (1)
+# while (1):
 # 	a = 1
 
 size = len(calcul)
