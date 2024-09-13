@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/13 15:05:44 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/13 17:04:35 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ int	send_response(struct client &co, ConfigFile config)
 
 	int	code;
 	int	index_serv = config.getServerFromFd(co.server_fd);
-	int	index_loc = find_location2(co.rq.getRql().getUrl().getPath(), config.getServers()[index_serv]);
+	int	index_loc = find_location(co.rq.getRql().getUrl().getPath(), config.getServers()[index_serv]);
 
 	std::cout << "servnb:" << index_serv << ", locnb:" << index_loc << std::endl;
 
