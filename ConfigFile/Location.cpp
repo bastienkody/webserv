@@ -2,7 +2,10 @@
 
 // constructors + copy
 Location::Location() {}
-Location::~Location() {}
+Location::~Location()
+{
+	_path.clear();
+}
 Location::Location(const Location & src): ConfigFile() {*this = src;}
 Location & Location::operator=(const Location & rhs)
 {

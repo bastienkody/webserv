@@ -61,6 +61,7 @@ void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, in
 	std::ofstream my_html(path.c_str());
 	if (!my_html)
 	{
+		std::cout << "File creation failed" << std::endl;
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}

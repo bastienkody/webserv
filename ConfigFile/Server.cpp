@@ -3,7 +3,13 @@
 
 //	constructors + copy
 Server::Server(): _ip("0.0.0.0"), _port(8080), _portSTR("8080")	{}
-Server::~Server() {}
+Server::~Server()
+{
+	_names.clear();
+	_ip.clear();
+	_portSTR.clear();
+	_locations.clear();
+}
 Server::Server(const Server & src): ConfigFile() {*this = src;}
 Server & Server::operator=(const Server & rhs)
 {

@@ -103,6 +103,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 		}
 	}
 	free(server_fd);
+	clients.clear();
 }
 
 int verif_host(ConfigFile config, int i)
@@ -143,6 +144,7 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 			return std::cerr << e.what() << std::endl, 1;
 		}
 	}
+	//std::exit(0);
 	launch_server(config, poll_fds);
 	return 0;
 }
