@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/13 18:36:53 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/14 20:22:11 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int create_socket_server(Server serv)
 
 size_t read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct client &co)
 {
-	size_t nb_bytes;
+	int nb_bytes;
 	char buff [4096];
 	
 	memset(&buff, 0, sizeof(buff));
