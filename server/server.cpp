@@ -51,12 +51,12 @@ size_t read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct clien
 	memset(&buff, 0, sizeof(buff));
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 4095, 0);
 	// si nb_bytes == 0 (deco) ou < 0 (error recv) => virer le client sans lui repondre
-	if (nb_bytes < 0)
-	{
-		perror("recv");
-		throw std::runtime_error("error recv");
-	}
-	else if (nb_bytes == 0)
+//	if (nb_bytes < 0)
+//	{
+//		perror("recv");
+//		throw std::runtime_error("error recv");
+//	}
+	if (nb_bytes == 0)
 	{
 		std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl;
 		throw std::runtime_error("connection closed");

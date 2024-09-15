@@ -16,6 +16,7 @@
 #include "ConfigFile/Server.hpp"
 #include "include/Poll.hpp"
 #include "include/server.hpp"
+#include <csignal>
 #include <unistd.h>
 #include <vector>
 
@@ -50,19 +51,33 @@ struct client	create_client(int server_fd, Poll &poll_fds)
 	return cli;
 }
 
+void	handler(__attribute__((unused))int dunmmy)
+{
+	std::cout << "Handler called" << std::endl;
+	return;
+}
+
 void launch_server(ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd = list_server_fd(poll_fds);
 	std::vector<struct client> clients;
 	int	pos;
 
+
 	while (true)
 	{
-		int status = poll_fds.call_to_poll();
+		int status = poll(poll_fds.getAllFds(), poll_fds.getCount(), -1);
 		if (status < 0)
+		{
+			free(server_fd);
+			clients.clear();
 			return (perror("poll"));
-		else if (status == 0)
+		}
+		else if (status == 0) // selon la doc on devrait jamais avoir ca sauf si signal ??
+		{
+			std::cout << "Status == 0 in poll !!" << std::endl;
 			continue;
+		}
 		for (int i = 0; i < poll_fds.getCount(); i++)
 		{
 			if (poll_fds.getFds(i).revents & POLLIN)
@@ -79,7 +94,6 @@ void launch_server(ConfigFile config, Poll poll_fds)
 						read_recv_data(i, &poll_fds, clients[pos]);
 						if (is_rq_finished(clients[pos].rq.getRaw()))
 							clients[pos].await_response = true;
-						//usleep(20);
 					}
 					catch (const std::exception & e) {
 						deco_client(clients, &poll_fds, i);
@@ -102,8 +116,6 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			}
 		}
 	}
-	free(server_fd);
-	clients.clear();
 }
 
 int verif_host(ConfigFile config, int i)
@@ -116,6 +128,8 @@ int verif_host(ConfigFile config, int i)
 
 int main(int ac, char **av, __attribute__((unused))char **env)
 {
+	//signal(SIGINT, handler);
+
 	if (ac > 2)
 		return std::cerr << "expected config file as single argument" << std::endl, 2;
 
@@ -144,7 +158,6 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 			return std::cerr << e.what() << std::endl, 1;
 		}
 	}
-	//std::exit(0);
 	launch_server(config, poll_fds);
 	return 0;
 }

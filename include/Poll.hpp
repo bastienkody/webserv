@@ -24,6 +24,7 @@ class	Poll
 		~Poll(void);
 		// Poll & operator=(const Poll &obj);
 		struct pollfd	getFds(int i) ;
+		struct pollfd	*getAllFds();
 		int				getCount(void) const;
 		void			setFds(int i, int new_fd, short event);
 		void			setEvent(int i, short event);

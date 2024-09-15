@@ -54,6 +54,10 @@ struct pollfd	Poll::getFds(int i)
 	return (_fds[i]);
 }
 
+struct pollfd	*Poll::getAllFds()
+{
+	return (_fds);
+}
 
 int	Poll::getCount(void) const
 {
