@@ -20,6 +20,8 @@
 #include <unistd.h>
 #include <vector>
 
+static bool run = true;
+
 unsigned int *list_server_fd(Poll poll_fds)
 {
 	unsigned int *dest;
@@ -35,7 +37,7 @@ unsigned int *list_server_fd(Poll poll_fds)
 void deco_client(std::vector<struct client> &clients, Poll *poll_fds, int i)
 {
 	int offset = find_client(clients, poll_fds->getFds(i).fd);
-	std::cout << "[Client" << poll_fds->getFds(i).fd << "] to be deco" << std::endl;
+	if (DEBUGP) {std::cout << "[Client" << poll_fds->getFds(i).fd << "] to be deco" << std::endl;}
 	if (offset > -1)
 		clients.erase(clients.begin() + offset);
 	close(poll_fds->getFds(i).fd);
@@ -51,9 +53,17 @@ struct client	create_client(int server_fd, Poll &poll_fds)
 	return cli;
 }
 
+void	clear_client(struct client &cli)
+{
+	cli.await_response = false;
+	cli.rp = Response();
+	cli.rq = Request();
+}
+
 void	handler(__attribute__((unused))int dunmmy)
 {
-	std::cout << "Handler called" << std::endl;
+	std::cout << "... Webserv exiting ..." << std::endl;
+	run = false;
 	return;
 }
 
@@ -63,16 +73,11 @@ void launch_server(ConfigFile config, Poll poll_fds)
 	std::vector<struct client> clients;
 	int	pos;
 
-
-	while (true)
+	while (run)
 	{
-		int status = poll(poll_fds.getAllFds(), poll_fds.getCount(), -1);
+		int status = poll_fds.call_to_poll();
 		if (status < 0)
-		{
-			free(server_fd);
-			clients.clear();
-			return (perror("poll"));
-		}
+			return (free(server_fd), perror("poll"));
 		else if (status == 0) // selon la doc on devrait jamais avoir ca sauf si signal ??
 		{
 			std::cout << "Status == 0 in poll !!" << std::endl;
@@ -82,11 +87,10 @@ void launch_server(ConfigFile config, Poll poll_fds)
 		{
 			if (poll_fds.getFds(i).revents & POLLIN)
 			{
-				std::cout << "pi_" << std::endl;
 				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
 					clients.push_back(create_client(server_fd[status], poll_fds));
-				// data to read from the client request
+				// data to read from a connected client
 				else
 				{
 					try {
@@ -103,19 +107,16 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			// responding
 			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_client(clients, poll_fds.getFds(i).fd)].await_response == true)
 			{
-				std::cout << "po_" << std::endl;
 				pos = find_client(clients, poll_fds.getFds(i).fd);
 				if (send_response(clients[pos], config) < 0 || RequestChecking::isKeepAlive(clients[pos].rq) == false)
 					deco_client(clients, &poll_fds, i); // pb de read/write ou no keepalive  --> deco client
 				else
-				{
-					clients[pos].await_response = false;
-					clients[pos].rp = Response();
-					clients[pos].rq = Request();
-			    }
+					clear_client(clients[pos]);
 			}
 		}
 	}
+	free(server_fd);
+	clients.clear();
 }
 
 int verif_host(ConfigFile config, int i)
@@ -128,7 +129,7 @@ int verif_host(ConfigFile config, int i)
 
 int main(int ac, char **av, __attribute__((unused))char **env)
 {
-	//signal(SIGINT, handler);
+	signal(SIGINT, handler);
 
 	if (ac > 2)
 		return std::cerr << "expected config file as single argument" << std::endl, 2;
@@ -152,7 +153,7 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 			return 1;
 		try {
 			poll_fds.add_to_poll(fd);
-			config.setServerFd(fd, i); // for clients to be linked to a their own server (ie maxbodysize on that specific server)
+			config.setServerFd(fd, i);
 		}
 		catch (const std::exception &e) {
 			return std::cerr << e.what() << std::endl, 1;

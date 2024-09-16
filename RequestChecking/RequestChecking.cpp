@@ -43,7 +43,7 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 	std::multimap<std::string, std::string>::const_iterator it = rq.getHeader().begin();
 	std::multimap<std::string, std::string>::const_iterator ite = rq.getHeader().end();
 
-	std::cout << "REAL BODY SIZE: " << rq.getBody().size() << std::endl;
+	//std::cout << "REAL BODY SIZE: " << rq.getBody().size() << std::endl;
 
 	for (; it!=ite; ++it)
 	{

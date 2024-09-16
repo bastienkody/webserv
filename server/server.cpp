@@ -15,8 +15,6 @@
 #include "../Clients/Clients.hpp"
 #include "../ConfigFile/Server.hpp"
 
-static std::string rep("HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 5\nContent-Type: text/html\nConnection: Keep-alive\n\nabcd\n");
-
 int create_socket_server(Server serv)
 {
 	struct sockaddr_in adress;
@@ -45,23 +43,23 @@ int create_socket_server(Server serv)
 
 size_t read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct client &co)
 {
-	size_t nb_bytes;
+	int nb_bytes;
 	char buff [4096];
 	
 	memset(&buff, 0, sizeof(buff));
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 4095, 0);
 	// si nb_bytes == 0 (deco) ou < 0 (error recv) => virer le client sans lui repondre
-//	if (nb_bytes < 0)
-//	{
-//		perror("recv");
-//		throw std::runtime_error("error recv");
-//	}
+	if (nb_bytes < 0)
+	{
+		perror("recv");
+		throw std::runtime_error("error recv");
+	}
 	if (nb_bytes == 0)
 	{
-		std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl;
+		if (DEBUGP) {std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl;}
 		throw std::runtime_error("connection closed");
 	}
-	std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff  << std::endl;
+	if (DEBUGP) {std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff  << std::endl;}
 
 	co.rq.appendRaw(buff, nb_bytes);
 	return nb_bytes;
@@ -69,7 +67,6 @@ size_t read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct clien
 
 int	send_response(struct client &co, ConfigFile config)
 {
-	//std::cout << "-----------------RAWDEBUT----------------\n" + co.rq.getRaw() + "-----------------ENDOFRAW----------------"<< std::endl;
 	co.rq.parse();
 	//co.rq.print();
 
@@ -77,39 +74,33 @@ int	send_response(struct client &co, ConfigFile config)
 	int	index_serv = config.getServerFromFd(co.server_fd);
 	int	index_loc = find_location(co.rq.getRql().getUrl().getPath(), config.getServers()[index_serv]);
 
-	std::cout << "servnb:" << index_serv << ", locnb:" << index_loc << std::endl;
+	//std::cout << "servnb:" << index_serv << ", locnb:" << index_loc << std::endl;
 
 	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq)) != 0)
 	{
-		std::cout << "check basics error" << std::endl;
+		if (DEBUGP) {std::cout << "check basics error" << std::endl;}
 		co.rp = exec_rq_error(co.rq, config, code, index_serv, index_loc);
 	}
-
 	else if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, find_str_data(config.getServers()[index_serv], index_loc, "body_size"))) != 1)
 	{
-		if (code == 413 || code == 0) // maybe 0 must become a 400
+		if (code == 413 || code == 400) // maybe 0 must become a 400
 		{
-			std::cout << "header post error" << std::endl;
+			if (DEBUGP) {std::cout << "header post error" << std::endl;}
 			co.rp = exec_rq_error(co.rq, config, code, index_serv, index_loc);
 		}
 		if (code == 2)
 		{
-			std::cout << "post rq chunk to be treated" << std::endl;
 			if (co.rq.unchunkBody() == false) // bad or missing sizing sequence in a chunk
 				co.rp = exec_rq_error(co.rq, config, 400, index_serv, index_loc);
 			else
-			{
-				std::cout << "body unchunked:" << co.rq.getBody() << std::endl;
 				co.rp = exec_rq(co.rq, config, index_serv, index_loc);
-			}
 		}
 	}
-
 	else
 		co.rp = exec_rq(co.rq, config, index_serv, index_loc);
 
-	 std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
+	std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
 	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
 	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) < 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
@@ -123,7 +114,7 @@ int	accept_new_connection(int server_fd, Poll *poll_fds)
 	if (poll_fds->getCount() > 255)
 		return (close(server_fd), close(client_fd), exit(1), 0);
 	poll_fds->add_to_poll(client_fd);
-	std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;
+	if (DEBUGP) {std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;}
 	return client_fd;
 }
 

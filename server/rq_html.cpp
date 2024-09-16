@@ -27,7 +27,7 @@ void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int
 		return ;
 	}
 
-	std::cout << "from rq_html path: " + path << std::endl;
+	if (DEBUGP) {std::cout << "from rq_html path: " + path << std::endl;}
 	int status;
 	std::string tmp, buff;
 	status = check_file(path, 1);
@@ -49,7 +49,6 @@ void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int
 		else
 			buff.append(tmp);
 	}
-	std::cerr<< "ext : " << path.substr(path.rfind('.') + 1, path.size() - 1) << std::endl;
 	rp->setLineState(200);
 	rp->setHeader(rq, config, index_serv, index_loc);
 	rp->setBody(buff, path.substr(path.rfind('.') + 1, path.size() - 1)); // to get the real extension
@@ -61,14 +60,14 @@ void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, in
 	std::ofstream my_html(path.c_str());
 	if (!my_html)
 	{
-		std::cout << "File creation failed" << std::endl;
+		if (DEBUGP) {std::cout << "File creation failed" << std::endl;}
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}
 	my_html << rq.getBody();
 	rp->setLineState(201);
-	rp->setLocation(path);
 	rp->setHeader(rq, config, index_serv, index_loc);
+	rp->setLocation(rq.getRql().getUrl().getPath());
 }
 
 // idem redirect post

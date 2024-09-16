@@ -35,6 +35,9 @@
 #include <map>
 #include <dirent.h>
 
+/* Debug */
+#define DEBUGP 1
+
 /* Error default pages	*/
 #define DEFAULT_400 "www/400_error_default.html"
 #define DEFAULT_403 "www/403_error_default.html"

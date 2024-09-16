@@ -34,15 +34,13 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 	return (0);
 }
 
-// on peut mettre le path (apres redirect ou +root+) dans rq ?
-// si on envoit serveur au lieu de config + index_serv?
 Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
 	if (index_loc == -1)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 	
 	Response rp;
-	std::string path =concatenate_root_path(rq, config, index_serv, index_loc);
+	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
 	if (path.find("/..") != std::string::npos)
 	{
 		std::cout << "Security protection : deny acces to ani \"../\" in the filesystem" << std::endl;
@@ -51,25 +49,24 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 
 	int	redirect_code = is_url_redirected(rq.getRql().getUrl().getPath(), path, config.getServers()[index_serv], index_loc);
 
-	std::cout << "From exec rq path: " + path + " is redirected: " << redirect_code << std::endl;
-	std::cout << "Is a dir: " << (path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL ? "yes" : "no") << std::endl;
+	//std::cout << "From exec rq path: " + path + " is redirected: " << redirect_code << std::endl;
 	if (path.size() == 0)
 		return exec_rq_error(rq, config, 500, index_serv, index_loc);
 
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
 		{
-			std::cerr<< "Enter CGI :"<<std::endl;
+			if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		}
 		else if ((path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL) && rq.getRql().getVerb() == "GET")
 		{
-			std::cerr<< "Enter rq_dir :"<<std::endl;
+			if (DEBUGP) {std::cerr<< "Enter rq_dir :"<<std::endl;}
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		}
 		else
 		{
-			std::cerr<< "Enter rq_html :"<<std::endl;
+			if (DEBUGP) {std::cerr<< "Enter rq_html :"<<std::endl;}
 			rq_html(&rp, rq, path, config, index_serv, index_loc, redirect_code==0?false:true);
 		}
 	}
@@ -80,6 +77,11 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	{
 		rp.setLineState(redirect_code);
 		rp.setLocation(path);
+		if (redirect_code == 301)
+			rp.setBody("<h1>Error 301: Moved Permanently (redirection) /h1>", "html");
+		else
+			rp.setBody("<h1>Error 302: Found (temporary redirection) /h1>", "html");
+
 	}
 	return (rp);
 }

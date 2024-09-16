@@ -42,22 +42,28 @@ std::string read_index(Server serv, std::string index, int index_loc, int *code
 
 std::string	create_index(Server serv, int index_loc, int *code)
 {
-	std::string root = find_str_data(serv, index_loc, "root");
+	std::string root = find_str_data(serv, index_loc, "root"), loc_path = serv.getLocations()[index_loc].getPath();
 	if (root.size() == 0)
 		return (*code = 500, "Error");
 	DIR *my_dir = opendir(root.c_str());
 	if (!my_dir)
 		return (*code = 403, "Error");
-	std::string buff;
+	std::string buff("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<title>Index of ");
+	buff +=  loc_path + "</title>\n</head>\n<body>\n" + "<h1>Index of " + loc_path + "</h1>\n";
 	struct dirent *dir_struct;
 	while (true)
 	{
 		dir_struct = readdir(my_dir);
 		if (dir_struct == NULL)
 			break ;
+		// Append each file as a clickable link
+		buff += "<a href=\"";
+		buff += loc_path + "/" + dir_struct->d_name; // loc + relative pathes
+		buff += "\">";
 		buff += dir_struct->d_name;
-		buff += "<br>";
+		buff += "</a><br>\n";
 	}
+	buff += "</body>\n</html>";
 	if (closedir(my_dir) == -1)
 		return (*code = 500, "Error");
 	return (buff);
