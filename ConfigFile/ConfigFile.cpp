@@ -3,7 +3,10 @@
 #include <stdexcept>
 
 //	constructors + copy
-ConfigFile::ConfigFile() {}
+ConfigFile::ConfigFile()
+{
+	_root = "./"; // si pas de root set, nginx sert son default file at /var/www/html. on sert le dossier courant
+}
 ConfigFile::~ConfigFile()
 {
 	_filename.clear();

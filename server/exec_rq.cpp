@@ -56,7 +56,7 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 		return exec_rq_error(rq, config, 500, index_serv, index_loc);
 
 	try{
-		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
+		if (check_cgi_ext(config.getServers()[index_serv], rq.getRql().getUrl().getPath(), index_loc) == 1)
 		{
 			if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
 			CGI cgi(&rp, rq, config, index_serv, index_loc);

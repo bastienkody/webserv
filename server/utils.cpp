@@ -126,7 +126,7 @@ std::string concatenate_root_path(Request rq, ConfigFile config, int index_serv,
 
 std::string	find_str_data(Server serv, int index_loc, std::string to_find)
 {
-	std::string lst_data[4] = {"root", "index", "auto_index", "body_size"};
+	std::string lst_data[4] = {"root", "index", "autoindex", "body_size"};
 	for (int i = 0; i < 4; i++)
 	{
 		if (to_find == lst_data[i])

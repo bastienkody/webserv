@@ -62,7 +62,7 @@ void	delete_html(Response *rp, Request rq, std::string path);
 void	rq_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc, bool is_redirect);
 
 /*rq_dir.cpp*/
-void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_loc, int index_serv);
+void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int id_loc, int id_serv);
 
 /*exec_rq.cpp*/
 int			check_body_size(Request rq);

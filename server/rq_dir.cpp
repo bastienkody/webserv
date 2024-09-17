@@ -13,20 +13,13 @@
 #include "../include/server.hpp"
 #include "../ConfigFile/Server.hpp"
 
-std::string read_index(Server serv, std::string index, int index_loc, int *code
-)
+std::string read_index(std::string rooted_path, std::string index_filename, int *code)
 {
-	std::string root = find_str_data(serv, index_loc, "root");
-	if (root.size() == 0)
-		return (*code = 500, "Error");
-	index = root + index;
-	int status = check_file(index, 1);
+	std::string path(rooted_path + index_filename);
+	int status = check_file(path, 1);
 	if (status > 0)
-	{
-		std::cerr<< "status : "<< status<<std::endl;
 		return (*code = 404, "Error");
-	}
-	std::ifstream file(index.c_str());
+	std::ifstream file(path.c_str());
 	if (!file)
 		return (*code = 500, "Error");
 	std::string tmp, buff;
@@ -40,25 +33,22 @@ std::string read_index(Server serv, std::string index, int index_loc, int *code
 	return (buff);
 }
 
-std::string	create_index(Server serv, int index_loc, int *code)
+std::string	create_index(std::string rooted_path, std::string loc_path, std::string user_path, int *code)
 {
-	std::string root = find_str_data(serv, index_loc, "root"), loc_path = serv.getLocations()[index_loc].getPath();
-	if (root.size() == 0)
-		return (*code = 500, "Error");
-	DIR *my_dir = opendir(root.c_str());
+	DIR *my_dir = opendir(rooted_path.c_str());
 	if (!my_dir)
-		return (*code = 403, "Error");
+		return (*code = 403, "Error"); // 500 plutot nan?
 	std::string buff("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<title>Index of ");
-	buff +=  loc_path + "</title>\n</head>\n<body>\n" + "<h1>Index of " + loc_path + "</h1>\n";
+	buff +=  user_path + "</title>\n</head>\n<body>\n" + "<h1>Index of " + user_path + "</h1>\n";
 	struct dirent *dir_struct;
 	while (true)
 	{
 		dir_struct = readdir(my_dir);
 		if (dir_struct == NULL)
 			break ;
-		// Append each file as a clickable link
 		buff += "<a href=\"";
-		buff += loc_path + "/" + dir_struct->d_name; // loc + relative pathes
+		//buff += serv.getIp() + ":" + serv.getPortSTR(); // absolute path makes doublon in browser url but not in real rq
+		buff += "." + loc_path + (loc_path[loc_path.size()-1]=='/'?"":"/") + dir_struct->d_name; // ./loc/relative_pathe ---> PB pour les path de fichiers des sous dossiers
 		buff += "\">";
 		buff += dir_struct->d_name;
 		buff += "</a><br>\n";
@@ -69,47 +59,55 @@ std::string	create_index(Server serv, int index_loc, int *code)
 	return (buff);
 }
 
-void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int index_loc, int index_serv)
-{
-	std::string auto_index = find_str_data(serv, index_loc, "auto_index");
-	std::string buff;
-	std::string loc_index = serv.getLocations()[index_loc].getIndex();
-	int code;
+/*
+ SERVIR LES SOUS ODSSIERS (via path, pas juste loc + root)
+ SERVIR INDEX.HTML si pas de de directive index
+ directive index : ne sert que pour url == location, pas les sous dossiers
+*/
 
-	if (loc_index.size() != 0)
+void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int id_loc, int id_serv)
+{
+	int		code = 0;
+	std::string	buff, loc_index = serv.getLocations()[id_loc].getIndex(), serv_index = serv.getIndex();
+	bool		path_is_loc = (rq.getRql().getUrl().getPath() == serv.getLocations()[id_loc].getPath() ? true : false);
+	bool		auto_index = find_str_data(serv, id_loc, "autoindex") == "on" ? true : false;
+
+	std::cout << "Path:" +rq.getRql().getUrl().getPath() << std::endl;
+	std::cout << "loc_path:" + serv.getLocations()[id_loc].getPath() << std::endl;
+	std::cout << "Path==loc?" << path_is_loc << std::endl;
+	std::cout << "Autoindex?" << path_is_loc << std::endl;
+
+	if (path_is_loc && ( loc_index.size() != 0 || serv_index.size() != 0 ) )
 	{
-		buff = read_index(serv, loc_index, index_loc, &code);
+		if (loc_index.size() != 0)
+			buff = read_index(concatenate_root_path(rq, config, id_serv, id_loc), loc_index, &code);
+		else
+			buff = read_index(concatenate_root_path(rq, config, id_serv, id_loc), serv_index, &code);
 		if (buff == "Error")
 		{
-			*rp = exec_rq_error(rq, config, code, index_serv, index_loc);
+			*rp = exec_rq_error(rq, config, code, id_serv, id_loc);
 			return ;
 		}
 	}
-	else if (serv.getIndex().size() != 0)
+	else if (auto_index) // look for index.html, if not create index 
 	{
-		buff = read_index(serv, serv.getIndex(), index_loc, &code);
+		std::string	path = concatenate_root_path(rq, config, id_serv, id_loc);
+		buff = read_index(path, "/index.html", &code); // pb de slash ?
+		if (code == 404) // no index.html found
+			buff = create_index(path, serv.getLocations()[id_loc].getPath(), rq.getRql().getUrl().getPath(), &code);
 		if (buff == "Error")
 		{
-			*rp = exec_rq_error(rq, config, code, index_serv, index_loc);
-			return ;
-		}
-	}
-	else if (auto_index == "on")
-	{
-		buff = create_index(serv, index_loc, &code);
-		if (buff == "Error")
-		{
-			*rp = exec_rq_error(rq, config, code, index_serv, index_loc);
+			*rp = exec_rq_error(rq, config, code, id_serv, id_loc);
 			return ;
 		}
 	}
 	else
 	{
-		*rp = exec_rq_error(rq, config, 403, index_serv, index_loc);
+		*rp = exec_rq_error(rq, config, 403, id_serv, id_loc);
 		return ;
 	}
 	rp->setLineState(200);
-	rp->setHeader(rq, config, index_serv, index_loc);
+	rp->setHeader(rq, config, id_serv, id_loc);
 	rp->setBody(buff, "html");
 	return ;
 }
