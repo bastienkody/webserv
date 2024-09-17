@@ -14,6 +14,7 @@
 #include "../ConfigFile/Server.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
+#include <dirent.h>
 #include <sstream>
 
 /*ajouter Location obj pour check methods allows*/
@@ -38,7 +39,8 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
 	if (index_loc == -1)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
-	
+
+	DIR *dir_test = NULL;
 	Response rp;
 	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
 	if (path.find("/..") != std::string::npos)
@@ -59,8 +61,10 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 			if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		}
-		else if ((path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL) && rq.getRql().getVerb() == "GET")
+		else if ((path[path.size() - 1] == '/' || (dir_test = opendir(path.c_str())) != NULL) && rq.getRql().getVerb() == "GET")
 		{
+			if (dir_test)
+				closedir(dir_test);
 			if (DEBUGP) {std::cerr<< "Enter rq_dir :"<<std::endl;}
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		}
