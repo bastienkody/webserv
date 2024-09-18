@@ -33,7 +33,7 @@ std::string read_index(std::string rooted_path, std::string index_filename, int 
 	return (buff);
 }
 
-std::string	create_index(std::string rooted_path, std::string loc_path, std::string user_path, int *code)
+std::string	create_index(std::string rooted_path, std::string loc_path, std::string user_path, int *code, bool is_loc_path)
 {
 	DIR *my_dir = opendir(rooted_path.c_str());
 	if (!my_dir)
@@ -48,7 +48,10 @@ std::string	create_index(std::string rooted_path, std::string loc_path, std::str
 			break ;
 		buff += "<a href=\"";
 		//buff += serv.getIp() + ":" + serv.getPortSTR(); // absolute path makes doublon in browser url but not in real rq
-		buff += "." + loc_path + (loc_path[loc_path.size()-1]=='/'?"":"/") + dir_struct->d_name; // ./loc/relative_pathe ---> PB pour les path de fichiers des sous dossiers
+		if (is_loc_path)
+			buff += "." + loc_path + (loc_path[loc_path.size()-1]=='/'?"":"/") + dir_struct->d_name; // ./loc/relative_pathe ---> PB pour les path de fichiers des sous dossiers
+		else
+			buff += "./" + std::string(dir_struct->d_name);
 		buff += "\">";
 		buff += dir_struct->d_name;
 		buff += "</a><br>\n";
@@ -94,7 +97,7 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int id_loc
 		std::string	path = concatenate_root_path(rq, config, id_serv, id_loc);
 		buff = read_index(path, "/index.html", &code); // pb de slash ?
 		if (code == 404) // no index.html found
-			buff = create_index(path, serv.getLocations()[id_loc].getPath(), rq.getRql().getUrl().getPath(), &code);
+			buff = create_index(path, serv.getLocations()[id_loc].getPath(), rq.getRql().getUrl().getPath(), &code, path_is_loc);
 		if (buff == "Error")
 		{
 			*rp = exec_rq_error(rq, config, code, id_serv, id_loc);

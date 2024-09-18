@@ -1,0 +1,15 @@
+	POLL_FDS
+- Fonction qui decale les entrees de poll_fds a chaque remove pour ne pas avoir de trous
+- fonction qui remove des clients si _count > 255
+
+	POST
+- pour ne pas ecraser les fichiers ou psot sur un dir, check d'un acces(url)
+
+	RQ_DIR
+- href de create dir des sous dossiers/fichiers pb
+
+	LIST_SERV_FD / CHECK_SERV_SOCK
+- invalid read lie a l'init?
+
+	ACCEPT_NEW_CO
+- modifier les exits 
