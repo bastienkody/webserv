@@ -116,6 +116,8 @@ void launch_server(ConfigFile config, Poll poll_fds)
 		}
 	}
 	free(server_fd);
+	for (std::vector<struct client>::iterator it = clients.begin(); it != clients.end(); ++it)
+		close(it->fd);
 	clients.clear();
 }
 
@@ -150,7 +152,7 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 			continue;
 		int fd = create_socket_server(config.getServers()[i]);
 		if (fd == -1)
-			return 1;
+			return poll_fds.end_close_fd(), 1;
 		try {
 			poll_fds.add_to_poll(fd);
 			config.setServerFd(fd, i);
@@ -160,5 +162,6 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 		}
 	}
 	launch_server(config, poll_fds);
+	poll_fds.end_close_fd(); // in the intermediate returns too
 	return 0;
 }

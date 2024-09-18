@@ -30,7 +30,7 @@ int create_socket_server(Server serv)
 		return (perror("socket"), -1);
 	// set options
 	fcntl(server_fd, F_SETFL, O_NONBLOCK); /*je vois pas encore de diff avec et sans*/
-	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &flag_true, sizeof(flag_true)) != 0)
+	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &flag_true, sizeof(flag_true)) != 0)
 		return (perror("setsockopt"), -1);
 	// make it listen on port
 	if (bind(server_fd, (struct sockaddr *) &adress, sizeof(adress)) < 0)
