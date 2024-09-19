@@ -13,6 +13,7 @@
 #include "../include/server.hpp"
 #include "../RequestParsing/Request.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
+#include <dirent.h>
 #include <fstream>
 
 /*gerer directory (comment ??)*/
@@ -54,13 +55,29 @@ void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int
 	rp->setBody(buff, path.substr(path.rfind('.') + 1, path.size() - 1)); // to get the real extension
 }
 
-// nsp si post vers url redirige sans nouvelle requete (on part sur ca) ou si nvle requete avec url modifie par le nav?
 void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
+	if (access(path.c_str(), F_OK) == 0)
+	{
+		if (DEBUGP) {std::cout << "File to be posted already exists (400)" << std::endl;}
+		*rp = exec_rq_error(rq, config, 400, index_serv, index_loc);
+		return ;
+	}
+	DIR *dir_test = NULL;
+	std::string	last_dir(path.substr(0, path.rfind('/') + 1)); // if url ends with a dir but no '/', catch just above !
+	if ( (dir_test = opendir(last_dir.c_str())) == NULL )
+	{
+		//std::cout<<"lastdir:"+last_dir<<std::endl;
+		if (DEBUGP) {std::cout << "Given path of post request does not exist (404)" << std::endl;}
+		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
+		return ;
+	}
+	closedir(dir_test);
+
 	std::ofstream my_html(path.c_str());
 	if (!my_html)
 	{
-		if (DEBUGP) {std::cout << "File creation failed" << std::endl;}
+		if (DEBUGP) {std::cout << "File creation failed (500)" << std::endl;}
 		*rp = exec_rq_error(rq, config, 500, index_serv, index_loc);
 		return ;
 	}

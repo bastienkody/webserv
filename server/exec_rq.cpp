@@ -23,6 +23,8 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
 	
+	if (path.find('.') == std::string::npos)
+		return 0;
 	ext = &path[path.rfind('.')];
 	std::vector<std::string> cgi_ext = find_vector_data(serv, index_loc, "cgi_ext");
 	if (cgi_ext.size() == 0)
@@ -61,7 +63,7 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 			if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		}
-		else if ((path[path.size() - 1] == '/' || (dir_test = opendir(path.c_str())) != NULL) && rq.getRql().getVerb() == "GET")
+		else if (rq.getRql().getVerb() == "GET" && (path[path.size() - 1] == '/' || (dir_test = opendir(path.c_str())) != NULL))
 		{
 			if (dir_test)
 				closedir(dir_test);
@@ -138,13 +140,12 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, 
 		sstr << infile.rdbuf();
 		rp.setBody(sstr.str(), "html");
 	}
+	else // could not retrieve any error pages
+	{
+		std::string	tmp(sscode.str() + ' ');
+		tmp += StatusCode::getPhrase(code);
+		rp.setBody(tmp, "html");
+	}
 	return (rp);
 }
-// int main(void)
-// {
-// 	std::string request = "GET http://localhost:80/home.txt?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\nformat: text\n";
 
-// 	Request rq(request);
-// 	rq.print();
-// 	exec_rq(rq);
-// }

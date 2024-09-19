@@ -1,4 +1,5 @@
 #include"RequestChecking.hpp"
+#include"../include/server.hpp"
 
 int RequestChecking::CheckBasics(const Request & rq)
 {
@@ -59,14 +60,18 @@ int	RequestChecking::CheckRequiredHeaderPOST(const Request & rq, std::string max
 	if (content_lenght == false)
 		return 400;
 
-	if (max_body_size.size() == 0)
-		return 1;
 	std::stringstream	str(max_body_size), str2(lenght);
 	unsigned int		i, j;
 	str >> i;
 	str2 >> j;
+
 	if (j != rq.getBody().size())
-		return std::cerr << "content_len!=body.size()" << std::endl, 400;
+	{
+		if(DEBUGP){std::cerr << "content_len!=body.size()" << std::endl;}
+		return 400;
+	}
+	if (max_body_size.size() == 0)
+		return 1;
 	return (i >= j ? 1 : 413);
 }
 

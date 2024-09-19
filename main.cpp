@@ -48,6 +48,8 @@ struct client	create_client(int server_fd, Poll &poll_fds)
 {
 	struct client cli;
 	cli.fd = accept_new_connection(server_fd, &poll_fds);
+	if (cli.fd < 0)
+		run = false;
 	cli.server_fd = server_fd;
 	cli.await_response = false;
 	return cli;
@@ -70,6 +72,7 @@ void	handler(__attribute__((unused))int dunmmy)
 void launch_server(ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd = list_server_fd(poll_fds);
+	// proteger le retour malloc de 0???
 	std::vector<struct client> clients;
 	int	pos;
 
@@ -88,7 +91,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 			if (poll_fds.getFds(i).revents & POLLIN)
 			{
 				// new client requesting the server
-				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, poll_fds.getCount())) != -1)
+				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, config.getServers().size())) != -1)
 					clients.push_back(create_client(server_fd[status], poll_fds));
 				// data to read from a connected client
 				else
@@ -117,7 +120,8 @@ void launch_server(ConfigFile config, Poll poll_fds)
 	}
 	free(server_fd);
 	for (std::vector<struct client>::iterator it = clients.begin(); it != clients.end(); ++it)
-		close(it->fd);
+		if (it->fd > 0)
+			close(it->fd);
 	clients.clear();
 }
 
@@ -141,6 +145,8 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 		config.openReadFileToStr();
 		config.readAllInfos();
 		//config.printAll();
+		if (config.getServers().size() == 0)
+			return std::cerr<<"No server in config file"<<std::endl, 1;
 	}
 	catch (const std::exception &e) {
 		return std::cerr << e.what() << std::endl, 1;

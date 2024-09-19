@@ -73,7 +73,7 @@ bool	is_rq_finished(std::string raw)
 			std::stringstream	sstr(it->second);
 			unsigned int		i;
 			sstr >> i;
-			if (i != rq.getBody().size())
+			if (i > rq.getBody().size())
 			{
 				//std::cerr << "is_rq_finish: content_len("<< i << ") != body.size("<<rq.getBody().size()<<")" << std::endl;
 				return false;
