@@ -39,7 +39,7 @@ elif (operator == '*'):
 elif (operator == '/'):
 	if (nb2 == 0):
 		print(html)
-		exit(1)
+		exit(0)
 	else:
 		res = nb1 / nb2
 
