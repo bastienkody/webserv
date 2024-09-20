@@ -14,6 +14,7 @@
 #include "../ConfigFile/Server.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/CGI.hpp"
+#include <dirent.h>
 #include <sstream>
 
 /*ajouter Location obj pour check methods allows*/
@@ -22,6 +23,8 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
 	
+	if (path.find('.') == std::string::npos)
+		return 0;
 	ext = &path[path.rfind('.')];
 	std::vector<std::string> cgi_ext = find_vector_data(serv, index_loc, "cgi_ext");
 	if (cgi_ext.size() == 0)
@@ -34,36 +37,42 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 	return (0);
 }
 
-// on peut mettre le path (apres redirect ou +root+) dans rq ?
-// si on envoit serveur au lieu de config + index_serv?
 Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
 	if (index_loc == -1)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
-	
+
+	DIR *dir_test = NULL;
 	Response rp;
 	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
+	if (path.find("/..") != std::string::npos)
+	{
+		std::cout << "Security protection : deny acces to ani \"../\" in the filesystem" << std::endl;
+		return 	rp = exec_rq_error(rq, config, 400, index_serv, index_loc);
+	}
 
 	int	redirect_code = is_url_redirected(rq.getRql().getUrl().getPath(), path, config.getServers()[index_serv], index_loc);
 
-	std::cout << "From exec rq path: " + path + " is redirected: " << redirect_code << std::endl;
+	//std::cout << "From exec rq path: " + path + " is redirected: " << redirect_code << std::endl;
 	if (path.size() == 0)
 		return exec_rq_error(rq, config, 500, index_serv, index_loc);
 
 	try{
-		if (check_cgi_ext(config.getServers()[index_serv], path, index_loc) == 1)
+		if (check_cgi_ext(config.getServers()[index_serv], rq.getRql().getUrl().getPath(), index_loc) == 1)
 		{
-			std::cerr<< "Enter CGI :"<<std::endl;
+			if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		}
-		else if ((path[path.size() - 1] == '/' || opendir(path.c_str()) != NULL) && rq.getRql().getVerb() == "GET")
+		else if (rq.getRql().getVerb() == "GET" && (path[path.size() - 1] == '/' || (dir_test = opendir(path.c_str())) != NULL))
 		{
-			std::cerr<< "Enter rq_dir :"<<std::endl;
+			if (dir_test)
+				closedir(dir_test);
+			if (DEBUGP) {std::cerr<< "Enter rq_dir :"<<std::endl;}
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		}
 		else
 		{
-			std::cerr<< "Enter rq_html :"<<std::endl;
+			if (DEBUGP) {std::cerr<< "Enter rq_html :"<<std::endl;}
 			rq_html(&rp, rq, path, config, index_serv, index_loc, redirect_code==0?false:true);
 		}
 	}
@@ -74,6 +83,11 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	{
 		rp.setLineState(redirect_code);
 		rp.setLocation(path);
+		if (redirect_code == 301)
+			rp.setBody("<h1>Error 301: Moved Permanently (redirection) /h1>", "html");
+		else
+			rp.setBody("<h1>Error 302: Found (temporary redirection) /h1>", "html");
+
 	}
 	return (rp);
 }
@@ -126,13 +140,12 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, 
 		sstr << infile.rdbuf();
 		rp.setBody(sstr.str(), "html");
 	}
+	else // could not retrieve any error pages
+	{
+		std::string	tmp(sscode.str() + ' ');
+		tmp += StatusCode::getPhrase(code);
+		rp.setBody(tmp, "html");
+	}
 	return (rp);
 }
-// int main(void)
-// {
-// 	std::string request = "GET http://localhost:80/home.txt?a=1&b=2&c=3&d=4#fragment HTTP/1.1\r\nHost: localhost:8080\nformat: text\n";
 
-// 	Request rq(request);
-// 	rq.print();
-// 	exec_rq(rq);
-// }

@@ -26,7 +26,7 @@ class Request
 		Request & operator=(const Request & rhs);
 
 		RequestLine				const & getRql() const;
-		std::map<std::string, std::string>	const & getHeader() const;
+		std::multimap<std::string, std::string>	const & getHeader() const;
 		std::string				const & getBody() const;
 		std::string				const & getRaw() const;
 
@@ -39,7 +39,7 @@ class Request
 
 		std::string				_raw;
 		RequestLine				_rql;
-		std::map<std::string, std::string>	_header;
+		std::multimap<std::string, std::string>	_header;
 		std::string				_body;
 };
 

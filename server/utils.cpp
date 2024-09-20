@@ -28,7 +28,7 @@ int	check_file(std::string path, int mode)
 	return (0);
 }
 
-// mod dest_url to real URL (og, or redirected) and returns 0 if not redirected, else 301/302
+// if redirected, mod dest_url to redirected URL and returns 301/302, else 0
 int	is_url_redirected(const std::string og_url, std::string &dest_url, Server serv, int index_loc)
 {
 	std::map<std::string, struct rewrite> redirections = find_redirections(serv, index_loc);
@@ -40,16 +40,14 @@ int	is_url_redirected(const std::string og_url, std::string &dest_url, Server se
 			return it->second.type;
 		}
 	}
-	//dest_url = og_url;
 	return 0;
 }
 
-// not case isensitive for header check
 bool	is_rq_finished(std::string raw)
 {
 	// fin des headers ?
 	if (raw.find("\r\n\r\n") == std::string::npos)
-		return std::cerr << "is_rq_finish: not yet CRLF+CRLF" << std::endl, false;
+		return false;
 
 	Request	rq;
 	rq.appendRaw(raw.data(), raw.size());
@@ -57,39 +55,32 @@ bool	is_rq_finished(std::string raw)
 
 	std::multimap<std::string, std::string>::const_iterator it = rq.getHeader().begin();
 	std::multimap<std::string, std::string>::const_iterator ite = rq.getHeader().end();
-	if (it == ite)
-		std::cout << "is_rq_finish: NO header" << std::endl;
 	for (; it!=ite; ++it)
 	{
-		std::cout <<"header:" << it->first << "->" << it->second << std::endl;
 		if (ParserUtils::compCaseInsensitive(it->first, "Transfer-Encoding") && ParserUtils::compCaseInsensitive(it->second, "chunked"))
 		{
 			std::string end = raw.substr(raw.size() -5, raw.size());
-			char a = end[0];
-			char b = end[1];
-			char c = end[2];
-			char d = end[3];
-			char e = end[4];
 			if (end != "0\r\n\r\n")
 			{
-				std::cerr << "is_rq_finish: not last chunked, we have:"<< std::endl;
-				std::cerr << std::dec << static_cast<int>(a)<<"-"<<static_cast<int>(b)<<"-"<<static_cast<int>(c)<<"-"<<static_cast<int>(d)<<"-"<<static_cast<int>(e)<<std::endl;
+				//std::cerr << "is_rq_finish: not last chunked, we have:"<< std::endl;
+				//char a = end[0], b = end[1], c = end[2], d = end[3], e = end[4];
+				//std::cerr << std::dec << static_cast<int>(a)<<"-"<<static_cast<int>(b)<<"-"<<static_cast<int>(c)<<"-"<<static_cast<int>(d)<<"-"<<static_cast<int>(e)<<std::endl;
 				return false;
 			}
-			else
-				std::cerr << "is_rq_finish: end of chunked" << std::endl;
 		}
 		else if (ParserUtils::compCaseInsensitive(it->first, "Content-Length"))
 		{
 			std::stringstream	sstr(it->second);
 			unsigned int		i;
 			sstr >> i;
-			if (i != rq.getBody().size())
-				return std::cerr << "is_rq_finish: content_len("<<i<< ") != body.size("<<rq.getBody().size()<<")" << std::endl, false;
-
+			if (i > rq.getBody().size())
+			{
+				//std::cerr << "is_rq_finish: content_len("<< i << ") != body.size("<<rq.getBody().size()<<")" << std::endl;
+				return false;
+			}
 		}
 	}
-	return std::cerr << "is_rq_finish: YES" << std::endl, true;
+	return true;
 }
 
 
@@ -135,7 +126,7 @@ std::string concatenate_root_path(Request rq, ConfigFile config, int index_serv,
 
 std::string	find_str_data(Server serv, int index_loc, std::string to_find)
 {
-	std::string lst_data[4] = {"root", "index", "auto_index", "body_size"};
+	std::string lst_data[4] = {"root", "index", "autoindex", "body_size"};
 	for (int i = 0; i < 4; i++)
 	{
 		if (to_find == lst_data[i])
@@ -225,7 +216,6 @@ std::vector<std::string> find_vector_data(Server serv, int index_loc, std::strin
 	}
 	return (std::vector<std::string>());
 }
-
 
 void	free_tab(char **tab)
 {
