@@ -80,11 +80,11 @@ bool	ParserUtils::isStrAlpha(const std::string & line)
 	return true;
 }
 
-//	only print?
+//	yc LF
 bool	ParserUtils::isStrPrint(const std::string & line)
 {
 	for (std::string::const_iterator it = line.begin(); it != line.end(); ++it)
-		if (isprint(*it) == false)
+		if (isprint(*it) == false && *it != '\n')
 			return false;
 	return true;
 }
