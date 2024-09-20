@@ -12,6 +12,7 @@
 
 #include "../include/Poll.hpp"
 #include <cstring>
+#include <unistd.h>
 #include <sys/poll.h>
 
 Poll::Poll(void)
@@ -20,7 +21,17 @@ Poll::Poll(void)
 }
 
 Poll::~Poll(void)
-{}
+{
+	//for (int i = 0; i < _count; ++i)
+		//close(_fds[i].fd);
+}
+
+void	Poll::end_close_fd(void)
+{
+	for (int i = 0; i < _count; ++i)
+		close(_fds[i].fd);
+}
+
 
 void	Poll::add_to_poll(int new_fd)
 {
@@ -54,6 +65,10 @@ struct pollfd	Poll::getFds(int i)
 	return (_fds[i]);
 }
 
+struct pollfd	*Poll::getAllFds()
+{
+	return (_fds);
+}
 
 int	Poll::getCount(void) const
 {

@@ -3,8 +3,17 @@
 #include <stdexcept>
 
 //	constructors + copy
-ConfigFile::ConfigFile() {}
-ConfigFile::~ConfigFile() {}
+ConfigFile::ConfigFile()
+{
+	_root = "./"; // si pas de root set, nginx sert son default file at /var/www/html. on sert le dossier courant
+}
+ConfigFile::~ConfigFile()
+{
+	_filename.clear();
+	_rawData.clear();
+	_servers.clear();
+	_fd_to_server_nb.clear();
+}
 ConfigFile::ConfigFile(const std::string filename) : _filename(filename) {}
 ConfigFile::ConfigFile(const ConfigFile & src) {*this = src;}
 ConfigFile & ConfigFile::operator=(const ConfigFile & rhs)
@@ -52,6 +61,7 @@ void	ConfigFile::openReadFileToStr()
 	else
 		throw std::invalid_argument("Problem with read on configfile");
 	delete [] buf;
+	_fs.close();
 }
 
 //	Read the whole config file line by line (erase comment + trim OWS) looking for server parts

@@ -5,6 +5,7 @@
 #include<fstream>
 #include<string>
 #include "../RequestParsing/Request.hpp"
+#include "../ConfigFile/Server.hpp"
 #include "../ParserUtils/ParserUtils.hpp"
 
 #define	EXPECTED_VERSION "HTTP/1.1"
@@ -17,9 +18,10 @@ class Request;
 class RequestChecking
 {
 	public:
-		static int	CheckBasics(const Request & rq);
-		static int	CheckHeaderKey(const Request & rq);
+		static int	CheckBasics(const Request & rq, const Server & serv);
+		static int	CheckHeaderKey(const Request & rq, const Server & serv);
 		static int	CheckRequiredHeaderPOST(const Request & rq, std::string max_body_size);
+		static bool	CheckHost(const std::string & field, const Server & serv);
 		static int	CheckRequiredHeaderDELETE(const Request & rq);
 		static int	CheckRequiredHeaderGET(const Request & rq);
 		static bool	isKeepAlive(const Request & rq);

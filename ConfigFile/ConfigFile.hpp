@@ -10,7 +10,7 @@
 
 struct rewrite{
 	std::string	redirect_url;
-	int			type; // 301 or 302
+	int		type; // 301 or 302
 };
 
 class Server;

@@ -3,7 +3,13 @@
 
 //	constructors + copy
 Server::Server(): _ip("0.0.0.0"), _port(8080), _portSTR("8080")	{}
-Server::~Server() {}
+Server::~Server()
+{
+	_names.clear();
+	_ip.clear();
+	_portSTR.clear();
+	_locations.clear();
+}
 Server::Server(const Server & src): ConfigFile() {*this = src;}
 Server & Server::operator=(const Server & rhs)
 {
@@ -131,9 +137,9 @@ void	Server::setIpPort(std::string line)
 	if (element.find(':') != std::string::npos)
 	{
 		std::string	ip = element.substr(0, element.find(':'));
-		if (checkIpv4(ip) == false)
+		if (checkIpv4(ip) == false && ip != "localhost")
 			throw std::invalid_argument("Bad config line (invalid IP address): " + line);
-		_ip = ip;
+		_ip = (ip == "localhost" ? "127.0.0.1" : ip);
 		std::string	port = element.substr(element.find(':') + 1, element.size() - 1);
 		if (checkPort(port) == false)
 			throw std::invalid_argument("Bad config line (invalid port): " + line);
@@ -189,6 +195,9 @@ void	Server::readInfos(std::string & raw)
 			// std::cerr<<" portSTR 2: " << _portSTR<<std::endl;
 		}
 	}
+	if (line.compare("}") != 0)
+		throw std::invalid_argument("Bad config: server is not closed (expecting closing bracket)");
+
 }
 
 // must add a check on redefinition of element (ie. 2 index) --> nginx tests needed

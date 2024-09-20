@@ -24,13 +24,15 @@ class	Poll
 		~Poll(void);
 		// Poll & operator=(const Poll &obj);
 		struct pollfd	getFds(int i) ;
-		int				getCount(void) const;
+		struct pollfd	*getAllFds();
+		int			getCount(void) const;
 		void			setFds(int i, int new_fd, short event);
 		void			setEvent(int i, short event);
 		void			setCount(int count);
 		void			add_to_poll(int new_fd); // throw
 		void			remove_to_poll(int i);
-		int				call_to_poll(void);
+		int			call_to_poll(void);
+		void			end_close_fd(void);
 
 		void			list_fd();
 
