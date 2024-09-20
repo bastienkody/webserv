@@ -20,7 +20,7 @@ Request & Request::operator=(const Request & rhs)
 }
 //	getters
 RequestLine							const & Request::getRql() const 	{return _rql;}
-std::map<std::string, std::string>	const & Request::getHeader() const	{return _header;}
+std::multimap<std::string, std::string>	const & Request::getHeader() const	{return _header;}
 std::string							const & Request::getBody() const	{return _body;} 
 std::string							const & Request::getRaw() const	{return _raw;}
 //	printer
@@ -54,7 +54,7 @@ void	Request::parse()
 
 		std::string key = line.substr(0, line.find(':'));
 		std::string	value = ParserUtils::trimOWS(line.substr(line.find(':') + 1, line.size() - 1));
-		//std::cout << "line=" + line + "|store=" + key + "-->" + value << std::endl;
+		std::cout << "line=" + line + "|store=" + key + "-->" + value << std::endl;
 		_header.insert(std::pair<std::string, std::string>(key, value));
 	}
 	_body = _raw;

@@ -3,6 +3,10 @@
 - fonction qui remove des clients si _count > 255
 - depuis accept new connection (pour l'instant ca quitte sans leak ni pb)
 
+	REQUEST CHECKING / parsing
+- host header must be accurate : ip or ip+port or name or name+port
+				only one host header, not empty
+
 	POST
 - pour ne pas ecraser les fichiers ou psot sur un dir, + check que le chemin existe
 --> acces(URL) et opendir(URL) doivent return false
