@@ -39,14 +39,14 @@
 #define DEBUGP 1
 
 /* Error default pages	*/
-#define DEFAULT_400 "www/400_error_default.html"
-#define DEFAULT_403 "www/403_error_default.html"
-#define DEFAULT_404 "www/404_error_default.html"
-#define DEFAULT_405 "www/405_error_default.html"
-#define DEFAULT_413 "www/413_error_default.html"
-#define DEFAULT_500 "www/500_error_default.html"
-#define DEFAULT_501 "www/501_error_default.html"
-#define DEFAULT_505 "www/505_error_default.html"
+#define DEFAULT_400 "www/error_pages/400_error_default.html"
+#define DEFAULT_403 "www/error_pages/403_error_default.html"
+#define DEFAULT_404 "www/error_pages/404_error_default.html"
+#define DEFAULT_405 "www/error_pages/405_error_default.html"
+#define DEFAULT_413 "www/error_pages/413_error_default.html"
+#define DEFAULT_500 "www/error_pages/500_error_default.html"
+#define DEFAULT_501 "www/error_pages/501_error_default.html"
+#define DEFAULT_505 "www/error_pages/505_error_default.html"
 
 /*server.cpp*/
 int 	create_socket_server(Server serv);
@@ -56,10 +56,10 @@ int		accept_new_connection(int server_fd, Poll *poll_fds);
 int		check_serv_socket(int fd, unsigned int *serv_fds, int size);
 
 /*rq_html.cpp*/
-void	get_html(Response *rp, Request rq, std::string path, bool is_redirect);
+void	get_html(Response *rp, Request rq, std::string path);
 void	post_html(Response *rp, Request rq, std::string path);
 void	delete_html(Response *rp, Request rq, std::string path);
-void	rq_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc, bool is_redirect);
+void	rq_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc);
 
 /*rq_dir.cpp*/
 void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int id_loc, int id_serv);

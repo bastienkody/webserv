@@ -16,22 +16,11 @@
 #include <dirent.h>
 #include <fstream>
 
-/*gerer directory (comment ??)*/
-
-// redirect: on sert le fichier redirige ce qui est inutil
-// on pourrait passer par un booleen pour savoir si on doit servir ou non
-void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc, bool is_redirect)
+void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
-	if (is_redirect)
-	{
-		rp->setHeader(rq, config, index_serv, index_loc);
-		return ;
-	}
-
-	if (DEBUGP) {std::cout << "from rq_html path: " + path << std::endl;}
-	int status;
-	std::string tmp, buff;
-	status = check_file(path, 1);
+	std::string	tmp, buff, type;
+	int		status = check_file(path, 1);
+	int		count = 0;
 	if (status > 0)
 	{
 		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
@@ -49,10 +38,12 @@ void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int
 			buff.append(tmp + '\n');
 		else
 			buff.append(tmp);
+		count++;
 	}
 	rp->setLineState(200);
 	rp->setHeader(rq, config, index_serv, index_loc);
-	rp->setBody(buff, path.substr(path.rfind('.') + 1, path.size() - 1)); // to get the real extension
+	type = (path.find('.') == std::string::npos? "" : path.substr(path.rfind('.') + 1, path.size() - 1)); // get extension, or empty string
+	rp->setBody(buff, type);
 }
 
 void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
@@ -87,11 +78,11 @@ void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, in
 	rp->setLocation(rq.getRql().getUrl().getPath());
 }
 
-// idem redirect post
 void	delete_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
 	int status;
 	status = check_file(path, 1);
+	//std::cerr<<"deletehtml path:"+path+" , status:"<<status<<std::endl;
 	if (status > 0)
 	{
 		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
@@ -120,7 +111,7 @@ int	check_allow(Server serv, int index_loc, std::string method)
 	return (0);
 }
 
-void	rq_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc, bool is_redirect)
+void	rq_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
 	std::string method[3] = {"GET", "POST", "DELETE"};
 
@@ -132,7 +123,7 @@ void	rq_html(Response *rp, Request rq, std::string path, ConfigFile config, int 
 				break ;
 			switch(i)
 			{
-				case 0: get_html(rp, rq, path, config, index_serv, index_loc, is_redirect); break;
+				case 0: get_html(rp, rq, path, config, index_serv, index_loc); break;
 				case 1: post_html(rp, rq, path, config, index_serv, index_loc); break;
 				case 2: delete_html(rp, rq, path, config, index_serv, index_loc); break;
 			}

@@ -81,13 +81,14 @@ void launch_server(ConfigFile config, Poll poll_fds)
 		int status = poll_fds.call_to_poll();
 		if (status < 0)
 			return (free(server_fd), perror("poll"));
-		else if (status == 0) // selon la doc on devrait jamais avoir ca sauf si signal ??
+/*		else if (status == 0) // selon la doc on devrait jamais avoir ca sauf si signal ??
 		{
 			std::cout << "Status == 0 in poll !!" << std::endl;
 			continue;
-		}
+		}*/
 		for (int i = 0; i < poll_fds.getCount(); i++)
 		{
+			// calculer pos ici : si -1 et pollin c un nvx cli, si>=0 et pollin readrecv
 			if (poll_fds.getFds(i).revents & POLLIN)
 			{
 				// new client requesting the server

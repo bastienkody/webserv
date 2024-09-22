@@ -74,10 +74,10 @@ void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int id_loc
 	bool		path_is_loc = (rq.getRql().getUrl().getPath() == serv.getLocations()[id_loc].getPath() ? true : false);
 	bool		auto_index = find_str_data(serv, id_loc, "autoindex") == "on" ? true : false;
 
-	std::cout << "Path:" +rq.getRql().getUrl().getPath() << std::endl;
-	std::cout << "loc_path:" + serv.getLocations()[id_loc].getPath() << std::endl;
-	std::cout << "Path==loc?" << path_is_loc << std::endl;
-	std::cout << "Autoindex?" << path_is_loc << std::endl;
+	//std::cout << "Path:" +rq.getRql().getUrl().getPath() << std::endl;
+	//std::cout << "loc_path:" + serv.getLocations()[id_loc].getPath() << std::endl;
+	//std::cout << "Path==loc?" << path_is_loc << std::endl;
+	//std::cout << "Autoindex?" << auto_index << std::endl;
 
 	if (path_is_loc && ( loc_index.size() != 0 || serv_index.size() != 0 ) )
 	{

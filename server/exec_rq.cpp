@@ -39,56 +39,55 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 
 Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
+	Response rp;
+	DIR	*dir_test = NULL;
+
 	if (index_loc == -1)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 
-	DIR *dir_test = NULL;
-	Response rp;
 	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
 	if (path.find("/..") != std::string::npos)
-	{
-		std::cout << "Security protection : deny acces to ani \"../\" in the filesystem" << std::endl;
-		return 	rp = exec_rq_error(rq, config, 400, index_serv, index_loc);
-	}
+		return std::cerr<<"Security protection: deny any \"../\" in URL"<<std::endl, exec_rq_error(rq, config, 400, index_serv, index_loc);
 
 	int	redirect_code = is_url_redirected(rq.getRql().getUrl().getPath(), path, config.getServers()[index_serv], index_loc);
+	if (redirect_code != 0)
+	{
+		rp.setLineState(redirect_code);
+		rp.setHeader(rq, config, index_serv, index_loc);
+		rp.setLocation(path);
+		if (redirect_code == 301)
+			rp.setBody("<h1>Error 301: Moved Permanently (redirection) /h1>", "html");
+		else
+			rp.setBody("<h1>Error 302: Found (temporary redirection) /h1>", "html");
+		return rp;
 
-	//std::cout << "From exec rq path: " + path + " is redirected: " << redirect_code << std::endl;
+	}
 	if (path.size() == 0)
 		return exec_rq_error(rq, config, 500, index_serv, index_loc);
 
 	try{
 		if (check_cgi_ext(config.getServers()[index_serv], rq.getRql().getUrl().getPath(), index_loc) == 1)
 		{
-			if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
+			//if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
 			CGI cgi(&rp, rq, config, index_serv, index_loc);
 		}
 		else if (rq.getRql().getVerb() == "GET" && (path[path.size() - 1] == '/' || (dir_test = opendir(path.c_str())) != NULL))
 		{
 			if (dir_test)
 				closedir(dir_test);
-			if (DEBUGP) {std::cerr<< "Enter rq_dir :"<<std::endl;}
+			//if (DEBUGP) {std::cerr<< "Enter rq_dir :"<<std::endl;}
 			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 		}
 		else
 		{
-			if (DEBUGP) {std::cerr<< "Enter rq_html :"<<std::endl;}
-			rq_html(&rp, rq, path, config, index_serv, index_loc, redirect_code==0?false:true);
+			//if (DEBUGP) {std::cerr<< "Enter rq_html :"<<std::endl;}
+			rq_html(&rp, rq, path, config, index_serv, index_loc);
 		}
 	}
 	catch(const std::exception& e){
 		std::cerr << e.what() << std::endl;
 	}
-	if (redirect_code != 0)
-	{
-		rp.setLineState(redirect_code);
-		rp.setLocation(path);
-		if (redirect_code == 301)
-			rp.setBody("<h1>Error 301: Moved Permanently (redirection) /h1>", "html");
-		else
-			rp.setBody("<h1>Error 302: Found (temporary redirection) /h1>", "html");
-
-	}
+	
 	return (rp);
 }
 
@@ -123,10 +122,9 @@ Response	exec_rq_error(Request rq, ConfigFile config, int code, int index_serv, 
 	Response		rp;
 	std::stringstream	sscode;
 	sscode << code;
+	rp.setLineState(code);
+	rp.setHeader(rq, config, index_serv, index_loc);
 
-	rp.setLineState(code);					// create status line
-	rp.setHeader(rq, config, index_serv, index_loc);	// create headers
-	// create body (via error pages in config file or default pages)
 	std::string				path;
 	std::map<std::string, std::string>	err_pages = find_error_pages(config.getServers()[index_serv], index_loc);
 	if (err_pages.size() != 0 && err_pages[sscode.str()].size() != 0)
