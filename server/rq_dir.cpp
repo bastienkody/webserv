@@ -35,6 +35,8 @@ std::string read_index(std::string rooted_path, std::string index_filename, int 
 
 std::string	create_index(std::string rooted_path, std::string user_path, int *code)
 {
+	if (check_file(rooted_path.c_str(), 1) > 0)
+		return (*code = 404, "Error");
 	DIR *my_dir = opendir(rooted_path.c_str());
 	if (!my_dir)
 		return (*code = 403, "Error"); // 500 plutot nan?
@@ -60,12 +62,6 @@ std::string	create_index(std::string rooted_path, std::string user_path, int *co
 		buff.append(*it);
 	return (buff);
 }
-
-/*
- SERVIR LES SOUS ODSSIERS (via path, pas juste loc + root)
- SERVIR INDEX.HTML si pas de de directive index
- directive index : ne sert que pour url == location, pas les sous dossiers
-*/
 
 void	rq_dir(Response *rp, Request rq, ConfigFile config, Server serv, int id_loc, int id_serv)
 {

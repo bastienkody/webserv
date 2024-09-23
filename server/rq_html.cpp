@@ -80,8 +80,7 @@ void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, in
 
 void	delete_html(Response *rp, Request rq, std::string path, ConfigFile config, int index_serv, int index_loc)
 {
-	int status;
-	status = check_file(path, 1);
+	int status = check_file(path, 1);
 	//std::cerr<<"deletehtml path:"+path+" , status:"<<status<<std::endl;
 	if (status > 0)
 	{

@@ -65,29 +65,23 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 	if (path.size() == 0)
 		return exec_rq_error(rq, config, 500, index_serv, index_loc);
 
-	try{
-		if (check_cgi_ext(config.getServers()[index_serv], rq.getRql().getUrl().getPath(), index_loc) == 1)
-		{
-			//if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
-			CGI cgi(&rp, rq, config, index_serv, index_loc);
-		}
-		else if (rq.getRql().getVerb() == "GET" && (path[path.size() - 1] == '/' || (dir_test = opendir(path.c_str())) != NULL))
-		{
-			if (dir_test)
-				closedir(dir_test);
-			//if (DEBUGP) {std::cerr<< "Enter rq_dir :"<<std::endl;}
-			rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
-		}
-		else
-		{
-			//if (DEBUGP) {std::cerr<< "Enter rq_html :"<<std::endl;}
-			rq_html(&rp, rq, path, config, index_serv, index_loc);
-		}
+	if (check_cgi_ext(config.getServers()[index_serv], rq.getRql().getUrl().getPath(), index_loc) == 1)
+	{
+		//if (DEBUGP) {std::cerr<< "Enter CGI :"<<std::endl;}
+		CGI cgi(&rp, rq, config, index_serv, index_loc);
 	}
-	catch(const std::exception& e){
-		std::cerr << e.what() << std::endl;
+	else if (rq.getRql().getVerb() == "GET" && (path[path.size() - 1] == '/' || (dir_test = opendir(path.c_str())) != NULL))
+	{
+		if (dir_test)
+			closedir(dir_test);
+		//if (DEBUGP) {std::cerr<< "Enter rq_dir :"<<std::endl;}
+		rq_dir(&rp, rq, config, config.getServers()[index_serv], index_loc, index_serv);
 	}
-	
+	else
+	{
+		//if (DEBUGP) {std::cerr<< "Enter rq_html :"<<std::endl;}
+		rq_html(&rp, rq, path, config, index_serv, index_loc);
+	}
 	return (rp);
 }
 

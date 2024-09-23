@@ -28,7 +28,7 @@ unsigned int *list_server_fd(Poll poll_fds)
 
 	dest = (unsigned int *)malloc(sizeof(unsigned int) * (poll_fds.getCount()));
 	if (!dest)
-		return (0);
+		return (NULL);
 	for (int i = 0; i < poll_fds.getCount(); i++)
 		dest[i] = poll_fds.getFds(i).fd;
 	return (dest);
@@ -72,33 +72,31 @@ void	handler(__attribute__((unused))int dunmmy)
 void launch_server(ConfigFile config, Poll poll_fds)
 {
 	unsigned int *server_fd = list_server_fd(poll_fds);
-	// proteger le retour malloc de 0???
+	if (server_fd == NULL)
+		return;
 	std::vector<struct client> clients;
-	int	pos;
+	int	pos, status;
 
 	while (run)
 	{
-		int status = poll_fds.call_to_poll();
-		if (status < 0)
+	;
+		if ( (status = poll_fds.call_to_poll()) < 0)
 			return (free(server_fd), perror("poll"));
-/*		else if (status == 0) // selon la doc on devrait jamais avoir ca sauf si signal ??
+/*		else if (status == 0) // selon la doc on devrait jamais avoir  ca
 		{
 			std::cout << "Status == 0 in poll !!" << std::endl;
 			continue;
 		}*/
 		for (int i = 0; i < poll_fds.getCount(); i++)
 		{
-			// calculer pos ici : si -1 et pollin c un nvx cli, si>=0 et pollin readrecv
+			pos = find_client(clients, poll_fds.getFds(i).fd);
 			if (poll_fds.getFds(i).revents & POLLIN)
 			{
-				// new client requesting the server
 				if ((status = check_serv_socket(poll_fds.getFds(i).fd, server_fd, config.getServers().size())) != -1)
 					clients.push_back(create_client(server_fd[status], poll_fds));
-				// data to read from a connected client
 				else
 				{
 					try {
-						pos = find_client(clients, poll_fds.getFds(i).fd);
 						read_recv_data(i, &poll_fds, clients[pos]);
 						if (is_rq_finished(clients[pos].rq.getRaw()))
 							clients[pos].await_response = true;
@@ -108,10 +106,8 @@ void launch_server(ConfigFile config, Poll poll_fds)
 					}
 				}
 			}
-			// responding
-			else if (poll_fds.getFds(i).revents & POLLOUT && clients.size() > 0 && clients[find_client(clients, poll_fds.getFds(i).fd)].await_response == true)
+			else if (poll_fds.getFds(i).revents & POLLOUT && pos > -1 && clients[pos].await_response == true)
 			{
-				pos = find_client(clients, poll_fds.getFds(i).fd);
 				if (send_response(clients[pos], config) < 0 || RequestChecking::isKeepAlive(clients[pos].rq) == false)
 					deco_client(clients, &poll_fds, i); // pb de read/write ou no keepalive  --> deco client
 				else
@@ -165,10 +161,10 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 			config.setServerFd(fd, i);
 		}
 		catch (const std::exception &e) {
-			return std::cerr << e.what() << std::endl, 1;
+			return std::cerr << e.what() << std::endl, poll_fds.end_close_fd(), 1;
 		}
 	}
 	launch_server(config, poll_fds);
-	poll_fds.end_close_fd(); // in the intermediate returns too
+	poll_fds.end_close_fd();
 	return 0;
 }
