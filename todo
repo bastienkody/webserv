@@ -44,9 +44,9 @@
 - server with no location
 	--> ok on return 404
 
-	TRY CATCH EXEC_RQ
-- utile?
-	--> nope, supp
-
 	CGI PATHES
 - a virer de configfile.cpp +
+
+	Try cacth launch server sur rrd
+- pas utile, on peut exploiter le retour de rrd
+

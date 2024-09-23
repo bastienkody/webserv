@@ -44,6 +44,14 @@ void deco_client(std::vector<struct client> &clients, Poll *poll_fds, int i)
 	poll_fds->remove_to_poll(i);
 }
 
+void	close_clients(std::vector<struct client> &clients)
+{
+	for (std::vector<struct client>::iterator it = clients.begin(); it != clients.end(); ++it)
+		if (it->fd > 0)
+			close(it->fd);
+	clients.clear();
+}
+
 struct client	create_client(int server_fd, Poll &poll_fds)
 {
 	struct client cli;
@@ -71,16 +79,16 @@ void	handler(__attribute__((unused))int dunmmy)
 
 void launch_server(ConfigFile config, Poll poll_fds)
 {
-	unsigned int *server_fd = list_server_fd(poll_fds);
+	int				pos, status, bytes;
+	std::vector<struct client>	clients;
+	unsigned int			*server_fd = list_server_fd(poll_fds);
 	if (server_fd == NULL)
 		return;
-	std::vector<struct client> clients;
-	int	pos, status;
 
 	while (run)
 	{
 		if ( (status = poll_fds.call_to_poll()) < 0)
-			return (free(server_fd), perror("poll"));
+			return (free(server_fd), close_clients(clients), perror("poll"));
 /*		else if (status == 0) // selon la doc on devrait jamais avoir  ca
 		{
 			std::cout << "Status == 0 in poll !!" << std::endl;
@@ -95,14 +103,11 @@ void launch_server(ConfigFile config, Poll poll_fds)
 					clients.push_back(create_client(server_fd[status], poll_fds));
 				else
 				{
-					try {
-						read_recv_data(i, &poll_fds, clients[pos]);
-						if (is_rq_finished(clients[pos].rq.getRaw()))
-							clients[pos].await_response = true;
-					}
-					catch (const std::exception & e) {
+					bytes = read_recv_data(i, &poll_fds, clients[pos]);
+					if (bytes <= 0)
 						deco_client(clients, &poll_fds, i);
-					}
+					else if (is_rq_finished(clients[pos].rq.getRaw()))
+						clients[pos].await_response = true;
 				}
 			}
 			else if (poll_fds.getFds(i).revents & POLLOUT && pos > -1 && clients[pos].await_response == true)
@@ -115,10 +120,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 		}
 	}
 	free(server_fd);
-	for (std::vector<struct client>::iterator it = clients.begin(); it != clients.end(); ++it)
-		if (it->fd > 0)
-			close(it->fd);
-	clients.clear();
+	close_clients(clients);
 }
 
 int verif_host(ConfigFile config, int i)
@@ -129,7 +131,7 @@ int verif_host(ConfigFile config, int i)
 	return (0);
 }
 
-int main(int ac, char **av, __attribute__((unused))char **env)
+int main(int ac, char **av)
 {
 	signal(SIGINT, handler);
 
