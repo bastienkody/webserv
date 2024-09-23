@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 13:31:57 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/07 13:48:39 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/23 17:26:26 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,30 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 	std::string ext;
 	
 	if (path.find('.') == std::string::npos)
+	{
+		std::cerr<< "BLABLA 1"<<std::endl;
 		return 0;
+	}
 	ext = &path[path.rfind('.')];
 	std::vector<std::string> cgi_ext = find_vector_data(serv, index_loc, "cgi_ext");
 	if (cgi_ext.size() == 0)
+	{
+		std::cerr<< "BLABLA 2"<<std::endl;
 		return (0);
+	}
 	for (std::vector<std::string>::iterator it = cgi_ext.begin(); it != cgi_ext.end(); it++)
 	{
 		if (*it == ext)
+		{
+			std::cerr<< "BLABLA 3"<<std::endl;
 			return (1);
+		}
 	}
+	std::cerr<< "BLABLA 4"<<std::endl;
 	return (0);
 }
+
+/*CHECK CGI EXT RENVOIE PLUS BONNE VALEUR ?????*/
 
 Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {

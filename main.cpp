@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/20 19:18:05 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/23 15:41:41 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void launch_server(ConfigFile config, Poll poll_fds)
 	// proteger le retour malloc de 0???
 	std::vector<struct client> clients;
 	int	pos;
-	int nb_serv = poll_fds.getCount();
+	// int nb_serv = poll_fds.getCount();
 
 	while (run)
 	{

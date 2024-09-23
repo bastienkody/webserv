@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/20 00:20:06 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/23 17:39:23 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ int find_location(const std::string path, Server serv)
 		if (serv.getLocations()[i].getIsPathAbsolute() == true && path == serv.getLocations()[i].getPath())
 				return i;
 	// non absolute : perfect or longest match
+	std::cerr<< "find location path : " << path <<std::endl;
 	for(size_t i = 0; i < serv.getLocations().size(); i++)
 	{
 		std::string loc_path = serv.getLocations()[i].getPath();
@@ -199,10 +200,12 @@ std::vector<std::string> find_vector_data(Server serv, int index_loc, std::strin
 						return (serv.getAllowMethods());
 					break ;
 				case 1:
+				std::cout<< "index loc : " << index_loc<<std::endl;
+				// std::cout<< serv.getLocations()[index_loc].getCgiExt()[0]<<std::endl;
 					if (index_loc > -1 && serv.getLocations()[index_loc].getCgiExt().size() != 0)
-						return (serv.getLocations()[index_loc].getCgiExt());
+						return (std::cerr<< "SPEOIFUHSEFOH"<<std::endl, serv.getLocations()[index_loc].getCgiExt());
 					else if (serv.getCgiExt().size() != 0)
-						return (serv.getCgiExt());
+						return (std::cerr<< "VDPMRJGHRDMOG"<<std::endl, serv.getCgiExt());
 					break ;
 				case 2:
 					if (index_loc > -1 && serv.getLocations()[index_loc].getCgiPathes().size() != 0)
@@ -214,6 +217,7 @@ std::vector<std::string> find_vector_data(Server serv, int index_loc, std::strin
 			}
 		}
 	}
+	std::cerr<< "VÖXIHVEÖRIF"<<std::endl;
 	return (std::vector<std::string>());
 }
 
