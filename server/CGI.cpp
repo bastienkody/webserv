@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/20 13:48:43 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/23 18:12:29 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,11 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	char **av = create_av();
 	(void) path;
 	/*check premiere ligne script ???*/
-	// execve(path.c_str(), av, env);
+	std::cerr<< "cgi path : " << path.c_str() << std::endl;
+	execve(path.c_str(), av, env);
 	free_tab(env);
 	free_tab(av);
+	std::cerr<< errno<<std::endl;
 	perror("Execve");
 	exit(-1);
 }
