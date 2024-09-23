@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 15:02:59 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/23 18:27:05 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/23 18:39:25 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,6 +157,7 @@ int main(int ac, char **av, __attribute__((unused))char **env)
 			return poll_fds.end_close_fd(), 1;
 		try {
 			poll_fds.add_to_poll(fd);
+			poll_fds.setNBserv(poll_fds.getNBserv() + 1);
 			config.setServerFd(fd, i);
 		}
 		catch (const std::exception &e) {

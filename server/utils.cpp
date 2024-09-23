@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/23 18:24:56 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/23 18:39:33 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ int find_location(const std::string path, Server serv)
 		if (serv.getLocations()[i].getIsPathAbsolute() == true && path == serv.getLocations()[i].getPath())
 				return i;
 	// non absolute : perfect or longest match
-	std::cerr<< "find location path : " << path <<std::endl;
 	for(size_t i = 0; i < serv.getLocations().size(); i++)
 	{
 		std::string loc_path = serv.getLocations()[i].getPath();
