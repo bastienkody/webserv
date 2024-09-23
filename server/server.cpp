@@ -59,7 +59,7 @@ size_t read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct clien
 		if (DEBUGP) {std::cout<< "[Server] Connexion with " << poll_fds->getFds(i).fd << " is closed."<<std::endl;}
 		throw std::runtime_error("connection closed");
 	}
-	if (DEBUGP) {std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff  << std::endl;}
+	//if (DEBUGP) {std::cout<< "[Client "<< poll_fds->getFds(i).fd<< "] " << buff  << std::endl;}
 
 	co.rq.appendRaw(buff, nb_bytes);
 	return nb_bytes;
@@ -68,7 +68,7 @@ size_t read_recv_data(int i, Poll *poll_fds, __attribute__((unused))struct clien
 int	send_response(struct client &co, ConfigFile config)
 {
 	co.rq.parse();
-	co.rq.print();
+	//co.rq.print();
 
 	int	code;
 	int	index_serv = config.getServerFromFd(co.server_fd);
@@ -76,12 +76,8 @@ int	send_response(struct client &co, ConfigFile config)
 
 	//std::cout << "servnb:" << index_serv << ", locnb:" << index_loc << std::endl;
 
-	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq, config.getServers()[index_serv])) != 0)
-	{
-		if (DEBUGP) {std::cout << "check basics error" << std::endl;}
 		co.rp = exec_rq_error(co.rq, config, code, index_serv, index_loc);
-	}
 	else if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, find_str_data(config.getServers()[index_serv], index_loc, "body_size"))) != 1)
 	{
 		if (code == 413 || code == 400)
@@ -100,9 +96,9 @@ int	send_response(struct client &co, ConfigFile config)
 	else
 		co.rp = exec_rq(co.rq, config, index_serv, index_loc);
 
-	std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
+	//std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
 	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
-	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) < 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
+	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) <= 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
 
 /* Fonction qui tej les clients a appeler si count>255 */

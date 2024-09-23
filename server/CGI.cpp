@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/20 19:17:18 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/23 18:27:40 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,18 +78,11 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	char **env = create_env();
 	char **av = create_av();
 	/*check premiere ligne script ???*/
-	// std::cerr<< "\npath execve : " << path.c_str()<<std::endl;
-	// int i = -1;
-	// while (av[++i])
-	// 	std::cerr<< "av : " << av[i]<<std::endl;
-	// i = -1;
-	// while (env[++i])
-	// 	std::cerr<< "env : " << env[i]<<std::endl;
-	// std::cerr<<std::endl;
+	std::cerr<< "cgi path : " << path.c_str() << std::endl;
 	execve(path.c_str(), av, env);
 	free_tab(env);
 	free_tab(av);
-	std::cerr<< "errno : " << errno<<std::endl;
+	std::cerr<< errno<<std::endl;
 	perror("Execve");
 	std::exit(-1);
 }

@@ -54,7 +54,7 @@ void	Request::parse()
 
 		std::string key = line.substr(0, line.find(':'));
 		std::string	value = ParserUtils::trimOWS(line.substr(line.find(':') + 1, line.size() - 1));
-		std::cout << "line=" + line + "|store=" + key + "-->" + value << std::endl;
+		//std::cout << "line=" + line + "|store=" + key + "-->" + value << std::endl;
 		_header.insert(std::pair<std::string, std::string>(key, value));
 	}
 	_body = _raw;

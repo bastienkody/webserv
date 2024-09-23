@@ -4,7 +4,8 @@
 - depuis accept new connection (pour l'instant ca quitte sans leak ni pb)
 
 	REDIRECTION POST AND DELETE
-- a decider
+- a decider 
+	--> ok, 301/302 sans effectuer l'action
 
 	REQUEST CHECKING / parsing
 - host header must be accurate : ip or ip+port or name or name+port
@@ -22,6 +23,7 @@
 
 	RQ_DIR
 - href de create dir des sous dossiers/fichiers pb
+	--> ok via user_path 
 
 	LIST_SERV_FD / CHECK_SERV_SOCK
 - invalid read lie a l'init?
@@ -41,3 +43,10 @@
 	--> ok
 - server with no location
 	--> ok on return 404
+
+	TRY CATCH EXEC_RQ
+- utile?
+	--> nope, supp
+
+	CGI PATHES
+- a virer de configfile.cpp +
