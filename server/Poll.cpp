@@ -36,7 +36,7 @@ void	Poll::end_close_fd(void)
 
 void	Poll::add_to_poll(int new_fd)
 {
-	if (this->_count >= 256) 
+	if (this->_count >= 256)
 		remove_to_poll(_nb_serv);
 	memset(&_fds[_count], 0, sizeof(struct pollfd));
 	_fds[_count].fd = new_fd;
@@ -46,6 +46,8 @@ void	Poll::add_to_poll(int new_fd)
 
 void	Poll::remove_to_poll(int i)
 {
+	if (_fds[i].fd > 0)
+		close(_fds[i].fd);
 	if (_count > 1)
 	{
 		for(int y = i; y < _count - 1; y++)
