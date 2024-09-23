@@ -51,6 +51,8 @@ bool	RequestChecking::CheckHost(const std::string & field, const Server & serv)
 {
 	if (field == serv.getIp() || field == std::string(serv.getIp() + ':' + serv.getPortSTR()))
 		return true;
+	if (serv.getIp() == "127.0.0.1" && (field == "localhost" || field == "localhost:" + serv.getPortSTR()) )
+		return true;
 	for (std::vector<std::string>::const_iterator it = serv.getNames().begin(); it != serv.getNames().end(); ++it)
 		if (ParserUtils::compCaseInsensitive(field, *it) == true || ParserUtils::compCaseInsensitive(field, *it + ':' + serv.getPortSTR()))
 			return true;

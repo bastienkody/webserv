@@ -3,10 +3,7 @@
 #include <stdexcept>
 
 //	constructors + copy
-ConfigFile::ConfigFile()
-{
-	_root = "./"; // si pas de root set, nginx sert son default file at /var/www/html. on sert le dossier courant
-}
+ConfigFile::ConfigFile() {}
 ConfigFile::~ConfigFile()
 {
 	_filename.clear();
@@ -85,6 +82,22 @@ void	ConfigFile::readAllInfos()
 		else
 			throw std::invalid_argument("Bad config line: " + rawLine);
 	}
+
+	// check basics
+	if (_servers.size() == 0)
+		throw std::invalid_argument("Please provide at least one server in configfile");
+	for (std::vector<Server>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+	{
+		if (it->_root.size() == 0)
+		{
+			for (std::vector<Location>::const_iterator lit = it->getLocations().begin(); lit != it->getLocations().end(); ++lit)
+				if (lit->_root.size() == 0)
+					throw std::invalid_argument("Missing root directive (not in server nor in loc) for loc " + lit->getPath());
+			// does not work
+		}
+	}
+
+
 }
 
 //	Config specific getters
