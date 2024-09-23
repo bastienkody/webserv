@@ -46,6 +46,7 @@
 
 	TRY CATCH EXEC_RQ
 - utile?
+	--> nope, supp
 
 	CGI PATHES
 - a virer de configfile.cpp +

@@ -20,7 +20,6 @@ void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int
 {
 	std::string	tmp, buff, type;
 	int		status = check_file(path, 1);
-	int		count = 0;
 	if (status > 0)
 	{
 		*rp = exec_rq_error(rq, config, 404, index_serv, index_loc);
@@ -38,7 +37,6 @@ void	get_html(Response *rp, Request rq, std::string path, ConfigFile config, int
 			buff.append(tmp + '\n');
 		else
 			buff.append(tmp);
-		count++;
 	}
 	rp->setLineState(200);
 	rp->setHeader(rq, config, index_serv, index_loc);
@@ -55,7 +53,7 @@ void	post_html(Response *rp, Request rq, std::string path, ConfigFile config, in
 		return ;
 	}
 	DIR *dir_test = NULL;
-	std::string	last_dir(path.substr(0, path.rfind('/') + 1)); // if url ends with a dir but no '/', catch just above !
+	std::string	last_dir(path.substr(0, path.rfind('/') + 1)); // if url a dir but ends not with '/', catch just above !
 	if ( (dir_test = opendir(last_dir.c_str())) == NULL )
 	{
 		//std::cout<<"lastdir:"+last_dir<<std::endl;

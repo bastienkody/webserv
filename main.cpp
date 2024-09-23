@@ -79,7 +79,6 @@ void launch_server(ConfigFile config, Poll poll_fds)
 
 	while (run)
 	{
-	;
 		if ( (status = poll_fds.call_to_poll()) < 0)
 			return (free(server_fd), perror("poll"));
 /*		else if (status == 0) // selon la doc on devrait jamais avoir  ca

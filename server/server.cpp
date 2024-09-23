@@ -76,12 +76,8 @@ int	send_response(struct client &co, ConfigFile config)
 
 	//std::cout << "servnb:" << index_serv << ", locnb:" << index_loc << std::endl;
 
-	//First check syntax, verb, version, host header present and headerfield syntax
 	if ((code = RequestChecking::CheckBasics(co.rq, config.getServers()[index_serv])) != 0)
-	{
-		//if (DEBUGP) {std::cout << "check basics error" << std::endl;}
 		co.rp = exec_rq_error(co.rq, config, code, index_serv, index_loc);
-	}
 	else if (co.rq.getRql().getVerb().compare("POST") == 0 && (code = RequestChecking::CheckRequiredHeaderPOST(co.rq, find_str_data(config.getServers()[index_serv], index_loc, "body_size"))) != 1)
 	{
 		if (code == 413 || code == 400)
