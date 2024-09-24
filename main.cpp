@@ -34,24 +34,6 @@ unsigned int *list_server_fd(Poll poll_fds)
 	return (dest);
 }
 
-void deco_client(std::vector<struct client> &clients, Poll *poll_fds, int i)
-{
-	int offset = find_client(clients, poll_fds->getFds(i).fd);
-	if (DEBUGP) {std::cout << "[Client" << poll_fds->getFds(i).fd << "] to be deco" << std::endl;}
-	if (offset > -1)
-		clients.erase(clients.begin() + offset);
-	close(poll_fds->getFds(i).fd);
-	poll_fds->remove_to_poll(i);
-}
-
-void	close_clients(std::vector<struct client> &clients)
-{
-	for (std::vector<struct client>::iterator it = clients.begin(); it != clients.end(); ++it)
-		if (it->fd > 0)
-			close(it->fd);
-	clients.clear();
-}
-
 struct client	create_client(int server_fd, Poll &poll_fds)
 {
 	struct client cli;
@@ -61,13 +43,6 @@ struct client	create_client(int server_fd, Poll &poll_fds)
 	cli.server_fd = server_fd;
 	cli.await_response = false;
 	return cli;
-}
-
-void	clear_client(struct client &cli)
-{
-	cli.await_response = false;
-	cli.rp = Response();
-	cli.rq = Request();
 }
 
 void	handler(__attribute__((unused))int dunmmy)
@@ -143,8 +118,6 @@ int main(int ac, char **av)
 		config.openReadFileToStr();
 		config.readAllInfos();
 		//config.printAll();
-		if (config.getServers().size() == 0)
-			return std::cerr<<"No server in config file"<<std::endl, 1;
 	}
 	catch (const std::exception &e) {
 		return std::cerr << e.what() << std::endl, 1;

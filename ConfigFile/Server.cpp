@@ -2,7 +2,7 @@
 #include"Location.hpp"
 
 //	constructors + copy
-Server::Server(): _ip("0.0.0.0"), _port(8080), _portSTR("8080")	{}
+Server::Server(): _ip("127.0.0.1"), _port(8080), _portSTR("8080")	{}
 Server::~Server()
 {
 	_names.clear();

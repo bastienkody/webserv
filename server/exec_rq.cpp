@@ -24,26 +24,14 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 	std::string ext;
 	
 	if (path.find('.') == std::string::npos)
-	{
-		std::cerr<< "BLABLA 1"<<std::endl;
 		return 0;
-	}
 	ext = &path[path.rfind('.')];
 	std::vector<std::string> cgi_ext = find_vector_data(serv, index_loc, "cgi_ext");
 	if (cgi_ext.size() == 0)
-	{
-		std::cerr<< "BLABLA 2"<<std::endl;
 		return (0);
-	}
 	for (std::vector<std::string>::iterator it = cgi_ext.begin(); it != cgi_ext.end(); it++)
-	{
 		if (*it == ext)
-		{
-			std::cerr<< "BLABLA 3"<<std::endl;
 			return (1);
-		}
-	}
-	std::cerr<< "BLABLA 4"<<std::endl;
 	return (0);
 }
 

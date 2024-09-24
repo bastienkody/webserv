@@ -216,7 +216,6 @@ std::vector<std::string> find_vector_data(Server serv, int index_loc, std::strin
 			}
 		}
 	}
-	std::cerr<< "VÖXIHVEÖRIF"<<std::endl;
 	return (std::vector<std::string>());
 }
 
