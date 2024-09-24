@@ -23,7 +23,7 @@
 #include <iostream>
 #include <sys/socket.h> /*socket, listen, bind, accept...*/
 #include <arpa/inet.h> /*inet_pton et inet_ntop  (transforme ip en chaine de caracteres et inversement)*/
-#include <string.h> /*memset*/
+#include <cstring> /*memset*/
 #include <netdb.h> /*struc addrinfo*/
 #include <unistd.h> /*fcntl*/
 #include <fcntl.h> /*fcntl*/

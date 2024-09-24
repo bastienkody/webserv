@@ -46,7 +46,7 @@ size_t read_recv_data(int i, Poll *poll_fds, struct client &co)
 	int nb_bytes;
 	char buff [4096];
 	
-	memset(&buff, 0, sizeof(buff));
+	std::memset(&buff, 0, sizeof(buff));
 	nb_bytes = recv(poll_fds->getFds(i).fd, &buff, 4095, 0);
 	if (nb_bytes <= 0)
 	{

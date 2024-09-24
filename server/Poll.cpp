@@ -23,8 +23,6 @@ Poll::Poll(void)
 
 Poll::~Poll(void)
 {
-	//for (int i = 0; i < _count; ++i)
-		//close(_fds[i].fd);
 }
 
 void	Poll::end_close_fd(void)
@@ -38,7 +36,7 @@ void	Poll::add_to_poll(int new_fd)
 {
 	if (this->_count >= 256)
 		remove_to_poll(_nb_serv);
-	memset(&_fds[_count], 0, sizeof(struct pollfd));
+	std::memset(&_fds[_count], 0, sizeof(struct pollfd));
 	_fds[_count].fd = new_fd;
 	_fds[_count].events = POLLIN | POLLOUT;
 	this->_count += 1;
@@ -54,10 +52,10 @@ void	Poll::remove_to_poll(int i)
 		{
 			_fds[y] = _fds[y + 1];
 		}
-		memset(&_fds[_count - 1], 0, sizeof(struct pollfd));
+		std::memset(&_fds[_count - 1], 0, sizeof(struct pollfd));
 	}
 	else
-		memset(&_fds[i], 0, sizeof(struct pollfd));
+		std::memset(&_fds[i], 0, sizeof(struct pollfd));
 	_count--;
 }
 
