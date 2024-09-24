@@ -46,7 +46,6 @@ Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 		return exec_rq_error(rq, config, 404, index_serv, index_loc);
 
 	std::string path = concatenate_root_path(rq, config, index_serv, index_loc);
-	std::cout<<"Rooted path:"+path<<std::endl;
 	if (path.find("/..") != std::string::npos)
 		return std::cerr<<"Security protection: deny any \"../\" in URL"<<std::endl, exec_rq_error(rq, config, 400, index_serv, index_loc);
 

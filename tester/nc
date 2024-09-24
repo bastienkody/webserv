@@ -1,2 +1,0 @@
-echo -e "POST /res.html HTTP/1.1\r\nHost:127.0.0.1\r\nContent-Length:5\r\n\r\nfhsfg" | nc 127.0.0.1 8080
-

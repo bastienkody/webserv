@@ -99,14 +99,11 @@ int	send_response(struct client &co, ConfigFile config)
 	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) <= 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
 
-/* Fonction qui tej les clients a appeler si count>255 */
 int	accept_new_connection(int server_fd, Poll *poll_fds)
 {
 	int client_fd = accept(server_fd, NULL, NULL);
 	if (client_fd < 0)
-		return (std::cerr<<"serverfd:"<<server_fd<<std::endl,perror("accept"), -1);
-	if (poll_fds->getCount() > 255)
-		return (std::cerr<<"poll_fds._count>255 in accept new connection"<<std::endl, close(client_fd), -1);
+		return perror("accept"), -1;
 	poll_fds->add_to_poll(client_fd);
 	if (DEBUGP) {std::cout<< "[Server] New connexion with client fd : " << poll_fds->getFds(poll_fds->getCount() - 1).fd<<std::endl;}
 	return client_fd;
