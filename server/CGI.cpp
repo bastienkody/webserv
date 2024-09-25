@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/23 18:27:40 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/25 17:05:50 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,14 +50,7 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 		*_rp = exec_rq_error(_rq, _config, 404, _index_serv, _index_loc);
 		return ;
 	}
-	status = pipe(pipe_fd);
-	if (status == -1)
-	{
-		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
-		return ;
-	}
-	status = fork();
-	if (status == -1)
+	if (pipe(pipe_fd) == -1 || (status = fork()) == -1)
 	{
 		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 		return ;
@@ -77,7 +70,6 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	
 	char **env = create_env();
 	char **av = create_av();
-	/*check premiere ligne script ???*/
 	std::cerr<< "cgi path : " << path.c_str() << std::endl;
 	execve(path.c_str(), av, env);
 	free_tab(env);
@@ -95,7 +87,7 @@ int	wait_son(int *pipe_fd, int pid)
 	while (st_wait == 0)
 	{
 		st_wait = waitpid(pid, &status, WNOHANG);
-		if ((WIFEXITED(status) == true && WEXITSTATUS(status) != 0) || s_time + 2 < (long) std::time(0))
+		if ((WIFEXITED(status) == true && WEXITSTATUS(status) != 0) || s_time + 10 < (long) std::time(0))
 		{
 			std::cerr<< "Error CGI : code retour script != 0"<<std::endl;
 			kill(pid, 9);
@@ -115,7 +107,6 @@ int	wait_son(int *pipe_fd, int pid)
 	return (0);
 }
 
-/*definir limite pour reponse body*/
 void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 {
 	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
@@ -127,13 +118,17 @@ void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 	char *buff;
 	buff = (char *) malloc(sizeof(char) * (4095 + 1));
 	if (!buff)
+	{
+		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 		return ;
+	}
 	for (int i = 0; i < 4095; i++)
 		buff[i] = '\0';
-	dup2(pipe_fd[0], STDIN_FILENO);
-	int status = read(pipe_fd[0], buff, 4095);
-	if (status == -1)
+	if (dup2(pipe_fd[0], STDIN_FILENO) == -1 || read(pipe_fd[0], buff, 4095) == -1)
+	{
+		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 		return ;
+	} 
 	this->getRp()->setLineState(201);
 	this->getRp()->setHeader(_rq, _config, _index_serv, _index_loc);
 	this->getRp()->setLocation(path);
@@ -174,15 +169,14 @@ char	**CGI::create_env()
 		i++;
 	}
 	env[i] = NULL;
-	
-	// std::cerr<< "env :"<<std::endl;
-	// i = 0;
-	// while (env[i] != NULL)
-	// {
-	// 	std::cerr<< "\t" << env[i]<<std::endl;
-	// 	i++;
-	// }
-	// std::cerr<< "\n";
+	std::cerr<< "env :"<<std::endl;
+	i = 0;
+	while (env[i] != NULL)
+	{
+		std::cerr<< "\t" << env[i]<<std::endl;
+		i++;
+	}
+	std::cerr<< "\n";
 	return (env);
 }
 

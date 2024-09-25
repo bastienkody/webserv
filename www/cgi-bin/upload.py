@@ -22,7 +22,6 @@ def save_uploaded_file():
 
     # Récupérer le fichier envoyé
     fileitem = form['file']
-    # print(fileitem)
 
     # Vérifier si un fichier a été sélectionné
     if not fileitem.filename:
@@ -39,14 +38,12 @@ def save_uploaded_file():
     try:
         file_data = fileitem.file.read()
         data_length = len(file_data)
-        # print(f"<p>Debug : Nombre d'octets lus : {data_length}</p>")
 
         # Écrire le contenu dans le fichier
         with open(filepath, 'wb') as f:
             bytes_written = f.write(file_data)
-        # print(f"<p>Debug : Nombre d'octets ecrits : {bytes_written}</p>")
         print("<h1>Success</h1>")
-        print(f"<p>File '{filename}' successfully uploaded to {UPLOAD_FOLDER}</p>")
+        print(f"<p>File '{filename}' successfully uploaded to /cgi-bin/upload/</p>")
     except Exception as e:
         print("<h1>Error</h1>")
         print(f"<p>Failed to upload file: {str(e)}</p>")

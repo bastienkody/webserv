@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:48:42 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/23 18:39:33 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/25 14:53:59 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,12 +199,10 @@ std::vector<std::string> find_vector_data(Server serv, int index_loc, std::strin
 						return (serv.getAllowMethods());
 					break ;
 				case 1:
-				std::cout<< "index loc : " << index_loc<<std::endl;
-				// std::cout<< serv.getLocations()[index_loc].getCgiExt()[0]<<std::endl;
 					if (index_loc > -1 && serv.getLocations()[index_loc].getCgiExt().size() != 0)
-						return (std::cerr<< "SPEOIFUHSEFOH"<<std::endl, serv.getLocations()[index_loc].getCgiExt());
+						return (serv.getLocations()[index_loc].getCgiExt());
 					else if (serv.getCgiExt().size() != 0)
-						return (std::cerr<< "VDPMRJGHRDMOG"<<std::endl, serv.getCgiExt());
+						return (serv.getCgiExt());
 					break ;
 				case 2:
 					if (index_loc > -1 && serv.getLocations()[index_loc].getCgiPathes().size() != 0)

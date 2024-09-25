@@ -22,6 +22,10 @@ calcul = form.getvalue('calcul')
 # while (1):
 # 	a = 1
 
+if calcul == None :
+	print(html)
+	exit(0)
+
 size = len(calcul)
 for i in range (1, size) :
 	if (calcul[i] == '+' or calcul[i] == '-' or calcul[i] == '*' or calcul[i] == '/') :
