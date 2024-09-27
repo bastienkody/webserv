@@ -13,7 +13,6 @@
 #include "../include/CGI.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/server.hpp"
-#include <errno.h>
 
 CGI::CGI(void){}
 CGI::~CGI(void){}
@@ -58,7 +57,7 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	else if (status == 0)
 		this->exec_son(pipe_fd, path);
 	else
-		this->exec_father(pipe_fd, path, status);
+		this->exec_father(pipe_fd, status);
 }
 
 void	CGI::exec_son(int *pipe_fd, std::string path)
@@ -70,11 +69,11 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	
 	char **env = create_env();
 	char **av = create_av();
-	std::cerr<< "cgi path : " << path.c_str() << std::endl;
+	//std::cerr<< "cgi path : " << path.c_str() << std::endl;
 	execve(path.c_str(), av, env);
 	free_tab(env);
 	free_tab(av);
-	std::cerr<< errno<<std::endl;
+	//std::cerr<< errno<<std::endl;
 	perror("Execve");
 	std::exit(-1);
 }
@@ -89,7 +88,7 @@ int	CGI::wait_son(int *pipe_fd, int pid)
 		st_wait = waitpid(pid, &status, WNOHANG);
 		if ((WIFEXITED(status) == true && WEXITSTATUS(status) != 0) || s_time + 10 < (long) std::time(0))
 		{
-			std::cerr<< "Error CGI : code retour script != 0"<<std::endl;
+			//std::cerr<< "Error CGI : code retour script != 0"<<std::endl;
 			kill(pid, 9);
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
@@ -97,7 +96,7 @@ int	CGI::wait_son(int *pipe_fd, int pid)
 		}
 		if (st_wait == -1)
 		{
-			std::cerr<< "Error CGI : waitpid failed"<<std::endl;
+			//std::cerr<< "Error CGI : waitpid failed"<<std::endl;
 			kill(pid, 9);
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
@@ -124,9 +123,8 @@ void	CGI::create_response(char *buff)
 	this->getRp()->setBody(buff, "html");
 }
 
-void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
+void	CGI::exec_father(int *pipe_fd, int pid)
 {
-	(void) path;
 	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
 	if (wait_son(pipe_fd, pid) == -1)
 	{
@@ -146,7 +144,7 @@ void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 	{
 		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 		return ;
-	} 
+	}
 	create_response(buff);
 	free(buff);
 	close(pipe_fd[0]);
@@ -184,14 +182,14 @@ char	**CGI::create_env()
 		i++;
 	}
 	env[i] = NULL;
-	std::cerr<< "env :"<<std::endl;
+	//std::cerr<< "env :"<<std::endl;
 	i = 0;
 	while (env[i] != NULL)
 	{
-		std::cerr<< "\t" << env[i]<<std::endl;
+		//std::cerr<< "\t" << env[i]<<std::endl;
 		i++;
 	}
-	std::cerr<< "\n";
+	//std::cerr<< "\n";
 	return (env);
 }
 

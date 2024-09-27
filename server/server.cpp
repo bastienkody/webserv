@@ -29,7 +29,7 @@ int create_socket_server(Server serv)
 	if ( (server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		return (perror("socket"), -1);
 	// set options
-	fcntl(server_fd, F_SETFL, O_NONBLOCK); /*je vois pas encore de diff avec et sans*/
+	fcntl(server_fd, F_SETFL, O_NONBLOCK);
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &flag_true, sizeof(flag_true)) != 0)
 		return (perror("setsockopt"), -1);
 	// make it listen on port

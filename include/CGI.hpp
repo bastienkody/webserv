@@ -33,7 +33,7 @@ class CGI
 		int			  wait_son(int *pipe_fd, int pid);
 		void		  create_response(char *buff);
 		void		  exec_son(int *pipe_fd, std::string path);
-		void		  exec_father(int *pipe_fd, std::string path, int pid);
+		void		  exec_father(int *pipe_fd, int pid);
 		void		  init_env();
 
 		Response							*getRp() const;
