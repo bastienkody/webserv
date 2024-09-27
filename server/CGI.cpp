@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/27 15:56:34 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/27 16:17:33 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ CGI::CGI(Response *rp, Request rq, ConfigFile config, int index_serv, int index_
 	else if (status == 0)
 		this->exec_son(pipe_fd, path);
 	else
-		this->exec_father(pipe_fd, path, status);
+		this->exec_father(pipe_fd, status);
 }
 
 void	CGI::exec_son(int *pipe_fd, std::string path)
@@ -124,9 +124,8 @@ void	CGI::create_response(char *buff)
 	this->getRp()->setBody(buff, "html");
 }
 
-void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
+void	CGI::exec_father(int *pipe_fd, int pid)
 {
-	(void) path;
 	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
 	if (wait_son(pipe_fd, pid) == -1)
 	{
@@ -146,7 +145,8 @@ void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 	{
 		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 		return ;
-	} 
+	}
+
 	create_response(buff);
 	free(buff);
 	close(pipe_fd[0]);

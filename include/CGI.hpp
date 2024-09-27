@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:30:22 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/27 15:48:34 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/27 16:17:49 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class CGI
 		int			  wait_son(int *pipe_fd, int pid);
 		void		  create_response(char *buff);
 		void		  exec_son(int *pipe_fd, std::string path);
-		void		  exec_father(int *pipe_fd, std::string path, int pid);
+		void		  exec_father(int *pipe_fd, int pid);
 		void		  init_env();
 
 		Response							*getRp() const;
