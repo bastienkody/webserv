@@ -15,8 +15,6 @@
 #include "../ConfigFile/Server.hpp"
 
 
-/*creer check dir -> return 0 si pas un dir*/
-
 int	check_file(std::string path, int mode)
 {
 	if (access(path.c_str(), F_OK) == -1)
@@ -28,7 +26,6 @@ int	check_file(std::string path, int mode)
 	return (0);
 }
 
-// if redirected, mod dest_url to redirected URL and returns 301/302, else 0
 int	is_url_redirected(const std::string og_url, std::string &dest_url, Server serv, int index_loc)
 {
 	std::map<std::string, struct rewrite> redirections = find_redirections(serv, index_loc);

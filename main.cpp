@@ -64,11 +64,6 @@ void launch_server(ConfigFile config, Poll poll_fds)
 	{
 		if ( (status = poll_fds.call_to_poll()) < 0)
 			return (free(server_fd), close_clients(clients), perror("poll"));
-/*		else if (status == 0) // selon la doc on devrait jamais avoir  ca
-		{
-			std::cout << "Status == 0 in poll !!" << std::endl;
-			continue;
-		}*/
 		for (int i = 0; i < poll_fds.getCount(); i++)
 		{
 			pos = find_client(clients, poll_fds.getFds(i).fd);

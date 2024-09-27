@@ -6,14 +6,13 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/27 16:17:33 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/27 20:16:58 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/CGI.hpp"
 #include "../ConfigFile/ConfigFile.hpp"
 #include "../include/server.hpp"
-#include <errno.h>
 
 CGI::CGI(void){}
 CGI::~CGI(void){}
@@ -70,11 +69,11 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	
 	char **env = create_env();
 	char **av = create_av();
-	std::cerr<< "cgi path : " << path.c_str() << std::endl;
+	//std::cerr<< "cgi path : " << path.c_str() << std::endl;
 	execve(path.c_str(), av, env);
 	free_tab(env);
 	free_tab(av);
-	std::cerr<< errno<<std::endl;
+	//std::cerr<< errno<<std::endl;
 	perror("Execve");
 	std::exit(-1);
 }
@@ -89,7 +88,7 @@ int	CGI::wait_son(int *pipe_fd, int pid)
 		st_wait = waitpid(pid, &status, WNOHANG);
 		if ((WIFEXITED(status) == true && WEXITSTATUS(status) != 0) || s_time + 10 < (long) std::time(0))
 		{
-			std::cerr<< "Error CGI : code retour script != 0"<<std::endl;
+			//std::cerr<< "Error CGI : code retour script != 0"<<std::endl;
 			kill(pid, 9);
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
@@ -97,7 +96,7 @@ int	CGI::wait_son(int *pipe_fd, int pid)
 		}
 		if (st_wait == -1)
 		{
-			std::cerr<< "Error CGI : waitpid failed"<<std::endl;
+			//std::cerr<< "Error CGI : waitpid failed"<<std::endl;
 			kill(pid, 9);
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
@@ -146,7 +145,6 @@ void	CGI::exec_father(int *pipe_fd, int pid)
 		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 		return ;
 	}
-
 	create_response(buff);
 	free(buff);
 	close(pipe_fd[0]);
@@ -184,14 +182,14 @@ char	**CGI::create_env()
 		i++;
 	}
 	env[i] = NULL;
-	std::cerr<< "env :"<<std::endl;
+	//std::cerr<< "env :"<<std::endl;
 	i = 0;
 	while (env[i] != NULL)
 	{
-		std::cerr<< "\t" << env[i]<<std::endl;
+		//std::cerr<< "\t" << env[i]<<std::endl;
 		i++;
 	}
-	std::cerr<< "\n";
+	//std::cerr<< "\n";
 	return (env);
 }
 

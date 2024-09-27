@@ -36,7 +36,7 @@
 #include <dirent.h>
 
 /* Debug */
-#define DEBUGP 1
+#define DEBUGP 0
 
 /* Error default pages	*/
 #define DEFAULT_400 "www/error_pages/400_error_default.html"

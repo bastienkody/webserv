@@ -29,7 +29,7 @@ int create_socket_server(Server serv)
 	if ( (server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		return (perror("socket"), -1);
 	// set options
-	fcntl(server_fd, F_SETFL, O_NONBLOCK); /*je vois pas encore de diff avec et sans*/
+	fcntl(server_fd, F_SETFL, O_NONBLOCK);
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &flag_true, sizeof(flag_true)) != 0)
 		return (perror("setsockopt"), -1);
 	// make it listen on port
@@ -94,8 +94,8 @@ int	send_response(struct client &co, ConfigFile config)
 	else
 		co.rp = exec_rq(co.rq, config, index_serv, index_loc);
 
-	std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
-	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
+	//std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
+	//std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
 	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) <= 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
 

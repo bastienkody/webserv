@@ -17,8 +17,6 @@
 #include <dirent.h>
 #include <sstream>
 
-/*ajouter Location obj pour check methods allows*/
-
 int	check_cgi_ext(Server serv, std::string path, int index_loc)
 {
 	std::string ext;
@@ -34,8 +32,6 @@ int	check_cgi_ext(Server serv, std::string path, int index_loc)
 			return (1);
 	return (0);
 }
-
-/*CHECK CGI EXT RENVOIE PLUS BONNE VALEUR ?????*/
 
 Response	exec_rq(Request rq, ConfigFile config, int index_serv, int index_loc)
 {
