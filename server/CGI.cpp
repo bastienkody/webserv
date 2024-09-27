@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 17:50:31 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/25 17:05:50 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/27 15:56:34 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	CGI::exec_son(int *pipe_fd, std::string path)
 	std::exit(-1);
 }
 
-int	wait_son(int *pipe_fd, int pid)
+int	CGI::wait_son(int *pipe_fd, int pid)
 {
 	int status;
 	int st_wait = 0;
@@ -107,8 +107,26 @@ int	wait_son(int *pipe_fd, int pid)
 	return (0);
 }
 
+void	CGI::create_response(char *buff)
+{
+	if (this->getRq().getRql().getUrl().getPath().find("upload.py") < this->getRq().getRql().getUrl().getPath().size())
+	{
+		std::string body = this->getRq().getBody();
+		std::string filename = body.substr(body.find("filename=") + 10, body.size());
+		std::string path = filename.substr(0, filename.find('\n') - 2);
+		
+		this->getRp()->setLineState(201);
+		this->getRp()->setLocation("/cgi-bin/upload/" + path);
+	}
+	else
+		this->getRp()->setLineState(200);
+	this->getRp()->setHeader(_rq, _config, _index_serv, _index_loc);
+	this->getRp()->setBody(buff, "html");
+}
+
 void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 {
+	(void) path;
 	write(pipe_fd[1], _rq.getBody().c_str(), _rq.getBody().size());
 	if (wait_son(pipe_fd, pid) == -1)
 	{
@@ -129,10 +147,7 @@ void	CGI::exec_father(int *pipe_fd, std::string path, int pid)
 		*_rp = exec_rq_error(_rq, _config, 500, _index_serv, _index_loc);
 		return ;
 	} 
-	this->getRp()->setLineState(201);
-	this->getRp()->setHeader(_rq, _config, _index_serv, _index_loc);
-	this->getRp()->setLocation(path);
-	this->getRp()->setBody(buff, "html");
+	create_response(buff);
 	free(buff);
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
