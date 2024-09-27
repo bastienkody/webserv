@@ -55,3 +55,4 @@ print ('<body>')
 print ("<h2> " + calcul + " = %s </h2>" % (res))
 print ('</body>')
 print ('</html>')
+
