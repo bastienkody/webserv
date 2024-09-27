@@ -6,7 +6,7 @@
 /*   By: mmuesser <mmuesser@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 14:46:02 by mmuesser          #+#    #+#             */
-/*   Updated: 2024/09/20 00:20:29 by mmuesser         ###   ########.fr       */
+/*   Updated: 2024/09/27 15:54:06 by mmuesser         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int	send_response(struct client &co, ConfigFile config)
 	else
 		co.rp = exec_rq(co.rq, config, index_serv, index_loc);
 
-	//std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
+	std::cout<< "CO.RP:\n" << co.rp.getWholeResponse()<< "\nEND CO.RP" << "bodysize:" << co.rp.getBody().size() <<std::endl;
 	std::cout << "responding fd:" << co.fd << "(path:" << co.rq.getRql().getUrl() << ')' << std::endl << "#############################################################################" << std::endl;
 	return send(co.fd, co.rp.getWholeResponse().c_str(), co.rp.getWholeResponse().size(), 0) <= 0 ? perror("send"), -1 : 1;// si erreur de send => virer le client sans re essayer de lui repondre.
 }
