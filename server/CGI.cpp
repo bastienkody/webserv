@@ -110,10 +110,11 @@ void	CGI::create_response(char *buff)
 {
 	if (this->getRq().getRql().getUrl().getPath().find("upload.py") < this->getRq().getRql().getUrl().getPath().size())
 	{
-		std::string body = this->getRq().getBody();
-		std::string filename = body.substr(body.find("filename=") + 10, body.size());
-		std::string path = filename.substr(0, filename.find('\n') - 2);
-		
+		std::string path, filename, body = this->getRq().getBody();
+		if (body.find("filename=") != std::string::npos)
+			filename = body.substr(body.find("filename=") + 10, body.size());
+		if (filename.find('\n') > 2)
+			path = filename.substr(0, filename.find('\n') - 2);
 		this->getRp()->setLineState(201);
 		this->getRp()->setLocation("/cgi-bin/upload/" + path);
 	}
